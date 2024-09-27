@@ -12,6 +12,7 @@ TIGER_GEO_NAMES = {
     "county": "county",
     "county_subdivision": "cousub",
     "place": "place",
+    "puma": "puma20",
     "state": "state",
     "tract": "tract",
     "zcta": "zcta520",
