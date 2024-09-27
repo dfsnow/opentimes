@@ -1,0 +1,26 @@
+schema: '2.0'
+stages:
+  fetch_tiger_national_file@2020-state:
+    cmd: python ./src/fetch_tiger.py --year 2020 --geography state
+    deps:
+    - path: ./src/fetch_tiger.py
+      hash: md5
+      md5: 5f242de11f25a96d090151a7d6309ba8
+      size: 2589
+    outs:
+    - path: ./input/tiger/year=2020/geography=state/state.zip
+      hash: md5
+      md5: d952efee7be1afa73e29acfe72c1de36
+      size: 9757887
+  fetch_tiger_national_file@2020-county:
+    cmd: python ./src/fetch_tiger.py --year 2020 --geography county
+    deps:
+    - path: ./src/fetch_tiger.py
+      hash: md5
+      md5: 5f242de11f25a96d090151a7d6309ba8
+      size: 2589
+    outs:
+    - path: ./input/tiger/year=2020/geography=county/county.zip
+      hash: md5
+      md5: 36e1db70ebca5c7a7a8a5119c4064d23
+      size: 80644766

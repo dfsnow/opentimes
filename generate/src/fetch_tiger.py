@@ -51,7 +51,7 @@ def fetch_shapefile(
         remote_file_name = f"tl_{year}_us_{tiger_geo_name}.zip"
     else:
         remote_file_name = f"tl_{year}_{state}_{tiger_geo_name}.zip"
-    url = f"{BASE_URL}{year}/{geography.upper()}/{remote_file_name}"
+    url = f"{BASE_URL}{year}/{tiger_geo_name.upper()}/{remote_file_name}"
     try:
         # Send a GET request to download the file
         response = r.get(url, stream=True)

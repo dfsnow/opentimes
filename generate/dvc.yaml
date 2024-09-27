@@ -1,36 +1,18 @@
 ---
 
-year: &year_arr
-  - 2020
-
-geography: &geography_arr
-  - state
-  - county
-  - county_subdivision
-  - place
-  - puma
-  - tract
-  - block_group
-  - block
-  - zcta
-
-state: &state_arr
-  - 17
-  - 31
-
 stages:
   fetch_tiger_national_file:
     deps:
       - ./src/fetch_tiger.py
     matrix:
-      year: *year_arr
+      year:
+        - 2020
       geography:
         - state
         - county
         - zcta
-    cmd: |
-      ./src/fetch_tiger.py --year ${item.year}
-        --geography ${item.geography}
+    cmd: >-
+      python ./src/fetch_tiger.py --year ${item.year} --geography ${item.geography}
     outs:
       - ./input/tiger/year=${item.year}/geography=${item.geography}/${item.geography}.zip
 
@@ -38,7 +20,8 @@ stages:
     deps:
       - ./src/fetch_tiger.py
     matrix:
-      year: *year_arr
+      year:
+        - 2020
       geography:
         - county_subdivision
         - place
@@ -46,9 +29,10 @@ stages:
         - tract
         - block_group
         - block
-      state: *state_arr
-    cmd: |
-      ./src/fetch_tiger.py --year ${item.year}
-        --geography ${item.geography} --state ${item.state}
+      state:
+        - 17
+        - 31
+    cmd: >-
+      python ./src/fetch_tiger.py --year ${item.year} --geography ${item.geography} --state ${item.state}
     outs:
       - ./input/tiger/year=${item.year}/geography=${item.geography}/state=${item.state}/${item.state}.zip
