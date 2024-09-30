@@ -2,11 +2,6 @@ schema: '2.0'
 stages:
   fetch_tiger_national@2020-state:
     cmd: python ./src/fetch_tiger.py --year 2020 --geography state
-    deps:
-    - path: ./src/fetch_tiger.py
-      hash: md5
-      md5: ac7922c7952aaf62555edf8d7dab253b
-      size: 2562
     params:
       params.yaml:
         input.census.geography.national:
@@ -18,6 +13,7 @@ stages:
         - '2021'
         - '2022'
         - '2023'
+        - '2024'
     outs:
     - path: ./input/tiger/year=2020/geography=state/state.zip
       hash: md5
@@ -25,11 +21,6 @@ stages:
       size: 9757887
   fetch_tiger_national@2020-county:
     cmd: python ./src/fetch_tiger.py --year 2020 --geography county
-    deps:
-    - path: ./src/fetch_tiger.py
-      hash: md5
-      md5: ac7922c7952aaf62555edf8d7dab253b
-      size: 2562
     params:
       params.yaml:
         input.census.geography.national:
@@ -41,8 +32,104 @@ stages:
         - '2021'
         - '2022'
         - '2023'
+        - '2024'
     outs:
     - path: ./input/tiger/year=2020/geography=county/county.zip
       hash: md5
       md5: 36e1db70ebca5c7a7a8a5119c4064d23
       size: 80644766
+  fetch_tiger_national@2020-zcta:
+    cmd: python ./src/fetch_tiger.py --year 2020 --geography zcta
+    params:
+      params.yaml:
+        input.census.geography.national:
+        - state
+        - county
+        - zcta
+        input.year:
+        - '2020'
+        - '2021'
+        - '2022'
+        - '2023'
+        - '2024'
+    outs:
+    - path: ./input/tiger/year=2020/geography=zcta/zcta.zip
+      hash: md5
+      md5: 305da47587d860f21377e544e2053ac6
+      size: 527995578
+  fetch_tiger_national@2021-state:
+    cmd: python ./src/fetch_tiger.py --year 2021 --geography state
+    params:
+      params.yaml:
+        input.census.geography.national:
+        - state
+        - county
+        - zcta
+        input.year:
+        - '2020'
+        - '2021'
+        - '2022'
+        - '2023'
+        - '2024'
+    outs:
+    - path: ./input/tiger/year=2021/geography=state/state.zip
+      hash: md5
+      md5: 7eaf39a65f609660ac98a8cd3e945be8
+      size: 9959018
+  fetch_tiger_national@2021-county:
+    cmd: python ./src/fetch_tiger.py --year 2021 --geography county
+    params:
+      params.yaml:
+        input.census.geography.national:
+        - state
+        - county
+        - zcta
+        input.year:
+        - '2020'
+        - '2021'
+        - '2022'
+        - '2023'
+        - '2024'
+    outs:
+    - path: ./input/tiger/year=2021/geography=county/county.zip
+      hash: md5
+      md5: 6d0d07acb342a206fddfeeedbe8376a5
+      size: 82328531
+  fetch_tiger_national@2021-zcta:
+    cmd: python ./src/fetch_tiger.py --year 2021 --geography zcta
+    params:
+      params.yaml:
+        input.census.geography.national:
+        - state
+        - county
+        - zcta
+        input.year:
+        - '2020'
+        - '2021'
+        - '2022'
+        - '2023'
+        - '2024'
+    outs:
+    - path: ./input/tiger/year=2021/geography=zcta/zcta.zip
+      hash: md5
+      md5: f782cb2ee5f16c4e4c1a3773a99ee5b4
+      size: 527055155
+  fetch_tiger_national@2022-state:
+    cmd: python ./src/fetch_tiger.py --year 2022 --geography state
+    params:
+      params.yaml:
+        input.census.geography.national:
+        - state
+        - county
+        - zcta
+        input.year:
+        - '2020'
+        - '2021'
+        - '2022'
+        - '2023'
+        - '2024'
+    outs:
+    - path: ./input/tiger/year=2022/geography=state/state.zip
+      hash: md5
+      md5: 399f3d4aa2299eeea0bd2bdc1e42e97c
+      size: 9967184
