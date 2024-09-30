@@ -5,8 +5,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=state/state.zip
       hash: md5
@@ -17,8 +17,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=county/county.zip
       hash: md5

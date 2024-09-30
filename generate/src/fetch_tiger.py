@@ -1,6 +1,7 @@
-import requests as r
 import argparse
 from pathlib import Path
+
+import requests as r
 
 # Base URL for TIGER/Line shapefiles
 BASE_URL = "https://www2.census.gov/geo/tiger/TIGER"
@@ -54,7 +55,6 @@ def fetch_shapefile(
         remote_file_name = f"tl_{year}_{state}_{tiger_geo_name}.zip"
     url = f"{BASE_URL}{year}/{tiger_geo_name.upper()}/{remote_file_name}"
     try:
-        # Send a GET request to download the file
         response = r.get(url, stream=True)
         response.raise_for_status()
 
