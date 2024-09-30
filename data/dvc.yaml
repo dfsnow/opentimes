@@ -35,6 +35,7 @@ stages:
     outs:
       - ./input/blockpop/year=${item.year}/state=${item.state}/${item.state}.parquet
 
-  # fetch_osm_planet_file:
-  #   cmd: "wget https://daylight-map-distribution.s3.us-west-1.amazonaws.com\
-  #     /release/${data.daylight_version}/planet-${data.daylight_version}.osm.pbf"
+  fetch_osm_planet_file:
+    cmd: "wget -P ./input/osm -O ./input/osm/planet.osm.pbf
+      https://daylight-map-distribution.s3.us-west-1.amazonaws.com\
+      /release/${data.daylight_version}/planet-${data.daylight_version}.osm.pbf"
