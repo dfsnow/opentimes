@@ -5,12 +5,8 @@ stages:
     deps:
       - ./src/fetch_tiger.py
     matrix:
-      year: &year
-        - '2020'
-      geography:
-        - state
-        - county
-        - zcta
+      year: ${data.years}
+      geography: ${data.geographies.national}
     cmd: >-
       python ./src/fetch_tiger.py --year ${item.year} --geography ${item.geography}
     outs:
@@ -20,69 +16,21 @@ stages:
     deps:
       - ./src/fetch_tiger.py
     matrix:
-      year: *year
-      geography:
-        - county_subdivision
-        - place
-        - puma
-        - tract
-        - block_group
-        - block
-      state: &states
-        - '01'
-        - '02'
-        - '04'
-        - '05'
-        - '06'
-        - '08'
-        - '09'
-        - '10'
-        - '11'
-        - '12'
-        - '13'
-        - '15'
-        - '16'
-        - '17'
-        - '18'
-        - '19'
-        - '20'
-        - '21'
-        - '22'
-        - '23'
-        - '24'
-        - '25'
-        - '26'
-        - '27'
-        - '28'
-        - '29'
-        - '30'
-        - '31'
-        - '32'
-        - '33'
-        - '34'
-        - '35'
-        - '36'
-        - '37'
-        - '38'
-        - '39'
-        - '40'
-        - '41'
-        - '42'
-        - '44'
-        - '45'
-        - '46'
-        - '47'
-        - '48'
-        - '49'
-        - '50'
-        - '51'
-        - '53'
-        - '54'
-        - '55'
-        - '56'
-        - '66'
-        - '72'
+      year: ${data.years}
+      geography: ${data.geographies.by_state}
+      state: ${data.states}
     cmd: >-
       python ./src/fetch_tiger.py --year ${item.year} --geography ${item.geography} --state ${item.state}
     outs:
       - ./input/tiger/year=${item.year}/geography=${item.geography}/state=${item.state}/${item.state}.zip
+
+  fetch_blockpop_by_state:
+    deps:
+      - ./src/fetch_blockpop.py
+    matrix:
+      year: ${data.years}
+      state: ${data.states}
+    cmd: >-
+      python ./src/fetch_blockpop.py --year ${item.year} --state ${item.state}
+    outs:
+      - ./input/blockpop/year=${item.year}/state=${item.state}/${item.state}.parquet
