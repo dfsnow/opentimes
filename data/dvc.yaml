@@ -5,8 +5,8 @@ stages:
     deps:
       - ./src/fetch_tiger.py
     matrix:
-      year: ${data.years}
-      geography: ${data.geographies.national}
+      year: ${input.census.years}
+      geography: ${input.census.geographies.national}
     cmd: "python ./src/fetch_tiger.py
       --year ${item.year} --geography ${item.geography}"
     outs:
@@ -16,9 +16,9 @@ stages:
     deps:
       - ./src/fetch_tiger.py
     matrix:
-      year: ${data.years}
-      geography: ${data.geographies.by_state}
-      state: ${data.states}
+      year: ${input.census.years}
+      geography: ${input.census.geographies.by_state}
+      state: ${input.census.states}
     cmd: "python ./src/fetch_tiger.py
       --year ${item.year} --geography ${item.geography} --state ${item.state}"
     outs:
@@ -28,14 +28,13 @@ stages:
     deps:
       - ./src/fetch_blockpop.py
     matrix:
-      year: ${data.years}
-      state: ${data.states}
+      year: ${input.census.years}
+      state: ${input.census.states}
     cmd: >-
       python ./src/fetch_blockpop.py --year ${item.year} --state ${item.state}
     outs:
       - ./input/blockpop/year=${item.year}/state=${item.state}/${item.state}.parquet
 
-  fetch_osm_planet_file:
-    cmd: "wget -P ./input/osm -O ./input/osm/planet.osm.pbf
-      https://daylight-map-distribution.s3.us-west-1.amazonaws.com\
-      /release/${data.daylight_version}/planet-${data.daylight_version}.osm.pbf"
+  # fetch_osm_national_file:
+  #   cmd: "wget -P ./input/osm -O ./input/osm/us.osm.pbf
+  #     https://download.geofabrik.de/north-america/us-210101.osm.pbf"
