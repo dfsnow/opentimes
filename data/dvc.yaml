@@ -7,8 +7,8 @@ stages:
     matrix:
       year: ${data.years}
       geography: ${data.geographies.national}
-    cmd: >-
-      python ./src/fetch_tiger.py --year ${item.year} --geography ${item.geography}
+    cmd: "python ./src/fetch_tiger.py
+      --year ${item.year} --geography ${item.geography}"
     outs:
       - ./input/tiger/year=${item.year}/geography=${item.geography}/${item.geography}.zip
 
@@ -19,8 +19,8 @@ stages:
       year: ${data.years}
       geography: ${data.geographies.by_state}
       state: ${data.states}
-    cmd: >-
-      python ./src/fetch_tiger.py --year ${item.year} --geography ${item.geography} --state ${item.state}
+    cmd: "python ./src/fetch_tiger.py
+      --year ${item.year} --geography ${item.geography} --state ${item.state}"
     outs:
       - ./input/tiger/year=${item.year}/geography=${item.geography}/state=${item.state}/${item.state}.zip
 
@@ -34,3 +34,7 @@ stages:
       python ./src/fetch_blockpop.py --year ${item.year} --state ${item.state}
     outs:
       - ./input/blockpop/year=${item.year}/state=${item.state}/${item.state}.parquet
+
+  # fetch_osm_planet_file:
+  #   cmd: "wget https://daylight-map-distribution.s3.us-west-1.amazonaws.com\
+  #     /release/${data.daylight_version}/planet-${data.daylight_version}.osm.pbf"

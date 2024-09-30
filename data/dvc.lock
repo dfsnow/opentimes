@@ -481,6 +481,18 @@ stages:
       hash: md5
       md5: dc621b0e1282cebf72239439a904cd52
       size: 9083369
+  fetch_blockpop_by_state@2020-17:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 17
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=17/17.parquet
+      hash: md5
+      md5: ceb13dfbec200adf22dd1036bd0c387e
+      size: 1057928
   fetch_tiger_by_state@2020-county_subdivision-28:
     cmd: python ./src/fetch_tiger.py --year 2020 --geography county_subdivision --state
       28
@@ -3910,22 +3922,598 @@ stages:
     deps:
     - path: ./src/fetch_blockpop.py
       hash: md5
-      md5: 40581d595d2525ec0800ec1b958a9d16
-      size: 2447
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
     outs:
     - path: ./input/blockpop/year=2020/state=01/01.parquet
       hash: md5
-      md5: 0e4ad1271a93f7cf496e7510b4a35ca9
-      size: 474970
+      md5: e4572f0b3a2ad8954e7202bc054bf2d2
+      size: 474148
   fetch_blockpop_by_state@2020-02:
     cmd: python ./src/fetch_blockpop.py --year 2020 --state 02
     deps:
     - path: ./src/fetch_blockpop.py
       hash: md5
-      md5: a27bf7132ad6e7720e8b5215ddd69bc9
-      size: 2205
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
     outs:
     - path: ./input/blockpop/year=2020/state=02/02.parquet
       hash: md5
       md5: 4690ecdacf6638c674453a4688e333cd
       size: 75733
+  fetch_blockpop_by_state@2020-04:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 04
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=04/04.parquet
+      hash: md5
+      md5: c795c09f51eb1c88f4a1369cd8feb46c
+      size: 415821
+  fetch_blockpop_by_state@2020-05:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 05
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=05/05.parquet
+      hash: md5
+      md5: 6d22de35d4d13898ea4aabb316ded825
+      size: 372110
+  fetch_blockpop_by_state@2020-06:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 06
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=06/06.parquet
+      hash: md5
+      md5: 503080855f037f913af211afc3d50ee0
+      size: 1427587
+  fetch_blockpop_by_state@2020-08:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 08
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=08/08.parquet
+      hash: md5
+      md5: 7647ba0350bf8727375bd274dd4f9661
+      size: 359869
+  fetch_blockpop_by_state@2020-09:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 09
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=09/09.parquet
+      hash: md5
+      md5: 7e6afde46221fc91fb5fa36448e5320a
+      size: 138850
+  fetch_blockpop_by_state@2020-10:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 10
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=10/10.parquet
+      hash: md5
+      md5: c6360835b92be745ddb381c9cd56aaff
+      size: 60379
+  fetch_blockpop_by_state@2020-11:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 11
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=11/11.parquet
+      hash: md5
+      md5: ad25115fe768ae07f35e883768f48e13
+      size: 23323
+  fetch_blockpop_by_state@2020-12:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 12
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=12/12.parquet
+      hash: md5
+      md5: 7f1cf128b3a102cb186e74c09edd68eb
+      size: 1116763
+  fetch_blockpop_by_state@2020-13:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 13
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=13/13.parquet
+      hash: md5
+      md5: 1aecbccc12feea8dcc3d4c50bb15fcf8
+      size: 660145
+  fetch_blockpop_by_state@2020-15:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 15
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=15/15.parquet
+      hash: md5
+      md5: 8f72428a3b50c23cb264bd6dd326e53a
+      size: 49501
+  fetch_blockpop_by_state@2020-16:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 16
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=16/16.parquet
+      hash: md5
+      md5: 8516b64de3c5c6fa821a1e77bc0fd788
+      size: 210591
+  fetch_blockpop_by_state@2020-18:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 18
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=18/18.parquet
+      hash: md5
+      md5: 98438674ae998149313324746c9bbc64
+      size: 579914
+  fetch_blockpop_by_state@2020-19:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 19
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=19/19.parquet
+      hash: md5
+      md5: b0879a82d984d9e245e38e580cac4566
+      size: 438027
+  fetch_blockpop_by_state@2020-20:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 20
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=20/20.parquet
+      hash: md5
+      md5: 0951497ad8fbadb7fbf1324e46b7b875
+      size: 435749
+  fetch_blockpop_by_state@2020-21:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 21
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=21/21.parquet
+      hash: md5
+      md5: 0a830d5402540aa04d91f53b4f49855d
+      size: 336120
+  fetch_blockpop_by_state@2020-22:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 22
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=22/22.parquet
+      hash: md5
+      md5: d0696fffa4fa9938ed147176d3450261
+      size: 401547
+  fetch_blockpop_by_state@2020-23:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 23
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=23/23.parquet
+      hash: md5
+      md5: a670cdc745069576389148a8f4673576
+      size: 136662
+  fetch_blockpop_by_state@2020-24:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 24
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=24/24.parquet
+      hash: md5
+      md5: 8975c3275a6399fdade0905dad02dc78
+      size: 242810
+  fetch_blockpop_by_state@2020-25:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 25
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=25/25.parquet
+      hash: md5
+      md5: d4aac4f0ac6e58f702bf12fd666aa47c
+      size: 288238
+  fetch_blockpop_by_state@2020-26:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 26
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=26/26.parquet
+      hash: md5
+      md5: 5990c2b678192a487e3b937c32708e97
+      size: 734739
+  fetch_blockpop_by_state@2020-27:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 27
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=27/27.parquet
+      hash: md5
+      md5: a4e7741056f72ca99774148fb39c1083
+      size: 580001
+  fetch_blockpop_by_state@2020-28:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 28
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=28/28.parquet
+      hash: md5
+      md5: c20cba01927b0be9b2bf838a25186de3
+      size: 334213
+  fetch_blockpop_by_state@2020-29:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 29
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=29/29.parquet
+      hash: md5
+      md5: 8915059e86cabef6e34e28d30820b6ec
+      size: 680330
+  fetch_blockpop_by_state@2020-30:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 30
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=30/30.parquet
+      hash: md5
+      md5: 7b1c0a1113198ac60b56b0bede2e1086
+      size: 208626
+  fetch_blockpop_by_state@2020-31:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 31
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=31/31.parquet
+      hash: md5
+      md5: 5123f4de9f96c43a0a206d4faab07a0f
+      size: 356637
+  fetch_blockpop_by_state@2020-32:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 32
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=32/32.parquet
+      hash: md5
+      md5: 588a96c327dbe4a70f6115c403371a1a
+      size: 178592
+  fetch_blockpop_by_state@2020-33:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 33
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=33/33.parquet
+      hash: md5
+      md5: 105990d699c4a357e736699c5e004d70
+      size: 100014
+  fetch_blockpop_by_state@2020-34:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 34
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=34/34.parquet
+      hash: md5
+      md5: 92ce3f865e24416d728a452618ce9d0f
+      size: 414807
+  fetch_blockpop_by_state@2020-35:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 35
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=35/35.parquet
+      hash: md5
+      md5: b85cff30f7ea4dc2471d446e073ea44e
+      size: 360382
+  fetch_blockpop_by_state@2020-36:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 36
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=36/36.parquet
+      hash: md5
+      md5: 8d8e10d74cd5806da02f8ef0276ce6b7
+      size: 877889
+  fetch_blockpop_by_state@2020-37:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 37
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=37/37.parquet
+      hash: md5
+      md5: 07e5204499bbb97f059e7d017f5f4ac6
+      size: 714487
+  fetch_blockpop_by_state@2020-38:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 38
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=38/38.parquet
+      hash: md5
+      md5: 80be2a2e13c5e887df86a9aa77b8bf85
+      size: 211111
+  fetch_blockpop_by_state@2020-39:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 39
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=39/39.parquet
+      hash: md5
+      md5: 5625f10e7f3ead9942667ace2c778e92
+      size: 799912
+  fetch_blockpop_by_state@2020-40:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 40
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=40/40.parquet
+      hash: md5
+      md5: c428e6c05e43fda950271f57d57402b3
+      size: 474437
+  fetch_blockpop_by_state@2020-41:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 41
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=41/41.parquet
+      hash: md5
+      md5: d72622849ddd4d3fb07fc49534d93bed
+      size: 408637
+  fetch_blockpop_by_state@2020-42:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 42
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=42/42.parquet
+      hash: md5
+      md5: 94e863b8ef5fc3db07d572bdebef8c6f
+      size: 970558
+  fetch_blockpop_by_state@2020-44:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 44
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=44/44.parquet
+      hash: md5
+      md5: 0a1c6126d7ff033eb12f3cbc4833ba21
+      size: 76214
+  fetch_blockpop_by_state@2020-45:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 45
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=45/45.parquet
+      hash: md5
+      md5: e848741f99843f7a5020fe39d35ef4df
+      size: 378978
+  fetch_blockpop_by_state@2020-46:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 46
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=46/46.parquet
+      hash: md5
+      md5: 4e1ba427d065729650509b243bdc2a84
+      size: 182463
+  fetch_blockpop_by_state@2020-47:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 47
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=47/47.parquet
+      hash: md5
+      md5: ba89783f5d57b5c385405824fbe2fe3a
+      size: 489280
+  fetch_blockpop_by_state@2020-48:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 48
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=48/48.parquet
+      hash: md5
+      md5: 9b973454033365ba08e8ecf0dad0f29a
+      size: 2052558
+  fetch_blockpop_by_state@2020-49:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 49
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=49/49.parquet
+      hash: md5
+      md5: fbf9380f0410df0ec17c0c639619cc57
+      size: 231479
+  fetch_blockpop_by_state@2020-50:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 50
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=50/50.parquet
+      hash: md5
+      md5: 0b3f2f5bca36a27612ab972cf46102ae
+      size: 68321
+  fetch_blockpop_by_state@2020-51:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 51
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=51/51.parquet
+      hash: md5
+      md5: 95aa62631285a2dd84822ce0d883c2ee
+      size: 470388
+  fetch_blockpop_by_state@2020-53:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 53
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=53/53.parquet
+      hash: md5
+      md5: fe59419a47cba86dbe5c1d1e80d79cdb
+      size: 453537
+  fetch_blockpop_by_state@2020-54:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 54
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=54/54.parquet
+      hash: md5
+      md5: 2696558d26f756b83305771c9dfd38c5
+      size: 207933
+  fetch_blockpop_by_state@2020-55:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 55
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=55/55.parquet
+      hash: md5
+      md5: 350284aef8dd68f21e134c2265c10683
+      size: 574854
+  fetch_blockpop_by_state@2020-56:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 56
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: e27df8f5a012dd6b97c7002ad6a9c8a1
+      size: 2161
+    outs:
+    - path: ./input/blockpop/year=2020/state=56/56.parquet
+      hash: md5
+      md5: be569b355c691c3039475b0b4537357c
+      size: 158415
