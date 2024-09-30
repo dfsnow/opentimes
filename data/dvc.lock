@@ -163,8 +163,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=17/17.zip
       hash: md5
@@ -175,8 +175,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=31/31.zip
       hash: md5
@@ -3406,8 +3406,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=12/12.zip
       hash: md5
@@ -3418,8 +3418,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=13/13.zip
       hash: md5
@@ -3430,8 +3430,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=15/15.zip
       hash: md5
@@ -3442,8 +3442,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=16/16.zip
       hash: md5
@@ -3454,8 +3454,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=18/18.zip
       hash: md5
@@ -3466,8 +3466,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=19/19.zip
       hash: md5
@@ -3478,8 +3478,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=20/20.zip
       hash: md5
@@ -3490,8 +3490,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=21/21.zip
       hash: md5
@@ -3502,8 +3502,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=22/22.zip
       hash: md5
@@ -3514,8 +3514,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=23/23.zip
       hash: md5
@@ -3526,8 +3526,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=24/24.zip
       hash: md5
@@ -3538,8 +3538,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=25/25.zip
       hash: md5
@@ -3550,8 +3550,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=26/26.zip
       hash: md5
@@ -3562,8 +3562,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=27/27.zip
       hash: md5
@@ -3574,8 +3574,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=28/28.zip
       hash: md5
@@ -3586,8 +3586,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=29/29.zip
       hash: md5
@@ -3598,8 +3598,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=30/30.zip
       hash: md5
@@ -3610,8 +3610,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=32/32.zip
       hash: md5
@@ -3622,8 +3622,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=33/33.zip
       hash: md5
@@ -3634,8 +3634,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=34/34.zip
       hash: md5
@@ -3646,8 +3646,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=35/35.zip
       hash: md5
@@ -3658,8 +3658,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=36/36.zip
       hash: md5
@@ -3670,8 +3670,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=37/37.zip
       hash: md5
@@ -3682,8 +3682,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=38/38.zip
       hash: md5
@@ -3694,8 +3694,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=39/39.zip
       hash: md5
@@ -3706,8 +3706,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=40/40.zip
       hash: md5
@@ -3718,8 +3718,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=41/41.zip
       hash: md5
@@ -3730,8 +3730,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=42/42.zip
       hash: md5
@@ -3742,8 +3742,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=44/44.zip
       hash: md5
@@ -3754,8 +3754,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=45/45.zip
       hash: md5
@@ -3766,8 +3766,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=46/46.zip
       hash: md5
@@ -3778,8 +3778,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=47/47.zip
       hash: md5
@@ -3790,20 +3790,20 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=48/48.zip
       hash: md5
-      md5: 8bb210f8f567e1bda2b9eb5fd3022c87
-      size: 128155648
+      md5: a6c7b4e7bf63d1beea23ce838bf4ee09
+      size: 746348959
   fetch_tiger_by_state@2020-block-49:
     cmd: python ./src/fetch_tiger.py --year 2020 --geography block --state 49
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=49/49.zip
       hash: md5
@@ -3814,8 +3814,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=50/50.zip
       hash: md5
@@ -3826,8 +3826,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=51/51.zip
       hash: md5
@@ -3838,8 +3838,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=53/53.zip
       hash: md5
@@ -3850,8 +3850,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=54/54.zip
       hash: md5
@@ -3862,8 +3862,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=55/55.zip
       hash: md5
@@ -3874,8 +3874,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=56/56.zip
       hash: md5
@@ -3886,8 +3886,8 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=66/66.zip
       hash: md5
@@ -3898,10 +3898,34 @@ stages:
     deps:
     - path: ./src/fetch_tiger.py
       hash: md5
-      md5: 4bf029c832b25938b904a6b23b5e403f
-      size: 2611
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
     outs:
     - path: ./input/tiger/year=2020/geography=block/state=72/72.zip
       hash: md5
       md5: c322c39dfe50d14fb49e957acb53ca2c
       size: 42520635
+  fetch_blockpop_by_state@2020-01:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 01
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: 40581d595d2525ec0800ec1b958a9d16
+      size: 2447
+    outs:
+    - path: ./input/blockpop/year=2020/state=01/01.parquet
+      hash: md5
+      md5: 0e4ad1271a93f7cf496e7510b4a35ca9
+      size: 474970
+  fetch_blockpop_by_state@2020-02:
+    cmd: python ./src/fetch_blockpop.py --year 2020 --state 02
+    deps:
+    - path: ./src/fetch_blockpop.py
+      hash: md5
+      md5: a27bf7132ad6e7720e8b5215ddd69bc9
+      size: 2205
+    outs:
+    - path: ./input/blockpop/year=2020/state=02/02.parquet
+      hash: md5
+      md5: 4690ecdacf6638c674453a4688e333cd
+      size: 75733

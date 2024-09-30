@@ -2,9 +2,7 @@ import argparse
 import os
 from pathlib import Path
 
-import pyarrow
 import pandas as pd
-import pyarrow.parquet as pq
 import requests as r
 from dotenv import load_dotenv
 
@@ -50,20 +48,9 @@ def fetch_blockpop(year: str, state: str) -> None:
             columns=["population", "state", "county", "tract", "block"]
         )
         data["population"] = data["population"].astype("int32")
-        data["state"] = data["state"].astype("string")
-
-        schema = pyarrow.schema([
-            ("population", pyarrow.int32()),
-            ("state", pyarrow.string()),
-            ("county", pyarrow.string()),
-            ("tract", pyarrow.string()),
-            ("block", pyarrow.string())
-        ])
-
-        breakpoint()
-
-        table = pyarrow.Table.from_pandas(data, schema=schema)
-        pq.write_table(table, output_file)
+        # Drop state column because it already exists as a Hive-partition key
+        data.drop(columns=["state"], inplace=True)
+        data.to_parquet(output_file, engine="pyarrow", index=False)
 
         print(f"File downloaded successfully: {output_file}")
     except r.exceptions.RequestException as e:
