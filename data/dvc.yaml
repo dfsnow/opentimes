@@ -4,7 +4,7 @@ stages:
   fetch_tiger_national:
     params:
       - input.year
-      - input.census
+      - input.census.geography.national
     deps:
       - ./src/fetch_tiger.py
     matrix:
@@ -18,7 +18,7 @@ stages:
   fetch_tiger_by_state:
     params:
       - input.year
-      - input.census
+      - input.census.geography.by_state
       - input.state
     deps:
       - ./src/fetch_tiger.py
@@ -50,10 +50,10 @@ stages:
       - input.year
     matrix:
       year: ${input.year}
-    cmd: "
-      last_two_digits=$(echo ${item.year} | cut -c 1-2)
+    cmd:
+      'LAST_TWO=$( echo ${item.year} | cut -c 3-4) &&
       wget -P ./input/osm/year=${item.year}
       -O ./input/osm/year=${item.year}/us-${item.year}.osm.pbf
-      https://download.geofabrik.de/north-america/us-\"$last_two_digits\"0101.osm.pbf"
+      https://download.geofabrik.de/north-america/us-"$LAST_TWO"0101.osm.pbf'
     outs:
       - ./input/osm/year=${item.year}/us-${item.year}.osm.pbf
