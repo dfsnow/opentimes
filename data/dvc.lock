@@ -4517,3 +4517,15 @@ stages:
       hash: md5
       md5: be569b355c691c3039475b0b4537357c
       size: 158415
+  fetch_tiger_national_file@2021-state:
+    cmd: python ./src/fetch_tiger.py --year 2021 --geography state
+    deps:
+    - path: ./src/fetch_tiger.py
+      hash: md5
+      md5: ac7922c7952aaf62555edf8d7dab253b
+      size: 2562
+    outs:
+    - path: ./input/tiger/year=2021/geography=state/state.zip
+      hash: md5
+      md5: 7eaf39a65f609660ac98a8cd3e945be8
+      size: 9959018
