@@ -4,7 +4,9 @@ build/
 venv/
 *.csv
 *.egg-info/
+*.osm
 *.parquet
+*.pbf
 *.pyc
 *.zip
 .env
