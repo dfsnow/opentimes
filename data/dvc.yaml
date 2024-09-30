@@ -1,40 +1,59 @@
 ---
 
 stages:
-  fetch_tiger_national_file:
+  fetch_tiger_national:
+    params:
+      - input.year
+      - input.census
     deps:
       - ./src/fetch_tiger.py
     matrix:
-      year: ${input.census.years}
-      geography: ${input.census.geographies.national}
+      year: ${input.year}
+      geography: ${input.census.geography.national}
     cmd: "python ./src/fetch_tiger.py
       --year ${item.year} --geography ${item.geography}"
     outs:
       - ./input/tiger/year=${item.year}/geography=${item.geography}/${item.geography}.zip
 
   fetch_tiger_by_state:
+    params:
+      - input.year
+      - input.census
+      - input.state
     deps:
       - ./src/fetch_tiger.py
     matrix:
-      year: ${input.census.years}
-      geography: ${input.census.geographies.by_state}
-      state: ${input.census.states}
+      year: ${input.year}
+      geography: ${input.census.geography.by_state}
+      state: ${input.state}
     cmd: "python ./src/fetch_tiger.py
       --year ${item.year} --geography ${item.geography} --state ${item.state}"
     outs:
       - ./input/tiger/year=${item.year}/geography=${item.geography}/state=${item.state}/${item.state}.zip
 
   fetch_blockpop_by_state:
+    params:
+      - input.year
+      - input.state
     deps:
       - ./src/fetch_blockpop.py
     matrix:
-      year: ${input.census.years}
-      state: ${input.census.states}
+      year: ${input.year}
+      state: ${input.state}
     cmd: >-
       python ./src/fetch_blockpop.py --year ${item.year} --state ${item.state}
     outs:
       - ./input/blockpop/year=${item.year}/state=${item.state}/${item.state}.parquet
 
-  # fetch_osm_national_file:
-  #   cmd: "wget -P ./input/osm -O ./input/osm/us.osm.pbf
-  #     https://download.geofabrik.de/north-america/us-210101.osm.pbf"
+  fetch_osm_national:
+    params:
+      - input.year
+    matrix:
+      year: ${input.year}
+    cmd: "
+      last_two_digits=$(echo ${item.year} | cut -c 1-2)
+      wget -P ./input/osm/year=${item.year}
+      -O ./input/osm/year=${item.year}/us-${item.year}.osm.pbf
+      https://download.geofabrik.de/north-america/us-\"$last_two_digits\"0101.osm.pbf"
+    outs:
+      - ./input/osm/year=${item.year}/us-${item.year}.osm.pbf
