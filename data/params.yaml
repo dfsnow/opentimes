@@ -6,6 +6,7 @@ input:
     - '2021'
     - '2022'
     - '2023'
+    - '2024'
 
   state:
     - '01'
@@ -69,7 +70,6 @@ input:
       by_state:
         - county_subdivision
         - place
-        - puma
         - tract
         - block_group
         - block
