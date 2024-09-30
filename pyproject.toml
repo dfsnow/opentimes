@@ -11,10 +11,11 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
-  "pandas>=2.2.0",
-  "python-dotenv>=1.0.1",
-  "pyarrow>=17.0.0",
-  "requests>=2.32.3"
+  "dvc==3.55.2",
+  "pandas==2.2.3",
+  "python-dotenv==1.0.1",
+  "pyarrow==17.0.0",
+  "requests==2.32.3"
 ]
 
 [tool.ruff]
