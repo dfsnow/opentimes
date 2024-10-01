@@ -48,6 +48,6 @@ stages:
       'LAST_TWO=$( echo ${item.year} | cut -c 3-4) &&
       wget -P ./input/osm/year=${item.year}
       -O ./input/osm/year=${item.year}/us-${item.year}.osm.pbf
-      https://download.geofabrik.de/north-america/us-"$LAST_TWO"0101.osm.pbf'
+      https://download.geofabrik.de/north-america-"$LAST_TWO"0101.osm.pbf'
     outs:
       - ./input/osm/year=${item.year}/us-${item.year}.osm.pbf
