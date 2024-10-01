@@ -1,16 +1,39 @@
 [project]
 name = "opentimes"
 version = "0.0.1"
-description = """
-Free travel times between U.S. Census geographies
-"""
+description = "Free multi-modal travel times between U.S. Census geographies"
 keywords = ["data engineering", "travel times", "spatial access"]
 authors = [
   {name = "Dan Snow", email = "dan@sno.ws"}
 ]
+classifiers = [
+  "Development Status :: 1 - Planning",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12"
+]
+license = {file = "LICENSE"}
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
+  "requests>=2.32.3"
+]
+
+[project.urls]
+Repository = "https://github.com/dfsnow/opentimes"
+Documentation = "https://opentimes.org"
+
+[project.optional-dependencies]
+test = [
+  "setuptools >= 61.0",
+  "pytest >= 7.3.0",
+  "pytest-cov >= 4.1.0",
+]
+data = [
   "dvc[s3]==3.55.2",
   "pandas==2.2.3",
   "python-dotenv==1.0.1",
@@ -18,5 +41,30 @@ dependencies = [
   "requests==2.32.3"
 ]
 
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.pyright]
+reportUnusedImport = false
+
 [tool.ruff]
 line-length = 79
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+min_version = 4.0
+envlist = py39, py38, py310, py311, py312
+
+[gh]
+python =
+    3.12 = py312
+    3.11 = py311
+    3.10 = py310
+    3.9 = py39
+    3.8 = py38
+"""
