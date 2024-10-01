@@ -2,9 +2,6 @@
 
 stages:
   fetch_tiger_national:
-    params:
-      - input.year
-      - input.census.geography.national
     matrix:
       year: ${input.year}
       geography: ${input.census.geography.national}
@@ -15,10 +12,6 @@ stages:
           persist: true
 
   fetch_tiger_by_state:
-    params:
-      - input.year
-      - input.census.geography.by_state
-      - input.state
     matrix:
       year: ${input.year}
       geography: ${input.census.geography.by_state}
@@ -30,8 +23,6 @@ stages:
           persist: true
 
   fetch_blockpop_by_state:
-    params:
-      - input.state
     matrix:
       year:
         - '2020'
@@ -43,8 +34,6 @@ stages:
           persist: true
 
   fetch_osm_national:
-    params:
-      - input.year
     matrix:
       year: ${input.year}
     cmd:
