@@ -52,3 +52,22 @@ stages:
       https://download.geofabrik.de/north-america-"$LAST_TWO"0101.osm.pbf'
     outs:
       - ./input/osm/year=${item.year}/us-${item.year}.osm.pbf
+
+  create_census_gpq:
+    params:
+      - input.year
+      - input.census.geography.by_state
+      - input.state
+    deps:
+      - ./input/blockpop
+      - ./input/tiger
+    matrix:
+      year: ${input.year}
+      geography:
+        - ${input.census.geography.national}
+        - ${input.census.geography.by_state}
+      state: ${input.state}
+    cmd: "python ./src/generate_census_gpq.py
+      --year ${item.year} --geography ${item.geography} --state ${item.state}"
+    outs:
+      - ./intermediate/census/gpq/year=${item.year}/geography=${item.geography}/state=${item.state}/${item.state}.parquet
