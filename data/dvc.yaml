@@ -11,7 +11,8 @@ stages:
     cmd: "python ./src/fetch_tiger.py
       --year ${item.year} --geography ${item.geography}"
     outs:
-      - ./input/tiger/year=${item.year}/geography=${item.geography}/${item.geography}.zip
+      - ./input/tiger/year=${item.year}/geography=${item.geography}/${item.geography}.zip:
+          persist: true
 
   fetch_tiger_by_state:
     params:
@@ -25,7 +26,8 @@ stages:
     cmd: "python ./src/fetch_tiger.py
       --year ${item.year} --geography ${item.geography} --state ${item.state}"
     outs:
-      - ./input/tiger/year=${item.year}/geography=${item.geography}/state=${item.state}/${item.state}.zip
+      - ./input/tiger/year=${item.year}/geography=${item.geography}/state=${item.state}/${item.state}.zip:
+          persist: true
 
   fetch_blockpop_by_state:
     params:
@@ -37,7 +39,8 @@ stages:
     cmd: >-
       python ./src/fetch_blockpop.py --year ${item.year} --state ${item.state}
     outs:
-      - ./input/blockpop/year=${item.year}/state=${item.state}/${item.state}.parquet
+      - ./input/blockpop/year=${item.year}/state=${item.state}/${item.state}.parquet:
+          persist: true
 
   fetch_osm_national:
     params:
@@ -51,7 +54,8 @@ stages:
       -O ./input/osm/year=${item.year}/us-${item.year}.osm.pbf
       https://download.geofabrik.de/north-america-"$LAST_TWO"0101.osm.pbf'
     outs:
-      - ./input/osm/year=${item.year}/us-${item.year}.osm.pbf
+      - ./input/osm/year=${item.year}/us-${item.year}.osm.pbf:
+          persist: true
 
   create_census_gpq:
     params:
