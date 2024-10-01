@@ -69,7 +69,4 @@ input:
         - zcta
       by_state:
         - county_subdivision
-        - place
         - tract
-        - block_group
-        - block
