@@ -1,8 +1,8 @@
 [project]
-name = "travel-times"
+name = "opentimes"
 version = "0.0.1"
 description = """
-Data infrastructure to generate national travel times using R5.
+Free travel times between U.S. Census geographies
 """
 keywords = ["data engineering", "travel times", "spatial access"]
 authors = [
