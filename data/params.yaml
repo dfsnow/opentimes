@@ -70,3 +70,5 @@ input:
       by_state:
         - county_subdivision
         - tract
+        - block_group
+        - block
