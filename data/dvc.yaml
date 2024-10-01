@@ -46,6 +46,7 @@ stages:
       year: ${input.year}
     cmd:
       'LAST_TWO=$( echo ${item.year} | cut -c 3-4) &&
+      mkdir -p ./input/osm/year=${item.year} &&
       wget -P ./input/osm/year=${item.year}
       -O ./input/osm/year=${item.year}/us-${item.year}.osm.pbf
       https://download.geofabrik.de/north-america-"$LAST_TWO"0101.osm.pbf'
