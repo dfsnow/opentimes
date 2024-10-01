@@ -10,3 +10,4 @@ venv/
 *.pyc
 *.zip
 .env
+.DS_Store
