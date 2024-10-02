@@ -1,10 +1,9 @@
 import argparse
 import math
 from pathlib import Path
-from utils.census import extract_centroids, load_shapefile
+from utils.census import extract_centroids, load_shapefile, split_geoid
 
 import pandas as pd
-import geopandas as gpd
 
 
 def create_blockloc(year: str, state: str) -> None:
@@ -52,22 +51,27 @@ def create_blockloc(year: str, state: str) -> None:
 
     # Load and cleanup block shapefile file
     gdf = load_shapefile(loc_file)
+    original_row_count = len(gdf)
     cols_to_keep = ["geoid", "intptlon", "intptlat"]
     gdf.drop(
         columns=[col for col in gdf.columns if col not in cols_to_keep],
         inplace=True,
     )
-    original_row_count = len(gdf)
 
     # Load the Census WGS84 centroid for conversion to planar projection
     gdf = extract_centroids(gdf)
+    gdf = split_geoid(gdf, "geoid")
 
-    # Join population data to location data and re-order columns
+    # Join population data to location data and re-order columns. Drop any
+    # columns used as partition keys (year, state)
     join_cols = ["state", "county", "tract", "block"]
     gdf = gdf.merge(df, left_on=join_cols, right_on=join_cols, how="left")
     gdf = gdf[
-        join_cols
-        + [
+        [
+            "county",
+            "tract",
+            "block_group",
+            "block",
             "population",
             "x_4326",
             "y_4326",

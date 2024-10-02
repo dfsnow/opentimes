@@ -56,23 +56,19 @@ stages:
     cmd: "python ./src/create_blockloc.py
       --year ${item.year} --state ${item.state}"
     outs:
-      - ./intermediate/blockloc/year=${item.year}/state=${item.state}/${item.state}.parquet
+      - ./intermediate/blockloc/year=${item.year}/state=${item.state}/${item.state}.parquet:
+          persist: true
 
-  # create_census_gpq:
-  #   params:
-  #     - input.year
-  #     - input.census.geography.by_state
-  #     - input.state
+  # create_cenloc_national:
   #   deps:
-  #     - ./input/blockpop
   #     - ./input/tiger
+  #     - ./intermediate/blockloc
   #   matrix:
   #     year: ${input.year}
-  #     geography:
-  #       - ${input.census.geography.national}
-  #       - ${input.census.geography.by_state}
+  #     geography: ${input.census.geography.national}
   #     state: ${input.state}
-  #   cmd: "python ./src/generate_census_gpq.py
-  #     --year ${item.year} --geography ${item.geography} --state ${item.state}"
+  #   cmd: "python ./src/create_cenloc.py
+  #     --year ${item.year} --geography ${item.geography}"
   #   outs:
-  #     - ./intermediate/census/gpq/year=${item.year}/geography=${item.geography}/state=${item.state}/${item.state}.parquet
+  #     - ./input/tiger/year=${item.year}/geography=${item.geography}/${item.geography}.zip:
+  #         persist: true
