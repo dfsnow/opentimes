@@ -1,7 +1,7 @@
 import argparse
 import math
 from pathlib import Path
-from utils.census import load_shapefile, split_geoid
+from utils.census import extract_centroids, load_shapefile
 
 import pandas as pd
 import geopandas as gpd
@@ -46,14 +46,12 @@ def create_blockloc(year: str, state: str) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Load the block-level population file. Missing state here since it's
-    # a join key
+    # a Hive-partition and not included in the actual data
     df = pd.read_parquet(pop_file)
     df["state"] = state
 
     # Load and cleanup block shapefile file
     gdf = load_shapefile(loc_file)
-    gdf.columns = gdf.columns.str.lower()
-    gdf.columns = gdf.columns.str.replace(r"\d+", "", regex=True)
     cols_to_keep = ["geoid", "intptlon", "intptlat"]
     gdf.drop(
         columns=[col for col in gdf.columns if col not in cols_to_keep],
@@ -62,17 +60,7 @@ def create_blockloc(year: str, state: str) -> None:
     original_row_count = len(gdf)
 
     # Load the Census WGS84 centroid for conversion to planar projection
-    gdf["geometry"] = gpd.points_from_xy(
-        x=gdf["intptlon"], y=gdf["intptlat"], crs="EPSG:4326"
-    )
-    gdf = gpd.GeoDataFrame(data=gdf, geometry="geometry", crs="EPSG:4326")
-    gdf["x_4326"] = gdf.geometry.x
-    gdf["y_4326"] = gdf.geometry.y
-    gdf.to_crs("EPSG:5071", inplace=True)
-    gdf["x_5071"] = gdf.geometry.x
-    gdf["y_5071"] = gdf.geometry.y
-    gdf.drop(columns=["geometry"], inplace=True)
-    gdf = split_geoid(gdf, "geoid")
+    gdf = extract_centroids(gdf)
 
     # Join population data to location data and re-order columns
     join_cols = ["state", "county", "tract", "block"]
