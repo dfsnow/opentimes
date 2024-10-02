@@ -75,19 +75,19 @@ if __name__ == "__main__":
         "--year",
         required=True,
         help="The year of the TIGER/Line data.",
-        type=str
+        type=str,
     )
     parser.add_argument(
         "--geography",
         required=True,
         help="The geography type of the shapefile.",
-        type=str
+        type=str,
     )
     parser.add_argument(
         "--state",
         required=False,
         help="The two-digit state code for the shapefile.",
-        type=str
+        type=str,
     )
 
     args = parser.parse_args()

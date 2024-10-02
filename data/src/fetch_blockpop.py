@@ -22,11 +22,7 @@ def fetch_blockpop(year: str, state: str) -> None:
     """
 
     output_dir = (
-        Path.cwd()
-        / "input"
-        / "blockpop"
-        / f"year={year}"
-        / f"state={state}"
+        Path.cwd() / "input" / "blockpop" / f"year={year}" / f"state={state}"
     )
     output_file = output_dir / f"{state}.parquet"
 
@@ -45,7 +41,7 @@ def fetch_blockpop(year: str, state: str) -> None:
 
         data = pd.DataFrame(
             response.json()[1:],
-            columns=["population", "state", "county", "tract", "block"]
+            columns=["population", "state", "county", "tract", "block"],
         )
         data["population"] = data["population"].astype("int32")
         # Drop state column because it already exists as a Hive-partition key
@@ -65,7 +61,7 @@ if __name__ == "__main__":
         "--year",
         required=True,
         choices=["2010", "2020"],
-        help="The year of the decennial Census."
+        help="The year of the decennial Census.",
     )
     parser.add_argument(
         "--state",
