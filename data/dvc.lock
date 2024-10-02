@@ -7897,3 +7897,4593 @@ stages:
       hash: md5
       md5: 3fa632af5455cec8efbfdbae597a26b5
       size: 86240578
+  create_blockloc@2020-01:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 01
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=01/01.parquet
+      hash: md5
+      md5: 313a6a43a11956f30e7925d3864edf38
+      size: 7993525
+  create_blockloc@2020-02:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 02
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=02/02.parquet
+      hash: md5
+      md5: 2e70278207caca1aec7a414178bf0463
+      size: 1257155
+  create_blockloc@2020-04:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 04
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=04/04.parquet
+      hash: md5
+      md5: 87fa7488e7f411e3e1eca7a03820141f
+      size: 6849833
+  create_blockloc@2020-05:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 05
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=05/05.parquet
+      hash: md5
+      md5: ed6b45bb3f46a2bb786ee5b93196f0d2
+      size: 6165704
+  create_blockloc@2020-06:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 06
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=06/06.parquet
+      hash: md5
+      md5: c54e5e8b794b93f4e00ab962f1311879
+      size: 20467327
+  create_blockloc@2020-08:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 08
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=08/08.parquet
+      hash: md5
+      md5: 5684c50e751cade80d0178ad81d2edb2
+      size: 6322595
+  create_blockloc@2020-09:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 09
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=09/09.parquet
+      hash: md5
+      md5: 4d2b3dabc33f689a1bcc54cd42e830a6
+      size: 2209680
+  create_blockloc@2020-10:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 10
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=10/10.parquet
+      hash: md5
+      md5: ac229a96e998028305a3f33465a2d210
+      size: 886080
+  create_blockloc@2020-11:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 11
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=11/11.parquet
+      hash: md5
+      md5: 61d01651b49dbe630121a55c2cdd6c52
+      size: 262272
+  create_blockloc@2020-12:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 12
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=12/12.parquet
+      hash: md5
+      md5: de12b0290f25d8b3f5dcb6dabaddebe1
+      size: 15571892
+  create_blockloc@2020-13:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 13
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=13/13.parquet
+      hash: md5
+      md5: 16cf5d80c212e86813b0bc90fb4e50b8
+      size: 9776479
+  create_blockloc@2020-15:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 15
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=15/15.parquet
+      hash: md5
+      md5: 42e11fb5115ecb0187c7c990ff745c33
+      size: 646654
+  create_blockloc@2020-16:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 16
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=16/16.parquet
+      hash: md5
+      md5: c9fd969f619964e0775380e999e28553
+      size: 3701283
+  create_blockloc@2020-17:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 17
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=17/17.parquet
+      hash: md5
+      md5: c77f67b918fde5d31b67523242f257c8
+      size: 14832626
+  create_blockloc@2020-18:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 18
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=18/18.parquet
+      hash: md5
+      md5: 565e61a90724477dce3ef9e4e55e2ff5
+      size: 8689442
+  create_blockloc@2020-19:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 19
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=19/19.parquet
+      hash: md5
+      md5: d22124a8c4a26d9e2356c67bb568a6c7
+      size: 7586579
+  create_blockloc@2020-20:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 20
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=20/20.parquet
+      hash: md5
+      md5: 26ba8fa2b6f7b951edd1d232b73634f7
+      size: 7498535
+  create_blockloc@2020-21:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 21
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=21/21.parquet
+      hash: md5
+      md5: 85d6c0e73cd3ac2e2a842571cb1153a0
+      size: 6018556
+  create_blockloc@2020-22:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 22
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=22/22.parquet
+      hash: md5
+      md5: b5fb3daa720ee5f1159eae493bad4f97
+      size: 6374871
+  create_blockloc@2020-23:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 23
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=23/23.parquet
+      hash: md5
+      md5: 524b6e2ccfa579fda1645d0ad59b6b6b
+      size: 2109254
+  create_blockloc@2020-24:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 24
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=24/24.parquet
+      hash: md5
+      md5: b1823a3a9adce93252fb64e22c2a6858
+      size: 3794397
+  create_blockloc@2020-25:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 25
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=25/25.parquet
+      hash: md5
+      md5: 264e2928384f0d2786035a1cf5c76c04
+      size: 4818840
+  create_blockloc@2020-26:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 26
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=26/26.parquet
+      hash: md5
+      md5: 4b7a848428be89349833883d87293541
+      size: 10560386
+  create_blockloc@2020-27:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 27
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=27/27.parquet
+      hash: md5
+      md5: b412267178f94290094eb0d58a1d1d06
+      size: 8497748
+  create_blockloc@2020-28:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 28
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=28/28.parquet
+      hash: md5
+      md5: 4d2e5cffc4fc23128d596b56d05882c6
+      size: 5070213
+  create_blockloc@2020-29:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 29
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=29/29.parquet
+      hash: md5
+      md5: 4cf14204054a6842930d5beda316ce5c
+      size: 10522381
+  create_blockloc@2020-30:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 30
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=30/30.parquet
+      hash: md5
+      md5: a7b4a8427cc1e0eab66f997ce5ab2eca
+      size: 3970501
+  create_blockloc@2020-31:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 31
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=31/31.parquet
+      hash: md5
+      md5: 984f4ee20b4383f9b7e4e537a8f00784
+      size: 5373439
+  create_blockloc@2020-32:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 32
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=32/32.parquet
+      hash: md5
+      md5: e0dd2426db76104fa65cd29ad18f8270
+      size: 2572983
+  create_blockloc@2020-33:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 33
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=33/33.parquet
+      hash: md5
+      md5: c1cb2bbda2963e2b00fb32229e86db30
+      size: 1403745
+  create_blockloc@2020-34:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 34
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=34/34.parquet
+      hash: md5
+      md5: de245ab716f84fd6785f2b0b4e27e431
+      size: 6217455
+  create_blockloc@2020-35:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 35
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=35/35.parquet
+      hash: md5
+      md5: ecce6d8f33eb0f09ce3e2e0c139efafa
+      size: 4844319
+  create_blockloc@2020-36:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 36
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=36/36.parquet
+      hash: md5
+      md5: 4c62d0f50966b4cd6c3001accf85e735
+      size: 11820989
+  create_blockloc@2020-37:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 37
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=37/37.parquet
+      hash: md5
+      md5: 64d18caed7eab76b99ba1cb753b6c21d
+      size: 9908512
+  create_blockloc@2020-38:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 38
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=38/38.parquet
+      hash: md5
+      md5: 9aa7833ff1e729947165a2878249c1d7
+      size: 3789568
+  create_blockloc@2020-39:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 39
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=39/39.parquet
+      hash: md5
+      md5: 6794a469d2e2ffb19779f1be257f2825
+      size: 11369382
+  create_blockloc@2020-40:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 40
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=40/40.parquet
+      hash: md5
+      md5: 242fae29284ab5f860d07713ab66f1f2
+      size: 7808869
+  create_blockloc@2020-41:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 41
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=41/41.parquet
+      hash: md5
+      md5: edd78b4988b8e83bdc747cd35db9cda0
+      size: 5926264
+  create_blockloc@2020-42:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 42
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=42/42.parquet
+      hash: md5
+      md5: eeb174034c92e20bc1b384c38e84db68
+      size: 13631994
+  create_blockloc@2020-44:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 44
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=44/44.parquet
+      hash: md5
+      md5: e88fb6f4fc8ed51f3c49017dbef1ff91
+      size: 1116287
+  create_blockloc@2020-45:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 45
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=45/45.parquet
+      hash: md5
+      md5: be7b733200fa7e6951daf48f2cf2cd85
+      size: 6508387
+  create_blockloc@2020-46:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 46
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=46/46.parquet
+      hash: md5
+      md5: 6c5dac6caecc4c82712823926bcf6426
+      size: 3220336
+  create_blockloc@2020-47:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 47
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=47/47.parquet
+      hash: md5
+      md5: 75517f6b31265f31e44d77b287f820e3
+      size: 7755137
+  create_blockloc@2020-48:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 48
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=48/48.parquet
+      hash: md5
+      md5: 8981603338c51848a827a46f02178ed0
+      size: 26170832
+  create_blockloc@2020-49:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 49
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=49/49.parquet
+      hash: md5
+      md5: 15d8a993adbd9e02490d5aec000921e1
+      size: 3224393
+  create_blockloc@2020-50:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 50
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=50/50.parquet
+      hash: md5
+      md5: b0741fad226155187135a556952e25bc
+      size: 1078706
+  create_blockloc@2020-51:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 51
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=51/51.parquet
+      hash: md5
+      md5: 3e4ad39adc20a4f62964a0c419651fe7
+      size: 7194052
+  create_blockloc@2020-53:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 53
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=53/53.parquet
+      hash: md5
+      md5: 69c113c7d3f02c6ddf80980598cb0d11
+      size: 6988878
+  create_blockloc@2020-54:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 54
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=54/54.parquet
+      hash: md5
+      md5: d4bdbd78bd843711b3b9c7d112746a23
+      size: 3266519
+  create_blockloc@2020-55:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 55
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=55/55.parquet
+      hash: md5
+      md5: ddafe5f647426f871931ad7d721d4a7d
+      size: 8602466
+  create_blockloc@2020-56:
+    cmd: python ./src/create_blockloc.py --year 2020 --state 56
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2020/state=56/56.parquet
+      hash: md5
+      md5: d4389208af13345bbb568831c4936d00
+      size: 2380834
+  create_blockloc@2021-01:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 01
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=01/01.parquet
+      hash: md5
+      md5: dbc3f3ba45a0e1b633f637ff06fb9340
+      size: 8020291
+  create_blockloc@2021-02:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 02
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=02/02.parquet
+      hash: md5
+      md5: 947b2824051548f93f6006e5175dbe1f
+      size: 1256386
+  create_blockloc@2021-04:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 04
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=04/04.parquet
+      hash: md5
+      md5: 62c8b8404cd91aba1dd3c2d0be1bf17b
+      size: 6880312
+  create_blockloc@2021-05:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 05
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=05/05.parquet
+      hash: md5
+      md5: 6da0dd50e9a95d755ccf131a11d75acf
+      size: 6169272
+  create_blockloc@2021-06:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 06
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=06/06.parquet
+      hash: md5
+      md5: 2055d747843a13c5b1a168ed8a426110
+      size: 20077327
+  create_blockloc@2021-08:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 08
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=08/08.parquet
+      hash: md5
+      md5: bf8e6ccc21582c9077138d064459ad0d
+      size: 6342775
+  create_blockloc@2021-09:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 09
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=09/09.parquet
+      hash: md5
+      md5: 5e572260e03d1052e28657da3b1414d8
+      size: 2211055
+  create_blockloc@2021-10:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 10
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=10/10.parquet
+      hash: md5
+      md5: caeca561d15abe0a4843e510c5e8c3a3
+      size: 887397
+  create_blockloc@2021-11:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 11
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=11/11.parquet
+      hash: md5
+      md5: d3d7987372c457b19b4dd07ab242af97
+      size: 262167
+  create_blockloc@2021-12:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 12
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=12/12.parquet
+      hash: md5
+      md5: eb44dd88876835573e971dca6d363f90
+      size: 15236941
+  create_blockloc@2021-13:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 13
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=13/13.parquet
+      hash: md5
+      md5: 40dd5843219263af44d3da37f680a548
+      size: 9817011
+  create_blockloc@2021-15:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 15
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=15/15.parquet
+      hash: md5
+      md5: 7890b08f201ce2f76b77c3ea23e93d96
+      size: 647425
+  create_blockloc@2021-16:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 16
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=16/16.parquet
+      hash: md5
+      md5: a0f27bf0b18f4ce6faaa8cc631e8aab0
+      size: 3709244
+  create_blockloc@2021-17:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 17
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=17/17.parquet
+      hash: md5
+      md5: cef44a276e0d3a400507b6abd2d4dd20
+      size: 14435940
+  create_blockloc@2021-18:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 18
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=18/18.parquet
+      hash: md5
+      md5: b45ca1e51a8c661f69009ef131a94787
+      size: 8712804
+  create_blockloc@2021-19:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 19
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=19/19.parquet
+      hash: md5
+      md5: ad2ad9a3ebde43e4fe41d93add3f5f36
+      size: 7598999
+  create_blockloc@2021-20:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 20
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=20/20.parquet
+      hash: md5
+      md5: 652c94141c330dce7b5e427ff881a307
+      size: 7518019
+  create_blockloc@2021-21:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 21
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=21/21.parquet
+      hash: md5
+      md5: b331304644252546acdbf891a75f548e
+      size: 6021810
+  create_blockloc@2021-22:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 22
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=22/22.parquet
+      hash: md5
+      md5: 8a4c8a1bc906e4f0c1a1adae3654e373
+      size: 6394023
+  create_blockloc@2021-23:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 23
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=23/23.parquet
+      hash: md5
+      md5: 23384877368465ee46d2b12fd155391d
+      size: 2111888
+  create_blockloc@2021-24:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 24
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=24/24.parquet
+      hash: md5
+      md5: 6eaf30b63b2058220fa7aa833fe5eb0d
+      size: 3800523
+  create_blockloc@2021-25:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 25
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=25/25.parquet
+      hash: md5
+      md5: 4e1f2802e19e15d9058ad1f3c51c9f04
+      size: 4829556
+  create_blockloc@2021-26:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 26
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=26/26.parquet
+      hash: md5
+      md5: d05de18cf075084cf797d4872f0447e2
+      size: 10290706
+  create_blockloc@2021-27:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 27
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=27/27.parquet
+      hash: md5
+      md5: c93e8554d500e506a68ac9543bf70b3a
+      size: 8516777
+  create_blockloc@2021-28:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 28
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=28/28.parquet
+      hash: md5
+      md5: db558a1237088166604bb885ff4ddafb
+      size: 5076773
+  create_blockloc@2021-29:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 29
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=29/29.parquet
+      hash: md5
+      md5: 2808ad238fc9bc06add14475e8797624
+      size: 10229311
+  create_blockloc@2021-30:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 30
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=30/30.parquet
+      hash: md5
+      md5: 6799311e6e8cd9e0d55fbee8d0bdeaba
+      size: 3976857
+  create_blockloc@2021-31:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 31
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=31/31.parquet
+      hash: md5
+      md5: 248c33edda9d1a784d47b54a4e22d3a6
+      size: 5388392
+  create_blockloc@2021-32:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 32
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=32/32.parquet
+      hash: md5
+      md5: 08870b3989135ecdec888e1b96a0bf9b
+      size: 2585595
+  create_blockloc@2021-33:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 33
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=33/33.parquet
+      hash: md5
+      md5: 359fac63ae0b920bc83c453fc8c58b73
+      size: 1407081
+  create_blockloc@2021-34:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 34
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=34/34.parquet
+      hash: md5
+      md5: e0b82afbed97a579fde6a2b3d3dd0ad1
+      size: 6236295
+  create_blockloc@2021-35:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 35
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=35/35.parquet
+      hash: md5
+      md5: 3362aa15c062aece128bbbc2a278466a
+      size: 4863242
+  create_blockloc@2021-36:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 36
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=36/36.parquet
+      hash: md5
+      md5: e2a3b953e23ee5f70ef875b5189932e7
+      size: 11577232
+  create_blockloc@2021-37:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 37
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=37/37.parquet
+      hash: md5
+      md5: d91169a013ea744e2ae614724ade4f09
+      size: 9928634
+  create_blockloc@2021-38:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 38
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=38/38.parquet
+      hash: md5
+      md5: 246a95932ed2aeb0423264e7ff68ca8a
+      size: 3797208
+  create_blockloc@2021-39:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 39
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=39/39.parquet
+      hash: md5
+      md5: 8af6a48e14cecf04891fea17395988fe
+      size: 11081896
+  create_blockloc@2021-40:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 40
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=40/40.parquet
+      hash: md5
+      md5: 077027c3879ac6e14caa1a4823e4bc70
+      size: 7827394
+  create_blockloc@2021-41:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 41
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=41/41.parquet
+      hash: md5
+      md5: f00d741efd12706f51b7334f19fe58b1
+      size: 5949459
+  create_blockloc@2021-42:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 42
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=42/42.parquet
+      hash: md5
+      md5: 5cdc8f532aa97f37dda4e1192eeb43ad
+      size: 13303525
+  create_blockloc@2021-44:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 44
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=44/44.parquet
+      hash: md5
+      md5: 4e9eec328761f1a28a4fab05965760c2
+      size: 1119960
+  create_blockloc@2021-45:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 45
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=45/45.parquet
+      hash: md5
+      md5: 26a187eb99b3ff75271c89b9cdb2d053
+      size: 6523514
+  create_blockloc@2021-46:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 46
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=46/46.parquet
+      hash: md5
+      md5: 27848c5f2ad3df8bf186847d1399e824
+      size: 3225104
+  create_blockloc@2021-47:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 47
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=47/47.parquet
+      hash: md5
+      md5: db381243997f459ad36d6b5e52f82b5d
+      size: 7771544
+  create_blockloc@2021-48:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 48
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=48/48.parquet
+      hash: md5
+      md5: 2b91aeccf9edaf4f563e250df74611d2
+      size: 25385355
+  create_blockloc@2021-49:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 49
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=49/49.parquet
+      hash: md5
+      md5: 6c60b10057ddd655680aa399a9cce23d
+      size: 3233591
+  create_blockloc@2021-50:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 50
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=50/50.parquet
+      hash: md5
+      md5: f466ebcab6fb8923d2c5f60c37e0218b
+      size: 1080085
+  create_blockloc@2021-51:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 51
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=51/51.parquet
+      hash: md5
+      md5: 57a08bad0f547d337de238de252de4d6
+      size: 7220576
+  create_blockloc@2021-53:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 53
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=53/53.parquet
+      hash: md5
+      md5: fa22a17eb5cf1aa31c67eeca3ea176bd
+      size: 7012079
+  create_blockloc@2021-54:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 54
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=54/54.parquet
+      hash: md5
+      md5: 5589c22907e1924474da7acb61767db5
+      size: 3267421
+  create_blockloc@2021-55:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 55
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=55/55.parquet
+      hash: md5
+      md5: d8389c14e3545ced8799038fb2406905
+      size: 8626860
+  create_blockloc@2021-56:
+    cmd: python ./src/create_blockloc.py --year 2021 --state 56
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2021/state=56/56.parquet
+      hash: md5
+      md5: 5debacc9a6dc97297f9b368a3bab6007
+      size: 2383748
+  create_blockloc@2022-01:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 01
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=01/01.parquet
+      hash: md5
+      md5: 0342d030f39ec1f44b5255857581add4
+      size: 8019419
+  create_blockloc@2022-02:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 02
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=02/02.parquet
+      hash: md5
+      md5: 7887f3a489e05ff24ba8d74f5249f7f4
+      size: 1256544
+  create_blockloc@2022-04:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 04
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=04/04.parquet
+      hash: md5
+      md5: 27197ceb818578be7a0b025ea3797b31
+      size: 6880483
+  create_blockloc@2022-05:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 05
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=05/05.parquet
+      hash: md5
+      md5: 7be11760c7b5077d230aec4e69056ac0
+      size: 6169757
+  create_blockloc@2022-06:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 06
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=06/06.parquet
+      hash: md5
+      md5: acab5d55d611c1d78a4c7965b3dba04c
+      size: 20089635
+  create_blockloc@2022-08:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 08
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=08/08.parquet
+      hash: md5
+      md5: 0905afa74427a8269de0f9897d1fab11
+      size: 6342776
+  create_blockloc@2022-09:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 09
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=09/09.parquet
+      hash: md5
+      md5: b376195c7516ca319a49bd101e940be9
+      size: 2211067
+  create_blockloc@2022-10:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 10
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=10/10.parquet
+      hash: md5
+      md5: 41ceaf3a47bfee94ed6e56e59497676e
+      size: 887338
+  create_blockloc@2022-11:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 11
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=11/11.parquet
+      hash: md5
+      md5: 05ff3510aa39d1c3151f8285673f948d
+      size: 262105
+  create_blockloc@2022-12:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 12
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=12/12.parquet
+      hash: md5
+      md5: a8e4781c0329edd6f38656c835985c01
+      size: 15246146
+  create_blockloc@2022-13:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 13
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=13/13.parquet
+      hash: md5
+      md5: f1a4ca27c77b11d874b36e71228b94a4
+      size: 9526461
+  create_blockloc@2022-15:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 15
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=15/15.parquet
+      hash: md5
+      md5: 0fd84cb0e93636faad6204ea34bb3093
+      size: 647373
+  create_blockloc@2022-16:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 16
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=16/16.parquet
+      hash: md5
+      md5: 42705d9d6198840c96e73c8fd5ce68f3
+      size: 3708829
+  create_blockloc@2022-17:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 17
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=17/17.parquet
+      hash: md5
+      md5: 1e530b5704f411ab7a63cf812172295e
+      size: 14438516
+  create_blockloc@2022-18:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 18
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=18/18.parquet
+      hash: md5
+      md5: a5c2a0abe3e61133d2a5b4caae8ca5a0
+      size: 8713324
+  create_blockloc@2022-19:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 19
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=19/19.parquet
+      hash: md5
+      md5: 99001cebc8d7a6e8f04d349df567d32a
+      size: 7596365
+  create_blockloc@2022-20:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 20
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=20/20.parquet
+      hash: md5
+      md5: fc243fe0a25ff72730b32c1391ec1c6a
+      size: 7517718
+  create_blockloc@2022-21:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 21
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=21/21.parquet
+      hash: md5
+      md5: 02450b8707046ac50a137f3183c973d2
+      size: 6020490
+  create_blockloc@2022-22:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 22
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=22/22.parquet
+      hash: md5
+      md5: d6120a4910473fc77b72de2fee836454
+      size: 6371008
+  create_blockloc@2022-23:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 23
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=23/23.parquet
+      hash: md5
+      md5: 02cb6d8c50bcd01cbfcd5cca3129e6a7
+      size: 2111716
+  create_blockloc@2022-24:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 24
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=24/24.parquet
+      hash: md5
+      md5: f482258aeef9a8a4018a6a6827897a71
+      size: 3800488
+  create_blockloc@2022-25:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 25
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=25/25.parquet
+      hash: md5
+      md5: b3c5568842786fd1ad6c7c7480f5ef2e
+      size: 4829638
+  create_blockloc@2022-26:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 26
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=26/26.parquet
+      hash: md5
+      md5: 3d6e1fc150c66bda92651f0e3daca7b3
+      size: 10281720
+  create_blockloc@2022-27:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 27
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=27/27.parquet
+      hash: md5
+      md5: 9d96b6c9b1679dd31213c28880e0f167
+      size: 8519029
+  create_blockloc@2022-28:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 28
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=28/28.parquet
+      hash: md5
+      md5: 3e4a67c61567e7f7dc0895e26e2760a9
+      size: 5074786
+  create_blockloc@2022-29:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 29
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=29/29.parquet
+      hash: md5
+      md5: 83aae3621ee424c28dff19c846271fd2
+      size: 10227865
+  create_blockloc@2022-30:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 30
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=30/30.parquet
+      hash: md5
+      md5: cbd8757b1823dccf1f4fe1a40513a61f
+      size: 3979695
+  create_blockloc@2022-31:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 31
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=31/31.parquet
+      hash: md5
+      md5: 31d52163389578a44e2e7aab16a74b21
+      size: 5389271
+  create_blockloc@2022-32:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 32
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=32/32.parquet
+      hash: md5
+      md5: 868dfdd963b4f225227ee8309708b35c
+      size: 2585540
+  create_blockloc@2022-33:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 33
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=33/33.parquet
+      hash: md5
+      md5: f1d3d858e05ac5b2f2c57b6601370de5
+      size: 1407052
+  create_blockloc@2022-34:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 34
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=34/34.parquet
+      hash: md5
+      md5: 013817eae776e34b8e4db3bb4968973e
+      size: 6235626
+  create_blockloc@2022-35:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 35
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=35/35.parquet
+      hash: md5
+      md5: c31d5cfa5bda070508309a1bf9def69f
+      size: 4863551
+  create_blockloc@2022-36:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 36
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=36/36.parquet
+      hash: md5
+      md5: 6812e60651f16c4db6b1d25f33ecf7ad
+      size: 11590174
+  create_blockloc@2022-37:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 37
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=37/37.parquet
+      hash: md5
+      md5: eebfb273b014cb28bf8de6bd6341d0d1
+      size: 9686304
+  create_blockloc@2022-38:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 38
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=38/38.parquet
+      hash: md5
+      md5: 76c00b6e222177e73d1a474d1b343b38
+      size: 3796248
+  create_blockloc@2022-39:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 39
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=39/39.parquet
+      hash: md5
+      md5: a5d7b0f9ccfbc5d19e2c62273f26e37b
+      size: 11064494
+  create_blockloc@2022-40:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 40
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=40/40.parquet
+      hash: md5
+      md5: f4aa17e99555a486dc3f783a6cf8aca9
+      size: 7831393
+  create_blockloc@2022-41:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 41
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=41/41.parquet
+      hash: md5
+      md5: 377e33f16f8e321beabd268a55e1aaec
+      size: 5948574
+  create_blockloc@2022-42:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 42
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=42/42.parquet
+      hash: md5
+      md5: 179b64facd30ce0260c5a6f462997fcd
+      size: 13309215
+  create_blockloc@2022-44:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 44
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=44/44.parquet
+      hash: md5
+      md5: bd431e93cd65c8a792c9d1ef7972902a
+      size: 1120029
+  create_blockloc@2022-45:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 45
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=45/45.parquet
+      hash: md5
+      md5: 4fa63f58928544d3cdb9e01b028b2dad
+      size: 6524779
+  create_blockloc@2022-46:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 46
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=46/46.parquet
+      hash: md5
+      md5: 9b880d57daa182a38a16c55ddcc9832d
+      size: 3223312
+  create_blockloc@2022-47:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 47
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=47/47.parquet
+      hash: md5
+      md5: 70f3a85aac1ced0aa6660f2291556a28
+      size: 7771995
+  create_blockloc@2022-48:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 48
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=48/48.parquet
+      hash: md5
+      md5: 8e6d7aa8565668d060c61aa6b1dea56a
+      size: 25383470
+  create_blockloc@2022-49:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 49
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=49/49.parquet
+      hash: md5
+      md5: bb1216f1c616c015394185cdff0eea62
+      size: 3232677
+  create_blockloc@2022-50:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 50
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=50/50.parquet
+      hash: md5
+      md5: 8ced302369a15d619c8cf9a3396010bb
+      size: 1079920
+  create_blockloc@2022-51:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 51
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=51/51.parquet
+      hash: md5
+      md5: e60e3a8fc13d8033ec8d364462d03496
+      size: 7220055
+  create_blockloc@2022-53:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 53
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=53/53.parquet
+      hash: md5
+      md5: d7cceccfb61e2d0d927367a17f1328e2
+      size: 7011853
+  create_blockloc@2022-54:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 54
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=54/54.parquet
+      hash: md5
+      md5: d1a5a218c25f42fd85e23542cbe1002d
+      size: 3266579
+  create_blockloc@2022-55:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 55
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=55/55.parquet
+      hash: md5
+      md5: 248c8e236df102c63a2a271723fdd62f
+      size: 8626893
+  create_blockloc@2022-56:
+    cmd: python ./src/create_blockloc.py --year 2022 --state 56
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2022/state=56/56.parquet
+      hash: md5
+      md5: 78d4d1a4f8aa36f015265e5e603d785f
+      size: 2385846
+  create_blockloc@2023-01:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 01
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=01/01.parquet
+      hash: md5
+      md5: 19e4e31fc8dd5ea1f384fb2bf72ebdc5
+      size: 7821285
+  create_blockloc@2023-02:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 02
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=02/02.parquet
+      hash: md5
+      md5: 7ec12c8c5edaa833b3aa10569086a72a
+      size: 1258633
+  create_blockloc@2023-04:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 04
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=04/04.parquet
+      hash: md5
+      md5: ea83e142cea72d1aed94af5c8e779740
+      size: 6758504
+  create_blockloc@2023-05:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 05
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=05/05.parquet
+      hash: md5
+      md5: e1c1ee07addbebe81308b847042b3ee0
+      size: 6001363
+  create_blockloc@2023-06:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 06
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=06/06.parquet
+      hash: md5
+      md5: 83c3c7b65350ed44384cb3be2c2ef0ff
+      size: 20090573
+  create_blockloc@2023-08:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 08
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=08/08.parquet
+      hash: md5
+      md5: aa2ecb6273a60205d1aa0cc8a49c25a8
+      size: 6196705
+  create_blockloc@2023-09:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 09
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=09/09.parquet
+      hash: md5
+      md5: 497749f7d8b88f36ff79bd24ee9b731d
+      size: 2205849
+  create_blockloc@2023-10:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 10
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=10/10.parquet
+      hash: md5
+      md5: d44d02cb2c6f1eb1c174b488026c11c6
+      size: 887641
+  create_blockloc@2023-11:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 11
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=11/11.parquet
+      hash: md5
+      md5: e5bed35e12ffbb16c8c51f210b53fb4c
+      size: 262251
+  create_blockloc@2023-12:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 12
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=12/12.parquet
+      hash: md5
+      md5: 407364182d251f52449e055e6b2d927f
+      size: 15258648
+  create_blockloc@2023-13:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 13
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=13/13.parquet
+      hash: md5
+      md5: c566adb4261deb77057b782955669444
+      size: 9530036
+  create_blockloc@2023-15:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 15
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=15/15.parquet
+      hash: md5
+      md5: 43bacf9bd7c3f03c6ca999fe8d5fcd01
+      size: 646196
+  create_blockloc@2023-16:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 16
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=16/16.parquet
+      hash: md5
+      md5: e1717a520be8186a55902a235f232ada
+      size: 3700652
+  create_blockloc@2023-17:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 17
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=17/17.parquet
+      hash: md5
+      md5: 21992fa24de367f9a17861bea281df00
+      size: 14461826
+  create_blockloc@2023-18:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 18
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=18/18.parquet
+      hash: md5
+      md5: 9e28b990487072c1ebfc546f6c7a0ccd
+      size: 8485898
+  create_blockloc@2023-19:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 19
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=19/19.parquet
+      hash: md5
+      md5: 1e74d3710df16a27b6ad62b696bdaadb
+      size: 7376215
+  create_blockloc@2023-20:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 20
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=20/20.parquet
+      hash: md5
+      md5: aa7e0417ea812723145b3282bcf777aa
+      size: 7255656
+  create_blockloc@2023-21:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 21
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=21/21.parquet
+      hash: md5
+      md5: 48ab0744a807eb623ee9f4f3a05d602e
+      size: 6001751
+  create_blockloc@2023-22:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 22
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=22/22.parquet
+      hash: md5
+      md5: 0e0a15473bb6df49c8e2b36ccb1cf164
+      size: 6248630
+  create_blockloc@2023-23:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 23
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=23/23.parquet
+      hash: md5
+      md5: e4409b1ed149077f6aa8f09c49162727
+      size: 2109642
+  create_blockloc@2023-24:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 24
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=24/24.parquet
+      hash: md5
+      md5: c2f3a4645bacb3b09fa14abdbf2a4c73
+      size: 3791902
+  create_blockloc@2023-25:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 25
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=25/25.parquet
+      hash: md5
+      md5: dcc324b77073f1a6bed77e21d241b7c2
+      size: 4808927
+  create_blockloc@2023-26:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 26
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=26/26.parquet
+      hash: md5
+      md5: b9e32d8ca2d844f6eefd05be2973aff4
+      size: 10295198
+  create_blockloc@2023-27:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 27
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=27/27.parquet
+      hash: md5
+      md5: d73fffb6c711a18e85c27d6db417a1ec
+      size: 8271868
+  create_blockloc@2023-28:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 28
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=28/28.parquet
+      hash: md5
+      md5: a5ddd48f8abaa6144ff204323e5782c7
+      size: 5061879
+  create_blockloc@2023-29:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 29
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=29/29.parquet
+      hash: md5
+      md5: 7f12d8334555ff09c6b5ce71ef2196f7
+      size: 10223441
+  create_blockloc@2023-30:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 30
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=30/30.parquet
+      hash: md5
+      md5: 7ade1561cb0ebd16a82b6a18a83037ba
+      size: 3962463
+  create_blockloc@2023-31:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 31
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=31/31.parquet
+      hash: md5
+      md5: aa4c0ed241cc93ae887de5a1b32a0155
+      size: 5222962
+  create_blockloc@2023-32:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 32
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=32/32.parquet
+      hash: md5
+      md5: c291aef7367f956eb5b84469858d41d6
+      size: 2566626
+  create_blockloc@2023-33:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 33
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=33/33.parquet
+      hash: md5
+      md5: 4e20bd4ead15de498dc38d01ae58de30
+      size: 1404950
+  create_blockloc@2023-34:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 34
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=34/34.parquet
+      hash: md5
+      md5: f82fbb14866b9008855d9cc55dcd3716
+      size: 6143172
+  create_blockloc@2023-35:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 35
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=35/35.parquet
+      hash: md5
+      md5: b5d7ad22c1deb03160a1b0fe64299ba7
+      size: 4839053
+  create_blockloc@2023-36:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 36
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=36/36.parquet
+      hash: md5
+      md5: caca015e026e9dac0b696a74f5cebe2f
+      size: 11598527
+  create_blockloc@2023-37:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 37
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=37/37.parquet
+      hash: md5
+      md5: 65f001de3343fd3116876a27ae04ea18
+      size: 9700400
+  create_blockloc@2023-38:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 38
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=38/38.parquet
+      hash: md5
+      md5: 9c2f3f865d16e096ce5dc5dd5b689f79
+      size: 3776881
+  create_blockloc@2023-39:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 39
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=39/39.parquet
+      hash: md5
+      md5: 0deb5b82dddf3c16d3f42e950419220c
+      size: 11087948
+  create_blockloc@2023-40:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 40
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=40/40.parquet
+      hash: md5
+      md5: 93cf4412faea4ca18c9512251b492eeb
+      size: 7595627
+  create_blockloc@2023-41:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 41
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=41/41.parquet
+      hash: md5
+      md5: 93d64a17e889bc22c0c2b729ddaa820d
+      size: 5797722
+  create_blockloc@2023-42:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 42
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=42/42.parquet
+      hash: md5
+      md5: 8064f27322c68fa3cef21a62ebcf0846
+      size: 13311075
+  create_blockloc@2023-44:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 44
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=44/44.parquet
+      hash: md5
+      md5: 0270616601c28d1bb721563959140d51
+      size: 1118910
+  create_blockloc@2023-45:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 45
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=45/45.parquet
+      hash: md5
+      md5: f96948203f391a604a2d4f01e93d3ed8
+      size: 6389267
+  create_blockloc@2023-46:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 46
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=46/46.parquet
+      hash: md5
+      md5: ddbb0ab3e553686a445040dca8e28da3
+      size: 3211250
+  create_blockloc@2023-47:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 47
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=47/47.parquet
+      hash: md5
+      md5: ce25839dd14a1d1139fa3da8cd061e50
+      size: 7584184
+  create_blockloc@2023-48:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 48
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=48/48.parquet
+      hash: md5
+      md5: 3d59cdbadf21c9066ef9c89e8a5048ba
+      size: 25423424
+  create_blockloc@2023-49:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 49
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=49/49.parquet
+      hash: md5
+      md5: 5ec34dca1679d6a156d3c0bec678c180
+      size: 3226232
+  create_blockloc@2023-50:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 50
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=50/50.parquet
+      hash: md5
+      md5: 6dca7969ff154f938d85b8c86532b694
+      size: 1079311
+  create_blockloc@2023-51:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 51
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=51/51.parquet
+      hash: md5
+      md5: 0c1728b03f0af35a3e8dc3f6df951765
+      size: 7027293
+  create_blockloc@2023-53:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 53
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=53/53.parquet
+      hash: md5
+      md5: 873719123823706bbfe3a4837afd0322
+      size: 6864868
+  create_blockloc@2023-54:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 54
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=54/54.parquet
+      hash: md5
+      md5: c84c6f49044da907c60860409ff4c345
+      size: 3261684
+  create_blockloc@2023-55:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 55
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=55/55.parquet
+      hash: md5
+      md5: dfc170c64ae9d727509c60d651a65a39
+      size: 8390678
+  create_blockloc@2023-56:
+    cmd: python ./src/create_blockloc.py --year 2023 --state 56
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2023/state=56/56.parquet
+      hash: md5
+      md5: 35e842944b6897ba781c1033b1bddd12
+      size: 2378233
+  create_blockloc@2024-01:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 01
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=01/01.parquet
+      hash: md5
+      md5: 908f86f5f67fcf1148d66de5b10136e0
+      size: 7822597
+  create_blockloc@2024-02:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 02
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=02/02.parquet
+      hash: md5
+      md5: 0acd876edc3acdb926ca3b29779f5753
+      size: 1258527
+  create_blockloc@2024-04:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 04
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=04/04.parquet
+      hash: md5
+      md5: 18b77b33a8999cd0163e96030c124124
+      size: 6771787
+  create_blockloc@2024-05:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 05
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=05/05.parquet
+      hash: md5
+      md5: 8e4449197be000ebde0e7af68d84376c
+      size: 5999758
+  create_blockloc@2024-06:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 06
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=06/06.parquet
+      hash: md5
+      md5: 11fe3dbd6beb05e418803c98cce8e5da
+      size: 20087787
+  create_blockloc@2024-08:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 08
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=08/08.parquet
+      hash: md5
+      md5: 34925f701540d78d70169d5d3ecce9cd
+      size: 6335676
+  create_blockloc@2024-09:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 09
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=09/09.parquet
+      hash: md5
+      md5: 4b752df5b1c48f7e235bb29ee70b9846
+      size: 2205899
+  create_blockloc@2024-10:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 10
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=10/10.parquet
+      hash: md5
+      md5: e6df164a1ac95cdec500ffe971c7dd35
+      size: 887224
+  create_blockloc@2024-11:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 11
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=11/11.parquet
+      hash: md5
+      md5: 7397a2d856f5a3f3f8dc53df4693c752
+      size: 262247
+  create_blockloc@2024-12:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 12
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=12/12.parquet
+      hash: md5
+      md5: 348e8ec7888310bb0de105f9f4394cf7
+      size: 15253667
+  create_blockloc@2024-13:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 13
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=13/13.parquet
+      hash: md5
+      md5: 8af494f98a49a4c685acfc849ad98c90
+      size: 9777436
+  create_blockloc@2024-15:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 15
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=15/15.parquet
+      hash: md5
+      md5: 18d59ef0cdb2d66e29ee6b6d2dbbcb14
+      size: 647039
+  create_blockloc@2024-16:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 16
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=16/16.parquet
+      hash: md5
+      md5: b336ebfee9a9da72b06b253b3e758dea
+      size: 3698828
+  create_blockloc@2024-17:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 17
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=17/17.parquet
+      hash: md5
+      md5: a78060dfd34478d37d024dad22482849
+      size: 14886110
+  create_blockloc@2024-18:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 18
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=18/18.parquet
+      hash: md5
+      md5: 289aac5ddf1c8d2c8ef03818c78276f4
+      size: 8488783
+  create_blockloc@2024-19:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 19
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=19/19.parquet
+      hash: md5
+      md5: 42b56cf9da95be0c8e0fef0a3134531b
+      size: 7375026
+  create_blockloc@2024-20:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 20
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=20/20.parquet
+      hash: md5
+      md5: 8c80363ddf55ee505e0284dc6d3bb504
+      size: 7485005
+  create_blockloc@2024-21:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 21
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=21/21.parquet
+      hash: md5
+      md5: 8e66e058c327cc7c673fbff6540a70ba
+      size: 5986022
+  create_blockloc@2024-22:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 22
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=22/22.parquet
+      hash: md5
+      md5: 6875228e900d50dabee7d4e59c24d8cc
+      size: 6376321
+  create_blockloc@2024-23:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 23
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=23/23.parquet
+      hash: md5
+      md5: 0c94a776a21721b8574f7ec384706318
+      size: 2107851
+  create_blockloc@2024-24:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 24
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=24/24.parquet
+      hash: md5
+      md5: 8a02c86040171c0b7c6e400527eadfd7
+      size: 3743375
+  create_blockloc@2024-25:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 25
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=25/25.parquet
+      hash: md5
+      md5: efa5b360b2c217f042f197ad1223f777
+      size: 4821194
+  create_blockloc@2024-26:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 26
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=26/26.parquet
+      hash: md5
+      md5: d957156bda59f67099d6430b8d057c5b
+      size: 10285359
+  create_blockloc@2024-27:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 27
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=27/27.parquet
+      hash: md5
+      md5: d876884d1e38351644004134b30ff1cb
+      size: 8285888
+  create_blockloc@2024-28:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 28
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=28/28.parquet
+      hash: md5
+      md5: 9a09245566e20470e6ea1defe254d22a
+      size: 4945982
+  create_blockloc@2024-29:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 29
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=29/29.parquet
+      hash: md5
+      md5: 351c1634bcf34f8b43cac9cd5e9f095c
+      size: 10491331
+  create_blockloc@2024-30:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 30
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=30/30.parquet
+      hash: md5
+      md5: 52d20ca7f05429daefb73b1e7b9325fd
+      size: 3969794
+  create_blockloc@2024-31:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 31
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=31/31.parquet
+      hash: md5
+      md5: dba6c16b617d1360995e59740f926db3
+      size: 5381377
+  create_blockloc@2024-32:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 32
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=32/32.parquet
+      hash: md5
+      md5: 493bbf3c57717b7dc113eea4a8667b02
+      size: 2567333
+  create_blockloc@2024-33:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 33
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=33/33.parquet
+      hash: md5
+      md5: 156b42811a5715261466e423059081a0
+      size: 1404997
+  create_blockloc@2024-34:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 34
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=34/34.parquet
+      hash: md5
+      md5: d3f924eee6f30222c6f48fd3e86e2ac0
+      size: 6138121
+  create_blockloc@2024-35:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 35
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=35/35.parquet
+      hash: md5
+      md5: 862468d43974e1224e8c229053d1c7df
+      size: 4738755
+  create_blockloc@2024-36:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 36
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=36/36.parquet
+      hash: md5
+      md5: b370143eb86fa47fc85488abf9791bf0
+      size: 11855047
+  create_blockloc@2024-37:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 37
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=37/37.parquet
+      hash: md5
+      md5: 85b1e3a72e2f4517f5b2bd70d9d295ac
+      size: 9903973
+  create_blockloc@2024-38:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 38
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=38/38.parquet
+      hash: md5
+      md5: 8301b1cc6aaf024cc0f1f387d2c966b9
+      size: 3777053
+  create_blockloc@2024-39:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 39
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=39/39.parquet
+      hash: md5
+      md5: e0f42290ab1237500484377c6b9079ca
+      size: 11382247
+  create_blockloc@2024-40:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 40
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=40/40.parquet
+      hash: md5
+      md5: e815dd85b03c9656604dd70d983633d3
+      size: 7603754
+  create_blockloc@2024-41:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 41
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=41/41.parquet
+      hash: md5
+      md5: a2b589dd1c0347d9a283cbb9d7fd6a6f
+      size: 5797769
+  create_blockloc@2024-42:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 42
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=42/42.parquet
+      hash: md5
+      md5: 0a06f0d4c180e10354af79a3698a9fe7
+      size: 13318224
+  create_blockloc@2024-44:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 44
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=44/44.parquet
+      hash: md5
+      md5: a99c9e114fc8a489dd24a9bb54fe30b6
+      size: 1118858
+  create_blockloc@2024-45:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 45
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=45/45.parquet
+      hash: md5
+      md5: e4b6f37e94be71eab1386ce6429d3eef
+      size: 6392236
+  create_blockloc@2024-46:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 46
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=46/46.parquet
+      hash: md5
+      md5: f076fc20ebbc213d49b7dbbdc89aa915
+      size: 3210904
+  create_blockloc@2024-47:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 47
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=47/47.parquet
+      hash: md5
+      md5: 725846478695573604caff96b0529ddf
+      size: 7577297
+  create_blockloc@2024-48:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 48
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=48/48.parquet
+      hash: md5
+      md5: 3010475f2fa74f72d68ccbd21163da13
+      size: 26131437
+  create_blockloc@2024-49:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 49
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=49/49.parquet
+      hash: md5
+      md5: 25bfb8aa8f550abd3b04bb68eaef1580
+      size: 3232318
+  create_blockloc@2024-50:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 50
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=50/50.parquet
+      hash: md5
+      md5: b343274e30a49bcf790693a6d45be56f
+      size: 1076319
+  create_blockloc@2024-51:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 51
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=51/51.parquet
+      hash: md5
+      md5: 516bcaea8b6d013c5e909d35b1615bbd
+      size: 7194016
+  create_blockloc@2024-53:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 53
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=53/53.parquet
+      hash: md5
+      md5: 6375e3dd397bf67db5325bc7e2c56059
+      size: 6867291
+  create_blockloc@2024-54:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 54
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=54/54.parquet
+      hash: md5
+      md5: 27c7c07e3f113e11150fbd8b3b97059a
+      size: 3261609
+  create_blockloc@2024-55:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 55
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=55/55.parquet
+      hash: md5
+      md5: 389d331fbca0ed66e1cdd4e22667e6bf
+      size: 8396624
+  create_blockloc@2024-56:
+    cmd: python ./src/create_blockloc.py --year 2024 --state 56
+    deps:
+    - path: ./input/blockpop
+      hash: md5
+      md5: a068f34e46c30cdf44b181a065674902.dir
+      size: 23051607
+      nfiles: 52
+    - path: ./input/tiger
+      hash: md5
+      md5: 8d5368578ba24a7e71f1f7767b2e10f1.dir
+      size: 45282845826
+      nfiles: 1039
+    outs:
+    - path: ./intermediate/blockloc/year=2024/state=56/56.parquet
+      hash: md5
+      md5: dfa4aa2d0cebe51b3dc088037313a2d6
+      size: 2378482
