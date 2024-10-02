@@ -46,21 +46,33 @@ stages:
       - ./input/osm/year=${item.year}/us-${item.year}.osm.pbf:
           persist: true
 
-  create_census_gpq:
-    params:
-      - input.year
-      - input.census.geography.by_state
-      - input.state
+  create_blockloc:
     deps:
       - ./input/blockpop
       - ./input/tiger
     matrix:
       year: ${input.year}
-      geography:
-        - ${input.census.geography.national}
-        - ${input.census.geography.by_state}
       state: ${input.state}
-    cmd: "python ./src/generate_census_gpq.py
-      --year ${item.year} --geography ${item.geography} --state ${item.state}"
+    cmd: "python ./src/create_blockloc.py
+      --year ${item.year} --state ${item.state}"
     outs:
-      - ./intermediate/census/gpq/year=${item.year}/geography=${item.geography}/state=${item.state}/${item.state}.parquet
+      - ./intermediate/blockloc/year=${item.year}/state=${item.state}/${item.state}.parquet
+
+  # create_census_gpq:
+  #   params:
+  #     - input.year
+  #     - input.census.geography.by_state
+  #     - input.state
+  #   deps:
+  #     - ./input/blockpop
+  #     - ./input/tiger
+  #   matrix:
+  #     year: ${input.year}
+  #     geography:
+  #       - ${input.census.geography.national}
+  #       - ${input.census.geography.by_state}
+  #     state: ${input.state}
+  #   cmd: "python ./src/generate_census_gpq.py
+  #     --year ${item.year} --geography ${item.geography} --state ${item.state}"
+  #   outs:
+  #     - ./intermediate/census/gpq/year=${item.year}/geography=${item.geography}/state=${item.state}/${item.state}.parquet
