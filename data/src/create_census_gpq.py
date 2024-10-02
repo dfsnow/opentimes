@@ -1,5 +1,4 @@
 import argparse
-import os
 import shutil
 import tempfile
 from pathlib import Path
@@ -10,7 +9,6 @@ import geopandas as gpd
 def create_census_gpq(
     year: str, geography: str, state: str | None = None
 ) -> None:
-
     input_dir = (
         Path.cwd()
         / "input"
@@ -39,7 +37,9 @@ def create_census_gpq(
         gdf = gpd.read_file(shapefile_path)
         gdf.columns = gdf.columns.str.lower()
         cols_to_keep = ["geoid", "geometry"]
-        gdf = gdf.drop(columns=[col for col in gdf.columns if col not in cols_to_keep])
+        gdf = gdf.drop(
+            columns=[col for col in gdf.columns if col not in cols_to_keep]
+        )
         gdf = gdf.to_crs("EPSG:4326")
 
         # Grab the unweighted centroid
@@ -50,12 +50,14 @@ def create_census_gpq(
 
         breakpoint()
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Create Census GeoParquet extract"
     )
     parser.add_argument(
-        "--year", required=True, help="The year of the TIGER/Line data."
+        "--year",
+        required=True, help="The year of the TIGER/Line data."
     )
     parser.add_argument(
         "--geography",
