@@ -401,17 +401,17 @@ stages:
     cmd: python ./src/fetch_tiger.py --year 2020 --geography county_subdivision --state
       01
     outs:
-    - hash: md5
+    - path: ./input/tiger/year=2020/geography=county_subdivision/state=01/01.zip
+      hash: md5
       md5: e85b6f190cf1cbd9955c4c13e30cbfca
-      path: ./input/tiger/year=2020/geography=county_subdivision/state=01/01.zip
       size: 7752849
   fetch_tiger_by_state@2020-county_subdivision-02:
     cmd: python ./src/fetch_tiger.py --year 2020 --geography county_subdivision --state
       02
     outs:
-    - hash: md5
+    - path: ./input/tiger/year=2020/geography=county_subdivision/state=02/02.zip
+      hash: md5
       md5: d501956118875854cff4ff494b6a863f
-      path: ./input/tiger/year=2020/geography=county_subdivision/state=02/02.zip
       size: 1227628
   fetch_tiger_by_state@2020-county_subdivision-04:
     cmd: python ./src/fetch_tiger.py --year 2020 --geography county_subdivision --state
@@ -4225,107 +4225,107 @@ stages:
   fetch_tiger_national@2020-county:
     cmd: python ./src/fetch_tiger.py --year 2020 --geography county
     outs:
-    - hash: md5
+    - path: ./input/tiger/year=2020/geography=county/county.zip
+      hash: md5
       md5: 36e1db70ebca5c7a7a8a5119c4064d23
-      path: ./input/tiger/year=2020/geography=county/county.zip
       size: 80644766
   fetch_tiger_national@2020-state:
     cmd: python ./src/fetch_tiger.py --year 2020 --geography state
     outs:
-    - hash: md5
+    - path: ./input/tiger/year=2020/geography=state/state.zip
+      hash: md5
       md5: d952efee7be1afa73e29acfe72c1de36
-      path: ./input/tiger/year=2020/geography=state/state.zip
       size: 9757887
   fetch_tiger_national@2020-zcta:
     cmd: python ./src/fetch_tiger.py --year 2020 --geography zcta
     outs:
-    - hash: md5
+    - path: ./input/tiger/year=2020/geography=zcta/zcta.zip
+      hash: md5
       md5: 305da47587d860f21377e544e2053ac6
-      path: ./input/tiger/year=2020/geography=zcta/zcta.zip
       size: 527995578
   fetch_tiger_national@2021-county:
     cmd: python ./src/fetch_tiger.py --year 2021 --geography county
     outs:
-    - hash: md5
+    - path: ./input/tiger/year=2021/geography=county/county.zip
+      hash: md5
       md5: 6d0d07acb342a206fddfeeedbe8376a5
-      path: ./input/tiger/year=2021/geography=county/county.zip
       size: 82328531
   fetch_tiger_national@2021-state:
     cmd: python ./src/fetch_tiger.py --year 2021 --geography state
     outs:
-    - hash: md5
+    - path: ./input/tiger/year=2021/geography=state/state.zip
+      hash: md5
       md5: 7eaf39a65f609660ac98a8cd3e945be8
-      path: ./input/tiger/year=2021/geography=state/state.zip
       size: 9959018
   fetch_tiger_national@2021-zcta:
     cmd: python ./src/fetch_tiger.py --year 2021 --geography zcta
     outs:
-    - hash: md5
+    - path: ./input/tiger/year=2021/geography=zcta/zcta.zip
+      hash: md5
       md5: f782cb2ee5f16c4e4c1a3773a99ee5b4
-      path: ./input/tiger/year=2021/geography=zcta/zcta.zip
       size: 527055155
   fetch_tiger_national@2022-county:
     cmd: python ./src/fetch_tiger.py --year 2022 --geography county
     outs:
-    - hash: md5
+    - path: ./input/tiger/year=2022/geography=county/county.zip
+      hash: md5
       md5: d609b510c424c7524c037f60fde72a9e
-      path: ./input/tiger/year=2022/geography=county/county.zip
       size: 83324165
   fetch_tiger_national@2022-state:
     cmd: python ./src/fetch_tiger.py --year 2022 --geography state
     outs:
-    - hash: md5
+    - path: ./input/tiger/year=2022/geography=state/state.zip
+      hash: md5
       md5: 399f3d4aa2299eeea0bd2bdc1e42e97c
-      path: ./input/tiger/year=2022/geography=state/state.zip
       size: 9967184
   fetch_tiger_national@2022-zcta:
     cmd: python ./src/fetch_tiger.py --year 2022 --geography zcta
     outs:
-    - hash: md5
+    - path: ./input/tiger/year=2022/geography=zcta/zcta.zip
+      hash: md5
       md5: 4e3a3000dd8517be5d60085dee2b3627
-      path: ./input/tiger/year=2022/geography=zcta/zcta.zip
       size: 527944866
   fetch_tiger_national@2023-county:
     cmd: python ./src/fetch_tiger.py --year 2023 --geography county
     outs:
-    - hash: md5
+    - path: ./input/tiger/year=2023/geography=county/county.zip
+      hash: md5
       md5: effbdb9fb88369e65345aea93a2659e3
-      path: ./input/tiger/year=2023/geography=county/county.zip
       size: 83451409
   fetch_tiger_national@2023-state:
     cmd: python ./src/fetch_tiger.py --year 2023 --geography state
     outs:
-    - hash: md5
+    - path: ./input/tiger/year=2023/geography=state/state.zip
+      hash: md5
       md5: 2389f138626f1ee84e347f022b36257a
-      path: ./input/tiger/year=2023/geography=state/state.zip
       size: 9947818
   fetch_tiger_national@2023-zcta:
     cmd: python ./src/fetch_tiger.py --year 2023 --geography zcta
     outs:
-    - hash: md5
+    - path: ./input/tiger/year=2023/geography=zcta/zcta.zip
+      hash: md5
       md5: 79805646d51652b963bf2a4b06a3c1c5
-      path: ./input/tiger/year=2023/geography=zcta/zcta.zip
       size: 528313293
   fetch_tiger_national@2024-county:
     cmd: python ./src/fetch_tiger.py --year 2024 --geography county
     outs:
-    - hash: md5
+    - path: ./input/tiger/year=2024/geography=county/county.zip
+      hash: md5
       md5: 43a7c4d56acd464c1d03ed7f1def4577
-      path: ./input/tiger/year=2024/geography=county/county.zip
       size: 83913847
   fetch_tiger_national@2024-state:
     cmd: python ./src/fetch_tiger.py --year 2024 --geography state
     outs:
-    - hash: md5
+    - path: ./input/tiger/year=2024/geography=state/state.zip
+      hash: md5
       md5: 5a23c5aa97c219279c49cf491813e80f
-      path: ./input/tiger/year=2024/geography=state/state.zip
       size: 9954914
   fetch_tiger_national@2024-zcta:
     cmd: python ./src/fetch_tiger.py --year 2024 --geography zcta
     outs:
-    - hash: md5
+    - path: ./input/tiger/year=2024/geography=zcta/zcta.zip
+      hash: md5
       md5: 57337c162a4a916c73e533827c01a8ce
-      path: ./input/tiger/year=2024/geography=zcta/zcta.zip
       size: 528807058
   fetch_tiger_by_state@2020-block_group-01:
     cmd: python ./src/fetch_tiger.py --year 2020 --geography block_group --state 01
@@ -7913,8 +7913,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=01/01.parquet
       hash: md5
-      md5: 313a6a43a11956f30e7925d3864edf38
-      size: 7993525
+      md5: 97145762de53fa26ee39c86928f99ae7
+      size: 8063711
   create_blockloc@2020-02:
     cmd: python ./src/create_blockloc.py --year 2020 --state 02
     deps:
@@ -7931,8 +7931,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=02/02.parquet
       hash: md5
-      md5: 2e70278207caca1aec7a414178bf0463
-      size: 1257155
+      md5: 0af72a022793b8a86f6495f76dcdaff7
+      size: 1267971
   create_blockloc@2020-04:
     cmd: python ./src/create_blockloc.py --year 2020 --state 04
     deps:
@@ -7949,8 +7949,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=04/04.parquet
       hash: md5
-      md5: 87fa7488e7f411e3e1eca7a03820141f
-      size: 6849833
+      md5: d7f834d8db35e2f55964f03dbc840354
+      size: 6908487
   create_blockloc@2020-05:
     cmd: python ./src/create_blockloc.py --year 2020 --state 05
     deps:
@@ -7967,8 +7967,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=05/05.parquet
       hash: md5
-      md5: ed6b45bb3f46a2bb786ee5b93196f0d2
-      size: 6165704
+      md5: fe7f4f11698c82e310a601d9f9b09c8c
+      size: 6217209
   create_blockloc@2020-06:
     cmd: python ./src/create_blockloc.py --year 2020 --state 06
     deps:
@@ -7985,8 +7985,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=06/06.parquet
       hash: md5
-      md5: c54e5e8b794b93f4e00ab962f1311879
-      size: 20467327
+      md5: 09749eb4b662197fc114e91eb7a82330
+      size: 20707781
   create_blockloc@2020-08:
     cmd: python ./src/create_blockloc.py --year 2020 --state 08
     deps:
@@ -8003,8 +8003,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=08/08.parquet
       hash: md5
-      md5: 5684c50e751cade80d0178ad81d2edb2
-      size: 6322595
+      md5: 6b9616efc99314bb393842bf43551ec6
+      size: 6375556
   create_blockloc@2020-09:
     cmd: python ./src/create_blockloc.py --year 2020 --state 09
     deps:
@@ -8021,8 +8021,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=09/09.parquet
       hash: md5
-      md5: 4d2b3dabc33f689a1bcc54cd42e830a6
-      size: 2209680
+      md5: bab7a37ab0f3a6fc27024ca46e3e9a1f
+      size: 2228590
   create_blockloc@2020-10:
     cmd: python ./src/create_blockloc.py --year 2020 --state 10
     deps:
@@ -8039,8 +8039,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=10/10.parquet
       hash: md5
-      md5: ac229a96e998028305a3f33465a2d210
-      size: 886080
+      md5: 02c10a19bef0b28845460a6ad0c45e1f
+      size: 893772
   create_blockloc@2020-11:
     cmd: python ./src/create_blockloc.py --year 2020 --state 11
     deps:
@@ -8057,8 +8057,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=11/11.parquet
       hash: md5
-      md5: 61d01651b49dbe630121a55c2cdd6c52
-      size: 262272
+      md5: 419ae7348682a12acb44a0844e797595
+      size: 264614
   create_blockloc@2020-12:
     cmd: python ./src/create_blockloc.py --year 2020 --state 12
     deps:
@@ -8075,8 +8075,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=12/12.parquet
       hash: md5
-      md5: de12b0290f25d8b3f5dcb6dabaddebe1
-      size: 15571892
+      md5: 90e00fa35654e793609d9629f30d2a02
+      size: 15718988
   create_blockloc@2020-13:
     cmd: python ./src/create_blockloc.py --year 2020 --state 13
     deps:
@@ -8093,8 +8093,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=13/13.parquet
       hash: md5
-      md5: 16cf5d80c212e86813b0bc90fb4e50b8
-      size: 9776479
+      md5: 271be813bd6f2868d01cd3b133c63e29
+      size: 9864266
   create_blockloc@2020-15:
     cmd: python ./src/create_blockloc.py --year 2020 --state 15
     deps:
@@ -8111,8 +8111,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=15/15.parquet
       hash: md5
-      md5: 42e11fb5115ecb0187c7c990ff745c33
-      size: 646654
+      md5: 6554b982f643322c169c5f221614dfcd
+      size: 652282
   create_blockloc@2020-16:
     cmd: python ./src/create_blockloc.py --year 2020 --state 16
     deps:
@@ -8129,8 +8129,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=16/16.parquet
       hash: md5
-      md5: c9fd969f619964e0775380e999e28553
-      size: 3701283
+      md5: 42eac40dae6f17a2e284304991c44098
+      size: 3732204
   create_blockloc@2020-17:
     cmd: python ./src/create_blockloc.py --year 2020 --state 17
     deps:
@@ -8147,8 +8147,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=17/17.parquet
       hash: md5
-      md5: c77f67b918fde5d31b67523242f257c8
-      size: 14832626
+      md5: 8d14c365e61cf39898e0445d1a351587
+      size: 14972183
   create_blockloc@2020-18:
     cmd: python ./src/create_blockloc.py --year 2020 --state 18
     deps:
@@ -8165,8 +8165,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=18/18.parquet
       hash: md5
-      md5: 565e61a90724477dce3ef9e4e55e2ff5
-      size: 8689442
+      md5: 1b0e54108c9854c84ef3fa216fec9fe3
+      size: 8766655
   create_blockloc@2020-19:
     cmd: python ./src/create_blockloc.py --year 2020 --state 19
     deps:
@@ -8183,8 +8183,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=19/19.parquet
       hash: md5
-      md5: d22124a8c4a26d9e2356c67bb568a6c7
-      size: 7586579
+      md5: edba7a1c403b1980a40b2808b3e8a4cc
+      size: 7652697
   create_blockloc@2020-20:
     cmd: python ./src/create_blockloc.py --year 2020 --state 20
     deps:
@@ -8201,8 +8201,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=20/20.parquet
       hash: md5
-      md5: 26ba8fa2b6f7b951edd1d232b73634f7
-      size: 7498535
+      md5: b5760a328db1ef722644b8d1621f465c
+      size: 7563636
   create_blockloc@2020-21:
     cmd: python ./src/create_blockloc.py --year 2020 --state 21
     deps:
@@ -8219,8 +8219,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=21/21.parquet
       hash: md5
-      md5: 85d6c0e73cd3ac2e2a842571cb1153a0
-      size: 6018556
+      md5: f220f661284f4a6a7eb3bcc8057613b9
+      size: 6068641
   create_blockloc@2020-22:
     cmd: python ./src/create_blockloc.py --year 2020 --state 22
     deps:
@@ -8237,8 +8237,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=22/22.parquet
       hash: md5
-      md5: b5fb3daa720ee5f1159eae493bad4f97
-      size: 6374871
+      md5: c7291695674756b3406a4b6d703a4854
+      size: 6443273
   create_blockloc@2020-23:
     cmd: python ./src/create_blockloc.py --year 2020 --state 23
     deps:
@@ -8255,8 +8255,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=23/23.parquet
       hash: md5
-      md5: 524b6e2ccfa579fda1645d0ad59b6b6b
-      size: 2109254
+      md5: 90b745572849e49b483b9e48999d395c
+      size: 2127103
   create_blockloc@2020-24:
     cmd: python ./src/create_blockloc.py --year 2020 --state 24
     deps:
@@ -8273,8 +8273,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=24/24.parquet
       hash: md5
-      md5: b1823a3a9adce93252fb64e22c2a6858
-      size: 3794397
+      md5: 6106db7b381ce731b492658ae724b3f9
+      size: 3832844
   create_blockloc@2020-25:
     cmd: python ./src/create_blockloc.py --year 2020 --state 25
     deps:
@@ -8291,8 +8291,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=25/25.parquet
       hash: md5
-      md5: 264e2928384f0d2786035a1cf5c76c04
-      size: 4818840
+      md5: 2c4ade1685318c6178eead95a16cdc54
+      size: 4872005
   create_blockloc@2020-26:
     cmd: python ./src/create_blockloc.py --year 2020 --state 26
     deps:
@@ -8309,8 +8309,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=26/26.parquet
       hash: md5
-      md5: 4b7a848428be89349833883d87293541
-      size: 10560386
+      md5: ed05f58bf927d9248d7f24fe4165bd53
+      size: 10656474
   create_blockloc@2020-27:
     cmd: python ./src/create_blockloc.py --year 2020 --state 27
     deps:
@@ -8327,8 +8327,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=27/27.parquet
       hash: md5
-      md5: b412267178f94290094eb0d58a1d1d06
-      size: 8497748
+      md5: c031b6f181ce5dac9f89db9a0156b3db
+      size: 8572740
   create_blockloc@2020-28:
     cmd: python ./src/create_blockloc.py --year 2020 --state 28
     deps:
@@ -8345,8 +8345,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=28/28.parquet
       hash: md5
-      md5: 4d2e5cffc4fc23128d596b56d05882c6
-      size: 5070213
+      md5: 1550fc1e9af802c992ed3db91f2d492b
+      size: 5112603
   create_blockloc@2020-29:
     cmd: python ./src/create_blockloc.py --year 2020 --state 29
     deps:
@@ -8363,8 +8363,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=29/29.parquet
       hash: md5
-      md5: 4cf14204054a6842930d5beda316ce5c
-      size: 10522381
+      md5: 69fff0f83fc5fa9d5b3503b9567076ec
+      size: 10618080
   create_blockloc@2020-30:
     cmd: python ./src/create_blockloc.py --year 2020 --state 30
     deps:
@@ -8381,8 +8381,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=30/30.parquet
       hash: md5
-      md5: a7b4a8427cc1e0eab66f997ce5ab2eca
-      size: 3970501
+      md5: a8df451b01bc68204561b167490eea01
+      size: 4003865
   create_blockloc@2020-31:
     cmd: python ./src/create_blockloc.py --year 2020 --state 31
     deps:
@@ -8399,8 +8399,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=31/31.parquet
       hash: md5
-      md5: 984f4ee20b4383f9b7e4e537a8f00784
-      size: 5373439
+      md5: 860d67ac2ecfeeb5d327e68a67e220cc
+      size: 5418403
   create_blockloc@2020-32:
     cmd: python ./src/create_blockloc.py --year 2020 --state 32
     deps:
@@ -8417,8 +8417,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=32/32.parquet
       hash: md5
-      md5: e0dd2426db76104fa65cd29ad18f8270
-      size: 2572983
+      md5: cd6ae1bd14979a7258abfa236d0a7ed3
+      size: 2594684
   create_blockloc@2020-33:
     cmd: python ./src/create_blockloc.py --year 2020 --state 33
     deps:
@@ -8435,8 +8435,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=33/33.parquet
       hash: md5
-      md5: c1cb2bbda2963e2b00fb32229e86db30
-      size: 1403745
+      md5: c0b2df92a60ec64a9c167a87ad97336b
+      size: 1415874
   create_blockloc@2020-34:
     cmd: python ./src/create_blockloc.py --year 2020 --state 34
     deps:
@@ -8453,8 +8453,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=34/34.parquet
       hash: md5
-      md5: de245ab716f84fd6785f2b0b4e27e431
-      size: 6217455
+      md5: b1e03d18e1a63b659c02a71b5806a200
+      size: 6283240
   create_blockloc@2020-35:
     cmd: python ./src/create_blockloc.py --year 2020 --state 35
     deps:
@@ -8471,8 +8471,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=35/35.parquet
       hash: md5
-      md5: ecce6d8f33eb0f09ce3e2e0c139efafa
-      size: 4844319
+      md5: 87f62c8dcd51cbf4871cb43a7d938ece
+      size: 4884793
   create_blockloc@2020-36:
     cmd: python ./src/create_blockloc.py --year 2020 --state 36
     deps:
@@ -8489,8 +8489,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=36/36.parquet
       hash: md5
-      md5: 4c62d0f50966b4cd6c3001accf85e735
-      size: 11820989
+      md5: 0f251811aea6a0cfa774e50e71cc80b2
+      size: 11961860
   create_blockloc@2020-37:
     cmd: python ./src/create_blockloc.py --year 2020 --state 37
     deps:
@@ -8507,8 +8507,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=37/37.parquet
       hash: md5
-      md5: 64d18caed7eab76b99ba1cb753b6c21d
-      size: 9908512
+      md5: 7d4a29e1056fa218ad76436f3988c748
+      size: 10014542
   create_blockloc@2020-38:
     cmd: python ./src/create_blockloc.py --year 2020 --state 38
     deps:
@@ -8525,8 +8525,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=38/38.parquet
       hash: md5
-      md5: 9aa7833ff1e729947165a2878249c1d7
-      size: 3789568
+      md5: 98a652e0ca256edd7efc8cb0e5febf8c
+      size: 3821503
   create_blockloc@2020-39:
     cmd: python ./src/create_blockloc.py --year 2020 --state 39
     deps:
@@ -8543,8 +8543,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=39/39.parquet
       hash: md5
-      md5: 6794a469d2e2ffb19779f1be257f2825
-      size: 11369382
+      md5: 5e8ec954c28bc30588a485e9bd93f168
+      size: 11502097
   create_blockloc@2020-40:
     cmd: python ./src/create_blockloc.py --year 2020 --state 40
     deps:
@@ -8561,8 +8561,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=40/40.parquet
       hash: md5
-      md5: 242fae29284ab5f860d07713ab66f1f2
-      size: 7808869
+      md5: 463e7dd9a19f679375b7021704f7e273
+      size: 7876836
   create_blockloc@2020-41:
     cmd: python ./src/create_blockloc.py --year 2020 --state 41
     deps:
@@ -8579,8 +8579,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=41/41.parquet
       hash: md5
-      md5: edd78b4988b8e83bdc747cd35db9cda0
-      size: 5926264
+      md5: bbcbce7b90c298043290488c2992ed6b
+      size: 5975651
   create_blockloc@2020-42:
     cmd: python ./src/create_blockloc.py --year 2020 --state 42
     deps:
@@ -8597,8 +8597,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=42/42.parquet
       hash: md5
-      md5: eeb174034c92e20bc1b384c38e84db68
-      size: 13631994
+      md5: 9bfab99412017a52aa7302589b98a671
+      size: 13796472
   create_blockloc@2020-44:
     cmd: python ./src/create_blockloc.py --year 2020 --state 44
     deps:
@@ -8615,8 +8615,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=44/44.parquet
       hash: md5
-      md5: e88fb6f4fc8ed51f3c49017dbef1ff91
-      size: 1116287
+      md5: a369c1a445637be0023fb93ff6fe2d47
+      size: 1126042
   create_blockloc@2020-45:
     cmd: python ./src/create_blockloc.py --year 2020 --state 45
     deps:
@@ -8633,8 +8633,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=45/45.parquet
       hash: md5
-      md5: be7b733200fa7e6951daf48f2cf2cd85
-      size: 6508387
+      md5: 92613319c407121bbe74a43304fde49e
+      size: 6563812
   create_blockloc@2020-46:
     cmd: python ./src/create_blockloc.py --year 2020 --state 46
     deps:
@@ -8651,8 +8651,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=46/46.parquet
       hash: md5
-      md5: 6c5dac6caecc4c82712823926bcf6426
-      size: 3220336
+      md5: 2a040b76625d7044696982afac153a89
+      size: 3247327
   create_blockloc@2020-47:
     cmd: python ./src/create_blockloc.py --year 2020 --state 47
     deps:
@@ -8669,8 +8669,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=47/47.parquet
       hash: md5
-      md5: 75517f6b31265f31e44d77b287f820e3
-      size: 7755137
+      md5: 3b8777df97590c0f70f95639e2bf17eb
+      size: 7822956
   create_blockloc@2020-48:
     cmd: python ./src/create_blockloc.py --year 2020 --state 48
     deps:
@@ -8687,8 +8687,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=48/48.parquet
       hash: md5
-      md5: 8981603338c51848a827a46f02178ed0
-      size: 26170832
+      md5: e60b23700294e3ee88d48be8801d9100
+      size: 26477924
   create_blockloc@2020-49:
     cmd: python ./src/create_blockloc.py --year 2020 --state 49
     deps:
@@ -8705,8 +8705,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=49/49.parquet
       hash: md5
-      md5: 15d8a993adbd9e02490d5aec000921e1
-      size: 3224393
+      md5: c85ce0b650018b20b3589a42ba8c784e
+      size: 3251315
   create_blockloc@2020-50:
     cmd: python ./src/create_blockloc.py --year 2020 --state 50
     deps:
@@ -8723,8 +8723,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=50/50.parquet
       hash: md5
-      md5: b0741fad226155187135a556952e25bc
-      size: 1078706
+      md5: 5e18774bf74e6b5d9768f130dd0e3d65
+      size: 1088063
   create_blockloc@2020-51:
     cmd: python ./src/create_blockloc.py --year 2020 --state 51
     deps:
@@ -8741,8 +8741,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=51/51.parquet
       hash: md5
-      md5: 3e4ad39adc20a4f62964a0c419651fe7
-      size: 7194052
+      md5: e1382ffcff33bd7b6121154b83b91912
+      size: 7269799
   create_blockloc@2020-53:
     cmd: python ./src/create_blockloc.py --year 2020 --state 53
     deps:
@@ -8759,8 +8759,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=53/53.parquet
       hash: md5
-      md5: 69c113c7d3f02c6ddf80980598cb0d11
-      size: 6988878
+      md5: 7a2c0dc19d088c62043c59f024be3343
+      size: 7048557
   create_blockloc@2020-54:
     cmd: python ./src/create_blockloc.py --year 2020 --state 54
     deps:
@@ -8777,8 +8777,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=54/54.parquet
       hash: md5
-      md5: d4bdbd78bd843711b3b9c7d112746a23
-      size: 3266519
+      md5: 3b50d321b7ff61b321502245b10fcb7d
+      size: 3293956
   create_blockloc@2020-55:
     cmd: python ./src/create_blockloc.py --year 2020 --state 55
     deps:
@@ -8795,8 +8795,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=55/55.parquet
       hash: md5
-      md5: ddafe5f647426f871931ad7d721d4a7d
-      size: 8602466
+      md5: 2f67bab626383a7169e0030fe6f351f4
+      size: 8679101
   create_blockloc@2020-56:
     cmd: python ./src/create_blockloc.py --year 2020 --state 56
     deps:
@@ -8813,8 +8813,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2020/state=56/56.parquet
       hash: md5
-      md5: d4389208af13345bbb568831c4936d00
-      size: 2380834
+      md5: b0e727ae4f0e3351affca17617c07cd4
+      size: 2401151
   create_blockloc@2021-01:
     cmd: python ./src/create_blockloc.py --year 2021 --state 01
     deps:
@@ -8831,8 +8831,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=01/01.parquet
       hash: md5
-      md5: dbc3f3ba45a0e1b633f637ff06fb9340
-      size: 8020291
+      md5: 079adbea0de073838112a35f4bde16de
+      size: 8090481
   create_blockloc@2021-02:
     cmd: python ./src/create_blockloc.py --year 2021 --state 02
     deps:
@@ -8849,8 +8849,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=02/02.parquet
       hash: md5
-      md5: 947b2824051548f93f6006e5175dbe1f
-      size: 1256386
+      md5: 57de2a1921cac6406d8a5b31f49547ce
+      size: 1267205
   create_blockloc@2021-04:
     cmd: python ./src/create_blockloc.py --year 2021 --state 04
     deps:
@@ -8867,8 +8867,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=04/04.parquet
       hash: md5
-      md5: 62c8b8404cd91aba1dd3c2d0be1bf17b
-      size: 6880312
+      md5: 254e9eb5a95d458228cd0087a6791774
+      size: 6938979
   create_blockloc@2021-05:
     cmd: python ./src/create_blockloc.py --year 2021 --state 05
     deps:
@@ -8885,8 +8885,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=05/05.parquet
       hash: md5
-      md5: 6da0dd50e9a95d755ccf131a11d75acf
-      size: 6169272
+      md5: 2515b44848c551a10c5cb2102fbc4edd
+      size: 6220776
   create_blockloc@2021-06:
     cmd: python ./src/create_blockloc.py --year 2021 --state 06
     deps:
@@ -8903,8 +8903,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=06/06.parquet
       hash: md5
-      md5: 2055d747843a13c5b1a168ed8a426110
-      size: 20077327
+      md5: db7fa1e0e0aded3e4e0603c10dd90adb
+      size: 20294072
   create_blockloc@2021-08:
     cmd: python ./src/create_blockloc.py --year 2021 --state 08
     deps:
@@ -8921,8 +8921,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=08/08.parquet
       hash: md5
-      md5: bf8e6ccc21582c9077138d064459ad0d
-      size: 6342775
+      md5: b47d22188ebd55f4ea948ac23e4f881f
+      size: 6395759
   create_blockloc@2021-09:
     cmd: python ./src/create_blockloc.py --year 2021 --state 09
     deps:
@@ -8939,8 +8939,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=09/09.parquet
       hash: md5
-      md5: 5e572260e03d1052e28657da3b1414d8
-      size: 2211055
+      md5: 68232fc0d96ddc393f705bb3f0529633
+      size: 2229966
   create_blockloc@2021-10:
     cmd: python ./src/create_blockloc.py --year 2021 --state 10
     deps:
@@ -8957,8 +8957,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=10/10.parquet
       hash: md5
-      md5: caeca561d15abe0a4843e510c5e8c3a3
-      size: 887397
+      md5: 9a46d0b96fb9a83211667e8acdd90815
+      size: 895088
   create_blockloc@2021-11:
     cmd: python ./src/create_blockloc.py --year 2021 --state 11
     deps:
@@ -8975,8 +8975,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=11/11.parquet
       hash: md5
-      md5: d3d7987372c457b19b4dd07ab242af97
-      size: 262167
+      md5: fd50a12a22124576e0f0acc8fe348e52
+      size: 264509
   create_blockloc@2021-12:
     cmd: python ./src/create_blockloc.py --year 2021 --state 12
     deps:
@@ -8993,8 +8993,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=12/12.parquet
       hash: md5
-      md5: eb44dd88876835573e971dca6d363f90
-      size: 15236941
+      md5: eb56b2eb384729e054e11e6c2ac3f21f
+      size: 15380124
   create_blockloc@2021-13:
     cmd: python ./src/create_blockloc.py --year 2021 --state 13
     deps:
@@ -9011,8 +9011,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=13/13.parquet
       hash: md5
-      md5: 40dd5843219263af44d3da37f680a548
-      size: 9817011
+      md5: 7a496cba6bc57a4d099afbda1013962e
+      size: 9904799
   create_blockloc@2021-15:
     cmd: python ./src/create_blockloc.py --year 2021 --state 15
     deps:
@@ -9029,8 +9029,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=15/15.parquet
       hash: md5
-      md5: 7890b08f201ce2f76b77c3ea23e93d96
-      size: 647425
+      md5: e04eccd3e3f676650126e58a6d9b32be
+      size: 653052
   create_blockloc@2021-16:
     cmd: python ./src/create_blockloc.py --year 2021 --state 16
     deps:
@@ -9047,8 +9047,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=16/16.parquet
       hash: md5
-      md5: a0f27bf0b18f4ce6faaa8cc631e8aab0
-      size: 3709244
+      md5: 087e42bc512097e77d251092762ed625
+      size: 3740182
   create_blockloc@2021-17:
     cmd: python ./src/create_blockloc.py --year 2021 --state 17
     deps:
@@ -9065,8 +9065,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=17/17.parquet
       hash: md5
-      md5: cef44a276e0d3a400507b6abd2d4dd20
-      size: 14435940
+      md5: ff443ad6d8bdbc691254b3825dfdf4a7
+      size: 14571217
   create_blockloc@2021-18:
     cmd: python ./src/create_blockloc.py --year 2021 --state 18
     deps:
@@ -9083,8 +9083,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=18/18.parquet
       hash: md5
-      md5: b45ca1e51a8c661f69009ef131a94787
-      size: 8712804
+      md5: d1cef741eab31ba5c92a05a781cb4d42
+      size: 8790017
   create_blockloc@2021-19:
     cmd: python ./src/create_blockloc.py --year 2021 --state 19
     deps:
@@ -9101,8 +9101,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=19/19.parquet
       hash: md5
-      md5: ad2ad9a3ebde43e4fe41d93add3f5f36
-      size: 7598999
+      md5: 745388a865092de36dda1ca13caa5bb0
+      size: 7665128
   create_blockloc@2021-20:
     cmd: python ./src/create_blockloc.py --year 2021 --state 20
     deps:
@@ -9119,8 +9119,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=20/20.parquet
       hash: md5
-      md5: 652c94141c330dce7b5e427ff881a307
-      size: 7518019
+      md5: 00f827f3adcc89f2f8c043ad555b3c91
+      size: 7583127
   create_blockloc@2021-21:
     cmd: python ./src/create_blockloc.py --year 2021 --state 21
     deps:
@@ -9137,8 +9137,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=21/21.parquet
       hash: md5
-      md5: b331304644252546acdbf891a75f548e
-      size: 6021810
+      md5: 03da9106788eed2d891504f0bd021ff3
+      size: 6071897
   create_blockloc@2021-22:
     cmd: python ./src/create_blockloc.py --year 2021 --state 22
     deps:
@@ -9155,8 +9155,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=22/22.parquet
       hash: md5
-      md5: 8a4c8a1bc906e4f0c1a1adae3654e373
-      size: 6394023
+      md5: 006c520663235b9a246d1209de7205db
+      size: 6462499
   create_blockloc@2021-23:
     cmd: python ./src/create_blockloc.py --year 2021 --state 23
     deps:
@@ -9173,8 +9173,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=23/23.parquet
       hash: md5
-      md5: 23384877368465ee46d2b12fd155391d
-      size: 2111888
+      md5: 10ef55e1ae09b5fa42987efab626bf8f
+      size: 2129750
   create_blockloc@2021-24:
     cmd: python ./src/create_blockloc.py --year 2021 --state 24
     deps:
@@ -9191,8 +9191,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=24/24.parquet
       hash: md5
-      md5: 6eaf30b63b2058220fa7aa833fe5eb0d
-      size: 3800523
+      md5: 89df3e225ed4da77aed01fbac66ace2c
+      size: 3839191
   create_blockloc@2021-25:
     cmd: python ./src/create_blockloc.py --year 2021 --state 25
     deps:
@@ -9209,8 +9209,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=25/25.parquet
       hash: md5
-      md5: 4e1f2802e19e15d9058ad1f3c51c9f04
-      size: 4829556
+      md5: 460bbc81f854eaf0818dcfd90521b660
+      size: 4883497
   create_blockloc@2021-26:
     cmd: python ./src/create_blockloc.py --year 2021 --state 26
     deps:
@@ -9227,8 +9227,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=26/26.parquet
       hash: md5
-      md5: d05de18cf075084cf797d4872f0447e2
-      size: 10290706
+      md5: c2d5e9dc8d724d7eb0499d8fff5d3c6a
+      size: 10383826
   create_blockloc@2021-27:
     cmd: python ./src/create_blockloc.py --year 2021 --state 27
     deps:
@@ -9245,8 +9245,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=27/27.parquet
       hash: md5
-      md5: c93e8554d500e506a68ac9543bf70b3a
-      size: 8516777
+      md5: d01795f4cf17f14b2b07bbb02e4090ea
+      size: 8591774
   create_blockloc@2021-28:
     cmd: python ./src/create_blockloc.py --year 2021 --state 28
     deps:
@@ -9263,8 +9263,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=28/28.parquet
       hash: md5
-      md5: db558a1237088166604bb885ff4ddafb
-      size: 5076773
+      md5: 6d5720178822db1eab65bd3dbefbf2d9
+      size: 5119164
   create_blockloc@2021-29:
     cmd: python ./src/create_blockloc.py --year 2021 --state 29
     deps:
@@ -9281,8 +9281,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=29/29.parquet
       hash: md5
-      md5: 2808ad238fc9bc06add14475e8797624
-      size: 10229311
+      md5: 117f00bf637bed53ca1e595a38fdab50
+      size: 10319920
   create_blockloc@2021-30:
     cmd: python ./src/create_blockloc.py --year 2021 --state 30
     deps:
@@ -9299,8 +9299,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=30/30.parquet
       hash: md5
-      md5: 6799311e6e8cd9e0d55fbee8d0bdeaba
-      size: 3976857
+      md5: 88236a459a1ad938dc20568dac539f8b
+      size: 4010253
   create_blockloc@2021-31:
     cmd: python ./src/create_blockloc.py --year 2021 --state 31
     deps:
@@ -9317,8 +9317,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=31/31.parquet
       hash: md5
-      md5: 248c33edda9d1a784d47b54a4e22d3a6
-      size: 5388392
+      md5: 7c4fb65877c5e6e130b8b1b4d4cabc0d
+      size: 5433371
   create_blockloc@2021-32:
     cmd: python ./src/create_blockloc.py --year 2021 --state 32
     deps:
@@ -9335,8 +9335,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=32/32.parquet
       hash: md5
-      md5: 08870b3989135ecdec888e1b96a0bf9b
-      size: 2585595
+      md5: b152470505b97edfcc5d190ff6a5bd2d
+      size: 2607306
   create_blockloc@2021-33:
     cmd: python ./src/create_blockloc.py --year 2021 --state 33
     deps:
@@ -9353,8 +9353,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=33/33.parquet
       hash: md5
-      md5: 359fac63ae0b920bc83c453fc8c58b73
-      size: 1407081
+      md5: 7dc04831d39fd5161d73f6c080270b3e
+      size: 1419212
   create_blockloc@2021-34:
     cmd: python ./src/create_blockloc.py --year 2021 --state 34
     deps:
@@ -9371,8 +9371,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=34/34.parquet
       hash: md5
-      md5: e0b82afbed97a579fde6a2b3d3dd0ad1
-      size: 6236295
+      md5: a3ea0586cad5e9e34d054eac82658d83
+      size: 6305643
   create_blockloc@2021-35:
     cmd: python ./src/create_blockloc.py --year 2021 --state 35
     deps:
@@ -9389,8 +9389,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=35/35.parquet
       hash: md5
-      md5: 3362aa15c062aece128bbbc2a278466a
-      size: 4863242
+      md5: 2e10a522c5b57588c4f2651a3265619b
+      size: 4903733
   create_blockloc@2021-36:
     cmd: python ./src/create_blockloc.py --year 2021 --state 36
     deps:
@@ -9407,8 +9407,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=36/36.parquet
       hash: md5
-      md5: e2a3b953e23ee5f70ef875b5189932e7
-      size: 11577232
+      md5: 06b40c6482f8008961b86966dd8ae0c1
+      size: 11701962
   create_blockloc@2021-37:
     cmd: python ./src/create_blockloc.py --year 2021 --state 37
     deps:
@@ -9425,8 +9425,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=37/37.parquet
       hash: md5
-      md5: d91169a013ea744e2ae614724ade4f09
-      size: 9928634
+      md5: d588d6dccf4f4873fa48fe5531272b0a
+      size: 10037240
   create_blockloc@2021-38:
     cmd: python ./src/create_blockloc.py --year 2021 --state 38
     deps:
@@ -9443,8 +9443,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=38/38.parquet
       hash: md5
-      md5: 246a95932ed2aeb0423264e7ff68ca8a
-      size: 3797208
+      md5: 7ac612b0d1b5e1e08f7dee3354d9cedf
+      size: 3829164
   create_blockloc@2021-39:
     cmd: python ./src/create_blockloc.py --year 2021 --state 39
     deps:
@@ -9461,8 +9461,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=39/39.parquet
       hash: md5
-      md5: 8af6a48e14cecf04891fea17395988fe
-      size: 11081896
+      md5: 3489885f683c4312f1da5692b1e1982c
+      size: 11202086
   create_blockloc@2021-40:
     cmd: python ./src/create_blockloc.py --year 2021 --state 40
     deps:
@@ -9479,8 +9479,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=40/40.parquet
       hash: md5
-      md5: 077027c3879ac6e14caa1a4823e4bc70
-      size: 7827394
+      md5: 703ea277cd68ee001ab882b8e8938856
+      size: 7895385
   create_blockloc@2021-41:
     cmd: python ./src/create_blockloc.py --year 2021 --state 41
     deps:
@@ -9497,8 +9497,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=41/41.parquet
       hash: md5
-      md5: f00d741efd12706f51b7334f19fe58b1
-      size: 5949459
+      md5: e6010f36883c0724446fdcf2ab7a0345
+      size: 5998857
   create_blockloc@2021-42:
     cmd: python ./src/create_blockloc.py --year 2021 --state 42
     deps:
@@ -9515,8 +9515,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=42/42.parquet
       hash: md5
-      md5: 5cdc8f532aa97f37dda4e1192eeb43ad
-      size: 13303525
+      md5: a142c141484dcf3b36efaecb6c9abf8e
+      size: 13447259
   create_blockloc@2021-44:
     cmd: python ./src/create_blockloc.py --year 2021 --state 44
     deps:
@@ -9533,8 +9533,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=44/44.parquet
       hash: md5
-      md5: 4e9eec328761f1a28a4fab05965760c2
-      size: 1119960
+      md5: 526a8b2a871557e9b33abd6803032ed7
+      size: 1129715
   create_blockloc@2021-45:
     cmd: python ./src/create_blockloc.py --year 2021 --state 45
     deps:
@@ -9551,8 +9551,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=45/45.parquet
       hash: md5
-      md5: 26a187eb99b3ff75271c89b9cdb2d053
-      size: 6523514
+      md5: 5651f5660a95ff740b491a3f15bf96d4
+      size: 6578945
   create_blockloc@2021-46:
     cmd: python ./src/create_blockloc.py --year 2021 --state 46
     deps:
@@ -9569,8 +9569,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=46/46.parquet
       hash: md5
-      md5: 27848c5f2ad3df8bf186847d1399e824
-      size: 3225104
+      md5: a7aebf4ada47cb856bea727e0095127c
+      size: 3252096
   create_blockloc@2021-47:
     cmd: python ./src/create_blockloc.py --year 2021 --state 47
     deps:
@@ -9587,8 +9587,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=47/47.parquet
       hash: md5
-      md5: db381243997f459ad36d6b5e52f82b5d
-      size: 7771544
+      md5: 8a90305fe55a49e75ea93afb465183fd
+      size: 7839365
   create_blockloc@2021-48:
     cmd: python ./src/create_blockloc.py --year 2021 --state 48
     deps:
@@ -9605,8 +9605,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=48/48.parquet
       hash: md5
-      md5: 2b91aeccf9edaf4f563e250df74611d2
-      size: 25385355
+      md5: dcc17d0bbd2bfcbbc827e20dc57713ba
+      size: 25640007
   create_blockloc@2021-49:
     cmd: python ./src/create_blockloc.py --year 2021 --state 49
     deps:
@@ -9623,8 +9623,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=49/49.parquet
       hash: md5
-      md5: 6c60b10057ddd655680aa399a9cce23d
-      size: 3233591
+      md5: 11e64bf478128c7f3a9c388b1823ae95
+      size: 3260519
   create_blockloc@2021-50:
     cmd: python ./src/create_blockloc.py --year 2021 --state 50
     deps:
@@ -9641,8 +9641,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=50/50.parquet
       hash: md5
-      md5: f466ebcab6fb8923d2c5f60c37e0218b
-      size: 1080085
+      md5: db74bf6240c6c8a6c1af55cefea27a90
+      size: 1089446
   create_blockloc@2021-51:
     cmd: python ./src/create_blockloc.py --year 2021 --state 51
     deps:
@@ -9659,8 +9659,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=51/51.parquet
       hash: md5
-      md5: 57a08bad0f547d337de238de252de4d6
-      size: 7220576
+      md5: 93c62a10397d3fefb59054a924ceff98
+      size: 7296074
   create_blockloc@2021-53:
     cmd: python ./src/create_blockloc.py --year 2021 --state 53
     deps:
@@ -9677,8 +9677,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=53/53.parquet
       hash: md5
-      md5: fa22a17eb5cf1aa31c67eeca3ea176bd
-      size: 7012079
+      md5: 8cb8a22dceb66a4094a16ad6c5b779e2
+      size: 7071765
   create_blockloc@2021-54:
     cmd: python ./src/create_blockloc.py --year 2021 --state 54
     deps:
@@ -9695,8 +9695,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=54/54.parquet
       hash: md5
-      md5: 5589c22907e1924474da7acb61767db5
-      size: 3267421
+      md5: d6ae060a5b5d9b82294e20b1dfb7fdd9
+      size: 3294860
   create_blockloc@2021-55:
     cmd: python ./src/create_blockloc.py --year 2021 --state 55
     deps:
@@ -9713,8 +9713,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=55/55.parquet
       hash: md5
-      md5: d8389c14e3545ced8799038fb2406905
-      size: 8626860
+      md5: 4ca125051b3320a6726cf05f1337a08e
+      size: 8703503
   create_blockloc@2021-56:
     cmd: python ./src/create_blockloc.py --year 2021 --state 56
     deps:
@@ -9731,8 +9731,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2021/state=56/56.parquet
       hash: md5
-      md5: 5debacc9a6dc97297f9b368a3bab6007
-      size: 2383748
+      md5: cd3146b01ef5b05f95388a3d8cd330b8
+      size: 2404082
   create_blockloc@2022-01:
     cmd: python ./src/create_blockloc.py --year 2022 --state 01
     deps:
@@ -9749,8 +9749,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=01/01.parquet
       hash: md5
-      md5: 0342d030f39ec1f44b5255857581add4
-      size: 8019419
+      md5: 9c96afc558c954bdfe2c75e85292c836
+      size: 8089613
   create_blockloc@2022-02:
     cmd: python ./src/create_blockloc.py --year 2022 --state 02
     deps:
@@ -9767,8 +9767,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=02/02.parquet
       hash: md5
-      md5: 7887f3a489e05ff24ba8d74f5249f7f4
-      size: 1256544
+      md5: bcbcd55a0e93c9bb2010e2fcbb83ef9e
+      size: 1267377
   create_blockloc@2022-04:
     cmd: python ./src/create_blockloc.py --year 2022 --state 04
     deps:
@@ -9785,8 +9785,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=04/04.parquet
       hash: md5
-      md5: 27197ceb818578be7a0b025ea3797b31
-      size: 6880483
+      md5: 37623fb58787d4afe3329a7e6640c374
+      size: 6939155
   create_blockloc@2022-05:
     cmd: python ./src/create_blockloc.py --year 2022 --state 05
     deps:
@@ -9803,8 +9803,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=05/05.parquet
       hash: md5
-      md5: 7be11760c7b5077d230aec4e69056ac0
-      size: 6169757
+      md5: c6ef9d53ae3d876fc779f4d6cb0a63e9
+      size: 6221261
   create_blockloc@2022-06:
     cmd: python ./src/create_blockloc.py --year 2022 --state 06
     deps:
@@ -9821,8 +9821,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=06/06.parquet
       hash: md5
-      md5: acab5d55d611c1d78a4c7965b3dba04c
-      size: 20089635
+      md5: 2033d95d96d225c2fafd2323d33c00d7
+      size: 20305988
   create_blockloc@2022-08:
     cmd: python ./src/create_blockloc.py --year 2022 --state 08
     deps:
@@ -9839,8 +9839,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=08/08.parquet
       hash: md5
-      md5: 0905afa74427a8269de0f9897d1fab11
-      size: 6342776
+      md5: fed062e1d8779114169b7bb1205f9036
+      size: 6395745
   create_blockloc@2022-09:
     cmd: python ./src/create_blockloc.py --year 2022 --state 09
     deps:
@@ -9857,8 +9857,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=09/09.parquet
       hash: md5
-      md5: b376195c7516ca319a49bd101e940be9
-      size: 2211067
+      md5: bd96faab6839bc6f76cecb0bfb9c3bea
+      size: 2229975
   create_blockloc@2022-10:
     cmd: python ./src/create_blockloc.py --year 2022 --state 10
     deps:
@@ -9875,8 +9875,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=10/10.parquet
       hash: md5
-      md5: 41ceaf3a47bfee94ed6e56e59497676e
-      size: 887338
+      md5: 3ff198578030f8055d1a8f4f923325b6
+      size: 895031
   create_blockloc@2022-11:
     cmd: python ./src/create_blockloc.py --year 2022 --state 11
     deps:
@@ -9893,8 +9893,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=11/11.parquet
       hash: md5
-      md5: 05ff3510aa39d1c3151f8285673f948d
-      size: 262105
+      md5: bb4f7ba9b53c8021b4df2ae5ba77936f
+      size: 264447
   create_blockloc@2022-12:
     cmd: python ./src/create_blockloc.py --year 2022 --state 12
     deps:
@@ -9911,8 +9911,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=12/12.parquet
       hash: md5
-      md5: a8e4781c0329edd6f38656c835985c01
-      size: 15246146
+      md5: 5822a0f636e0f55d7dba85ab1f998752
+      size: 15388826
   create_blockloc@2022-13:
     cmd: python ./src/create_blockloc.py --year 2022 --state 13
     deps:
@@ -9929,8 +9929,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=13/13.parquet
       hash: md5
-      md5: f1a4ca27c77b11d874b36e71228b94a4
-      size: 9526461
+      md5: f6a84e57e32cc381a275fc6bdbb3420c
+      size: 9609850
   create_blockloc@2022-15:
     cmd: python ./src/create_blockloc.py --year 2022 --state 15
     deps:
@@ -9947,8 +9947,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=15/15.parquet
       hash: md5
-      md5: 0fd84cb0e93636faad6204ea34bb3093
-      size: 647373
+      md5: 27362d6b91fc01f12ea45ab532d1991c
+      size: 653004
   create_blockloc@2022-16:
     cmd: python ./src/create_blockloc.py --year 2022 --state 16
     deps:
@@ -9965,8 +9965,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=16/16.parquet
       hash: md5
-      md5: 42705d9d6198840c96e73c8fd5ce68f3
-      size: 3708829
+      md5: 55c9829475dc6c456c66720786b266b0
+      size: 3739776
   create_blockloc@2022-17:
     cmd: python ./src/create_blockloc.py --year 2022 --state 17
     deps:
@@ -9983,8 +9983,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=17/17.parquet
       hash: md5
-      md5: 1e530b5704f411ab7a63cf812172295e
-      size: 14438516
+      md5: 92491402fcf5eb07952f79486293ac4d
+      size: 14573903
   create_blockloc@2022-18:
     cmd: python ./src/create_blockloc.py --year 2022 --state 18
     deps:
@@ -10001,8 +10001,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=18/18.parquet
       hash: md5
-      md5: a5c2a0abe3e61133d2a5b4caae8ca5a0
-      size: 8713324
+      md5: 728bb3b9d79cac9cf6d9e2a05be95bc5
+      size: 8790535
   create_blockloc@2022-19:
     cmd: python ./src/create_blockloc.py --year 2022 --state 19
     deps:
@@ -10019,8 +10019,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=19/19.parquet
       hash: md5
-      md5: 99001cebc8d7a6e8f04d349df567d32a
-      size: 7596365
+      md5: 60367c76511bc6d9e6865074ff7ac4d0
+      size: 7662496
   create_blockloc@2022-20:
     cmd: python ./src/create_blockloc.py --year 2022 --state 20
     deps:
@@ -10037,8 +10037,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=20/20.parquet
       hash: md5
-      md5: fc243fe0a25ff72730b32c1391ec1c6a
-      size: 7517718
+      md5: 273c136b4ab550e006ec4e4d0a997d0e
+      size: 7582830
   create_blockloc@2022-21:
     cmd: python ./src/create_blockloc.py --year 2022 --state 21
     deps:
@@ -10055,8 +10055,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=21/21.parquet
       hash: md5
-      md5: 02450b8707046ac50a137f3183c973d2
-      size: 6020490
+      md5: d2289a93cbf59d74388d751908b8d9b0
+      size: 6070578
   create_blockloc@2022-22:
     cmd: python ./src/create_blockloc.py --year 2022 --state 22
     deps:
@@ -10073,8 +10073,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=22/22.parquet
       hash: md5
-      md5: d6120a4910473fc77b72de2fee836454
-      size: 6371008
+      md5: 968f656a96c97eb2cc89f46f2ab6c4e9
+      size: 6438222
   create_blockloc@2022-23:
     cmd: python ./src/create_blockloc.py --year 2022 --state 23
     deps:
@@ -10091,8 +10091,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=23/23.parquet
       hash: md5
-      md5: 02cb6d8c50bcd01cbfcd5cca3129e6a7
-      size: 2111716
+      md5: 6b81f8a584b78085eda9300f7bf6e94e
+      size: 2129578
   create_blockloc@2022-24:
     cmd: python ./src/create_blockloc.py --year 2022 --state 24
     deps:
@@ -10109,8 +10109,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=24/24.parquet
       hash: md5
-      md5: f482258aeef9a8a4018a6a6827897a71
-      size: 3800488
+      md5: 1d0843be8b3a4e861b40459517e78088
+      size: 3841033
   create_blockloc@2022-25:
     cmd: python ./src/create_blockloc.py --year 2022 --state 25
     deps:
@@ -10127,8 +10127,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=25/25.parquet
       hash: md5
-      md5: b3c5568842786fd1ad6c7c7480f5ef2e
-      size: 4829638
+      md5: 9e5cd2e17c52f74a497d5d5c5920a2b5
+      size: 4883581
   create_blockloc@2022-26:
     cmd: python ./src/create_blockloc.py --year 2022 --state 26
     deps:
@@ -10145,8 +10145,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=26/26.parquet
       hash: md5
-      md5: 3d6e1fc150c66bda92651f0e3daca7b3
-      size: 10281720
+      md5: 75f4360711523620248693be01a55f21
+      size: 10374806
   create_blockloc@2022-27:
     cmd: python ./src/create_blockloc.py --year 2022 --state 27
     deps:
@@ -10163,8 +10163,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=27/27.parquet
       hash: md5
-      md5: 9d96b6c9b1679dd31213c28880e0f167
-      size: 8519029
+      md5: f1336c4a0dac1bc27a71f4f86da3797d
+      size: 8594024
   create_blockloc@2022-28:
     cmd: python ./src/create_blockloc.py --year 2022 --state 28
     deps:
@@ -10181,8 +10181,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=28/28.parquet
       hash: md5
-      md5: 3e4a67c61567e7f7dc0895e26e2760a9
-      size: 5074786
+      md5: 13690e1ace30eb38b931f0fa6d1923b2
+      size: 5117182
   create_blockloc@2022-29:
     cmd: python ./src/create_blockloc.py --year 2022 --state 29
     deps:
@@ -10199,8 +10199,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=29/29.parquet
       hash: md5
-      md5: 83aae3621ee424c28dff19c846271fd2
-      size: 10227865
+      md5: 47e63de3fbff1a314ed325f309beecd9
+      size: 10318361
   create_blockloc@2022-30:
     cmd: python ./src/create_blockloc.py --year 2022 --state 30
     deps:
@@ -10217,8 +10217,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=30/30.parquet
       hash: md5
-      md5: cbd8757b1823dccf1f4fe1a40513a61f
-      size: 3979695
+      md5: 9d6acb078f7c9618b3bf3e42c78c448f
+      size: 4013090
   create_blockloc@2022-31:
     cmd: python ./src/create_blockloc.py --year 2022 --state 31
     deps:
@@ -10235,8 +10235,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=31/31.parquet
       hash: md5
-      md5: 31d52163389578a44e2e7aab16a74b21
-      size: 5389271
+      md5: 9344436bfb203eae78847f1ddc1f550b
+      size: 5434242
   create_blockloc@2022-32:
     cmd: python ./src/create_blockloc.py --year 2022 --state 32
     deps:
@@ -10253,8 +10253,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=32/32.parquet
       hash: md5
-      md5: 868dfdd963b4f225227ee8309708b35c
-      size: 2585540
+      md5: db132653226d0e9f1a6398ae692408e3
+      size: 2607252
   create_blockloc@2022-33:
     cmd: python ./src/create_blockloc.py --year 2022 --state 33
     deps:
@@ -10271,8 +10271,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=33/33.parquet
       hash: md5
-      md5: f1d3d858e05ac5b2f2c57b6601370de5
-      size: 1407052
+      md5: 0beff66e769cba86f9983a4093a0e564
+      size: 1419182
   create_blockloc@2022-34:
     cmd: python ./src/create_blockloc.py --year 2022 --state 34
     deps:
@@ -10289,8 +10289,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=34/34.parquet
       hash: md5
-      md5: 013817eae776e34b8e4db3bb4968973e
-      size: 6235626
+      md5: c4f6000fb6babeadd64378f5b60d258f
+      size: 6303014
   create_blockloc@2022-35:
     cmd: python ./src/create_blockloc.py --year 2022 --state 35
     deps:
@@ -10307,8 +10307,8 @@ stages:
     outs:
     - path: ./intermediate/blockloc/year=2022/state=35/35.parquet
       hash: md5
-      md5: c31d5cfa5bda070508309a1bf9def69f
-      size: 4863551
+      md5: 2ec156633f0ebc1151e840dcdf52e506
+      size: 4904047
   create_blockloc@2022-36:
     cmd: python ./src/create_blockloc.py --year 2022 --state 36
     deps:
