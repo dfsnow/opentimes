@@ -54,10 +54,16 @@ def create_cenloc(year: str, geography: str, state: str | None = None) -> None:
         / f"year={year}"
         / f"geography={geography}"
     )
-    output_dir = Path.cwd() / "intermediate" / "cenloc" / f"year={year}"
+    output_dir = (
+        Path.cwd()
+        / "intermediate"
+        / "cenloc"
+        / f"year={year}"
+        / f"geography={geography}"
+    )
 
     if not state:
-        output_file = output_dir / f"{state}.parquet"
+        output_file = output_dir / f"{geography}.parquet"
         tiger_file = tiger_dir / f"{geography}.zip"
     else:
         blockloc_path = blockloc_path / f"state={state}"
@@ -134,15 +140,12 @@ def create_cenloc(year: str, geography: str, state: str | None = None) -> None:
 
     # Extract the original centroid of the TIGER data from the INTPT cols
     gdf = gdf.join(
-        extract_centroids(gdf.copy())[
-            ["x_4326", "y_4326", "x_5071", "y_5071"]
-        ]
+        extract_centroids(gdf.copy())[["x_4326", "y_4326", "x_5071", "y_5071"]]
     )
     gdf = gdf[FINAL_COLS]
-    breakpoint()
 
-    # Check for additional rows or empty values after the join
-    if len(gdf) != original_row_count:
+    # Check for additional new rows or empty values after the join
+    if len(gdf) >= original_row_count:
         raise ValueError("Row count mismatch after join operation.")
     if gdf.isnull().any().any():
         raise ValueError("Missing values detected after join operation.")
