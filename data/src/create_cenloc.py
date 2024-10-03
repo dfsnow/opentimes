@@ -1,7 +1,6 @@
 import argparse
 from pathlib import Path
 
-import geopandas as gpd
 import pandas as pd
 from utils.census import (
     calculate_weighted_mean,
