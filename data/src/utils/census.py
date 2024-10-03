@@ -13,7 +13,8 @@ def calculate_weighted_mean(
     value_cols: str | list[str],
 ):
     """
-    Calculate the weighted mean of specified columns.
+    Calculate the weighted mean of specified columns. Returns the unweighted
+    mean if the total weight is zero.
 
     :param df: The DataFrame containing the data.
     :param group_cols: The columns to group by.
@@ -23,9 +24,10 @@ def calculate_weighted_mean(
     """
 
     def weighted_mean(group, weight_col, value_col):
-        return (group[value_col] * group[weight_col]).sum() / group[
-            weight_col
-        ].sum()
+        total_weight = group[weight_col].sum()
+        if total_weight == 0:
+            return group[value_col].mean()
+        return (group[value_col] * group[weight_col]).sum() / total_weight
 
     grouped = df.groupby(group_cols)
     weighted_means = grouped.apply(
@@ -43,10 +45,7 @@ def extract_centroids(df: pd.DataFrame) -> pd.DataFrame:
     shapefiles. Returns one centroid as WGS84 and another as a planar
     projection.
     """
-    df["geometry"] = gpd.points_from_xy(
-        x=df["intptlon"], y=df["intptlat"], crs="EPSG:4326"
-    )
-    gdf = gpd.GeoDataFrame(data=df, geometry="geometry", crs="EPSG:4326")
+    gdf = points_to_gdf(df, "intptlon", "intptlat", "EPSG:4326")
     gdf["x_4326"] = gdf.geometry.x
     gdf["y_4326"] = gdf.geometry.y
     gdf.to_crs("EPSG:5071", inplace=True)
@@ -85,6 +84,17 @@ def load_shapefile(path: str | Path) -> gpd.GeoDataFrame:
         return gdf
 
 
+def points_to_gdf(
+    df: pd.DataFrame, x_col: str, y_col: str, crs: str
+) -> gpd.GeoDataFrame:
+    """
+    Convert a DataFrame with x and y columns to a GeoDataFrame.
+    """
+    df["geometry"] = gpd.points_from_xy(x=df[x_col], y=df[y_col], crs=crs)
+    gdf = gpd.GeoDataFrame(data=df, geometry="geometry", crs=crs)
+    return gdf
+
+
 def split_geoid(df: pd.DataFrame, geoid_col: str) -> pd.DataFrame:
     """
     Split a Census GEOID into component parts and append them as new columns.
@@ -95,15 +105,36 @@ def split_geoid(df: pd.DataFrame, geoid_col: str) -> pd.DataFrame:
     """
 
     def split_geoid_value(geoid):
-        result = {"state": geoid[:2], "county": geoid[2:5]}
-        if len(geoid) == 11:
-            result["tract"] = geoid[5:11]
-        elif len(geoid) == 15:
-            result["tract"] = geoid[5:11]
-            result["block_group"] = geoid[11:12]
-            result["block"] = geoid[11:15]
-        elif len(geoid) != 5:
-            raise ValueError("GEOID must be either 5, 11, or 15 digits long")
+        length_to_slices = {
+            2: {"state": slice(0, 2)},
+            5: {"state": slice(0, 2), "county": slice(2, 5)},
+            11: {
+                "state": slice(0, 2),
+                "county": slice(2, 5),
+                "tract": slice(5, 11),
+            },
+            12: {
+                "state": slice(0, 2),
+                "county": slice(2, 5),
+                "tract": slice(5, 11),
+                "block_group": slice(11, 12),
+            },
+            15: {
+                "state": slice(0, 2),
+                "county": slice(2, 5),
+                "tract": slice(5, 11),
+                "block_group": slice(11, 12),
+                "block": slice(11, 15),
+            },
+        }
+
+        if len(geoid) not in length_to_slices:
+            raise ValueError(
+                "GEOID must be either 2, 5, 11, 12, or 15 digits long"
+            )
+
+        slices = length_to_slices[len(geoid)]
+        result = {key: geoid[slc] for key, slc in slices.items()}
 
         return pd.Series(result)
 
@@ -111,14 +142,11 @@ def split_geoid(df: pd.DataFrame, geoid_col: str) -> pd.DataFrame:
     return df.join(split_df)
 
 
-def transform_5071_to_4327(df: pd.DataFrame) -> pd.DataFrame:
+def transform_5071_to_4326(df: pd.DataFrame) -> pd.DataFrame:
     """
     Convert x and y coordinates from EPSG:5071 to EPSG:4326.
     """
-    df["geometry"] = gpd.points_from_xy(
-        x=df["x_5071"], y=df["y_5071"], crs="EPSG:5071"
-    )
-    gdf = gpd.GeoDataFrame(data=df, geometry="geometry", crs="EPSG:5071")
+    gdf = points_to_gdf(df, "x_5071", "y_5071", "EPSG:5071")
     gdf.to_crs("EPSG:4326", inplace=True)
     gdf["x_4326"] = gdf.geometry.x
     gdf["y_4326"] = gdf.geometry.y
@@ -126,4 +154,3 @@ def transform_5071_to_4327(df: pd.DataFrame) -> pd.DataFrame:
     df = pd.DataFrame(gdf)
 
     return df
-
