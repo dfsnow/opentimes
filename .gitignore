@@ -4,6 +4,7 @@ build/
 venv/
 *.csv
 *.egg-info/
+*.geojson
 *.osm
 *.parquet
 *.pbf
