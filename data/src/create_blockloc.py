@@ -1,9 +1,9 @@
 import argparse
 import math
 from pathlib import Path
-from utils.census import extract_centroids, load_shapefile, split_geoid
 
 import pandas as pd
+from utils.census import extract_centroids, load_shapefile, split_geoid
 
 
 def create_blockloc(year: str, state: str) -> None:
