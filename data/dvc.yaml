@@ -84,7 +84,7 @@ stages:
         - block_group
       state: ${input.state}
     cmd: "python ./src/create_cenloc.py
-      --year ${item.year} --geography ${item.geography}"
+      --year ${item.year} --geography ${item.geography} --state ${item.state}"
     outs:
       - ./intermediate/cenloc/year=${item.year}/geography=${item.geography}/state=${item.state}/${item.state}.parquet:
           persist: true
@@ -101,5 +101,5 @@ stages:
     cmd: "python ./src/create_osmclip.py
       --year ${item.year} --state ${item.state} --buffer ${item.buffer}"
     outs:
-      - ./intermediate/osmclip/geography=state/state=${item.state}/${item.state}.parquet:
+      - ./intermediate/osmclip/geography=state/state=${item.state}/${item.state}.geojson:
           persist: true
