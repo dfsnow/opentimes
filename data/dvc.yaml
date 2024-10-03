@@ -103,3 +103,28 @@ stages:
     outs:
       - ./intermediate/osmclip/geography=state/state=${item.state}/${item.state}.geojson:
           persist: true
+
+  create_osmextract:
+    deps:
+      - ./input/osm/year=${item.year}/us-${item.year}.osm.pbf
+      - ./intermediate/osmclip/geography=state/state=${item.state}/${item.state}.geojson
+    matrix:
+      year: ${input.year}
+      state: ${input.state}
+    cmd: '
+      OUT_DIR=./intermediate/osmextract/year=${item.year}/geography=state/state=${item.state} &&
+      mkdir -p $OUT_DIR &&
+      osmium extract
+        --strategy complete_ways
+        -p ./intermediate/osmclip/geography=state/state=${item.state}/${item.state}.geojson
+        ./input/osm/year=${item.year}/us-${item.year}.osm.pbf
+        -o "$OUT_DIR"/tmp.osm.pbf &&
+      osmium tags-filter "$OUT_DIR"/tmp.osm.pbf
+        w/highway w/public_transport=platform
+        w/railway=platform w/park_ride r/type=restriction
+        -o "$OUT_DIR"/${item.state}.osm.pbf &&
+      rm $OUT_DIR/tmp.osm.pbf
+      '
+    outs:
+      - ./intermediate/osmextract/year=${item.year}/geography=state/state=${item.state}/${item.state}.osm.pbf:
+          persist: true

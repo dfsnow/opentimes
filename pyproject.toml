@@ -36,6 +36,7 @@ test = [
 data = [
   "dvc[s3]==3.55.2",
   "geopandas[all]==1.0.1",
+  "osmium==4.0.1",
   "pandas==2.2.3",
   "python-dotenv==1.0.1",
   "pyarrow==17.0.0",
