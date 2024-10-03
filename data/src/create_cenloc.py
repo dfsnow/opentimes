@@ -1,8 +1,8 @@
 import argparse
 from pathlib import Path
 
-from geopandas.geoseries import points_from_xy
-from numpy._core.shape_base import block
+import geopandas as gpd
+import pandas as pd
 from utils.census import (
     calculate_weighted_mean,
     extract_centroids,
@@ -11,9 +11,6 @@ from utils.census import (
     split_geoid,
     transform_5071_to_4326,
 )
-
-import pandas as pd
-import geopandas as gpd
 
 COLS_DICT = {
     "state": ["state"],
