@@ -48,7 +48,7 @@ stages:
 
   create_blockloc:
     deps:
-      - ./input/blockpop/year=${item.year}/state=${item.state}/${item.state}.parquet
+      - ./input/blockpop/year=2020/state=${item.state}/${item.state}.parquet
       - ./input/tiger/year=${item.year}/geography=block/state=${item.state}/${item.state}.zip
     matrix:
       year: ${input.year}
