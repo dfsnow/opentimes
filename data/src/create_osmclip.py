@@ -1,7 +1,6 @@
 import argparse
 from pathlib import Path
 
-import geopandas as gpd
 from utils.census import load_shapefile
 
 
@@ -34,6 +33,7 @@ def create_osmclip(year: str, state: str, buffer: int = 0) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
 
     gdf = load_shapefile(tiger_path)
+    gdf = gdf[gdf["geoid"] == state]
     gdf = gdf[["geometry"]]
     gdf.to_crs(crs="EPSG:5071", inplace=True)
     if buffer:
