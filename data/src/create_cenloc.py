@@ -66,7 +66,7 @@ def create_cenloc(year: str, geography: str, state: str | None = None) -> None:
         tiger_dir = tiger_dir / f"state={state}"
         tiger_file = tiger_dir / f"{state}.zip"
         output_dir = output_dir / f"state={state}"
-        output_file = output_dir / f"{state}.zip"
+        output_file = output_dir / f"{state}.parquet"
 
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -141,7 +141,7 @@ def create_cenloc(year: str, geography: str, state: str | None = None) -> None:
     gdf = gdf[FINAL_COLS]
 
     # Check for additional new rows or empty values after the join
-    if len(gdf) >= original_row_count:
+    if len(gdf) > original_row_count:
         raise ValueError("Row count mismatch after join operation.")
     if gdf.isnull().any().any():
         raise ValueError("Missing values detected after join operation.")
