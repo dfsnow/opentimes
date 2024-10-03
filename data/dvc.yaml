@@ -59,16 +59,32 @@ stages:
       - ./intermediate/blockloc/year=${item.year}/state=${item.state}/${item.state}.parquet:
           persist: true
 
-  # create_cenloc_national:
-  #   deps:
-  #     - ./input/tiger
-  #     - ./intermediate/blockloc
-  #   matrix:
-  #     year: ${input.year}
-  #     geography: ${input.census.geography.national}
-  #     state: ${input.state}
-  #   cmd: "python ./src/create_cenloc.py
-  #     --year ${item.year} --geography ${item.geography}"
-  #   outs:
-  #     - ./input/tiger/year=${item.year}/geography=${item.geography}/${item.geography}.zip:
-  #         persist: true
+  create_cenloc_national:
+    deps:
+      - ./input/tiger
+      - ./intermediate/blockloc
+    matrix:
+      year: ${input.year}
+      geography: ${input.census.geography.national}
+    cmd: "python ./src/create_cenloc.py
+      --year ${item.year} --geography ${item.geography}"
+    outs:
+      - ./intermediate/cenloc/year=${item.year}/geography=${item.geography}/${item.geography}.zip:
+          persist: true
+
+  create_cenloc_by_state:
+    deps:
+      - ./input/tiger
+      - ./intermediate/blockloc
+    matrix:
+      year: ${input.year}
+      geography:
+        - county_subdivision
+        - tract
+        - block_group
+      state: ${input.state}
+    cmd: "python ./src/create_cenloc.py
+      --year ${item.year} --geography ${item.geography}"
+    outs:
+      - ./intermediate/cenloc/year=${item.year}/geography=${item.geography}/state=${item.state}/${item.state}.zip:
+          persist: true
