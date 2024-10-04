@@ -11,4 +11,5 @@ venv/
 *.pyc
 *.zip
 .env
+.gitignore
 .DS_Store
