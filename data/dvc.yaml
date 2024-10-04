@@ -46,7 +46,7 @@ stages:
       - ./input/osm/year=${item.year}/us-${item.year}.osm.pbf:
           persist: true
 
-  create_blockloc:
+  create_blockloc_by_state:
     deps:
       - ./input/blockpop/year=2020/state=${item.state}/${item.state}.parquet
       - ./input/tiger/year=${item.year}/geography=block/state=${item.state}/${item.state}.zip
@@ -69,7 +69,7 @@ stages:
     cmd: "python ./src/create_cenloc.py
       --year ${item.year} --geography ${item.geography}"
     outs:
-      - ./intermediate/cenloc/year=${item.year}/geography=${item.geography}/${item.geography}.parquet:
+      - ./intermediate/cenloc/year=${item.year}/geography=${item.geography}/:
           persist: true
 
   create_cenloc_by_state:
@@ -89,25 +89,22 @@ stages:
       - ./intermediate/cenloc/year=${item.year}/geography=${item.geography}/state=${item.state}/${item.state}.parquet:
           persist: true
 
-  create_osmclip:
+  create_osmclip_by_state:
     deps:
       - ./input/tiger/year=${item.year}/geography=state/state.zip
     matrix:
-      year:
-        - '2024'
+      year: ${input.year}
       state: ${input.state}
-      buffer:
-        - 300000  # 300km
     cmd: "python ./src/create_osmclip.py
-      --year ${item.year} --state ${item.state} --buffer ${item.buffer}"
+      --year ${item.year} --state ${item.state} --buffer ${input.buffer_m}"
     outs:
-      - ./intermediate/osmclip/geography=state/state=${item.state}/${item.state}.geojson:
+      - ./intermediate/osmclip/year=${item.year}/geography=state/state=${item.state}/${item.state}.geojson:
           persist: true
 
-  create_osmextract:
+  create_osmextract_by_state:
     deps:
       - ./input/osm/year=${item.year}/us-${item.year}.osm.pbf
-      - ./intermediate/osmclip/geography=state/state=${item.state}/${item.state}.geojson
+      - ./intermediate/osmclip/year=${item.year}/geography=state/state=${item.state}/${item.state}.geojson
     matrix:
       year: ${input.year}
       state: ${input.state}

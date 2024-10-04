@@ -140,13 +140,49 @@ def create_cenloc(year: str, geography: str, state: str | None = None) -> None:
     )
     gdf = gdf[FINAL_COLS]
 
+    # Add the state FIPS code to each geography if it's missing. This is
+    # usually easy to recover from the FIPS code. For ZCTAs you need to
+    # spatial join the state since it is (annoyingly) not in the GEOID/FIPS
+    if geography == "zcta":
+        state_file = (
+            Path.cwd()
+            / "input"
+            / "tiger"
+            / f"year={year}"
+            / "geography=state"
+            / "state.zip"
+        )
+        state_gdf = load_shapefile(state_file)
+        state_gdf.to_crs("EPSG:5071", inplace=True)
+        state_gdf = state_gdf[["geoid", "geometry"]]
+        state_gdf = state_gdf.rename(columns={"geoid": "state"})
+        gdf = points_to_gdf(gdf, "x_5071", "y_5071", "EPSG:5071")
+        gdf = gdf.sjoin(state_gdf, how="inner", predicate="within")
+        gdf.drop(columns=["index_right", "geometry"], inplace=True)
+    elif not state:
+        gdf["state"] = split_geoid(gdf.copy(), "geoid")["state"]
+
     # Check for additional new rows or empty values after the join
     if len(gdf) > original_row_count:
         raise ValueError("Row count mismatch after join operation.")
     if gdf.isnull().any().any():
         raise ValueError("Missing values detected after join operation.")
 
-    gdf.to_parquet(output_file, engine="pyarrow", index=False)
+    # For inputs that are national files (e.g. all states are in one big file)
+    # split them by state and write them as individual state-level files
+    if not state:
+        for state in gdf["state"].unique():
+            state_gdf = gdf[gdf["state"] == state]
+            state_gdf = state_gdf.drop(columns=["state"])
+            state_output_dir = output_dir / f"state={state}"
+            state_output_dir.mkdir(parents=True, exist_ok=True)
+            state_gdf.to_parquet(
+                state_output_dir / f"{state}.parquet",
+                engine="pyarrow",
+                index=False,
+            )
+    else:
+        gdf.to_parquet(output_file, engine="pyarrow", index=False)
 
 
 def suffix_coord_cols(df: pd.DataFrame) -> pd.DataFrame:
