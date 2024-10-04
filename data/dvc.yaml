@@ -101,6 +101,23 @@ stages:
       - ./intermediate/osmclip/year=${item.year}/geography=state/state=${item.state}/${item.state}.geojson:
           persist: true
 
+  create_destpoint_by_state:
+    deps:
+      - ./intermediate/cenloc/year=${item.year}/geography=${item.geography}/state=${item.state}/${item.state}.parquet
+      - ./intermediate/osmclip/year=${item.year}/geography=state/state=${item.state}/${item.state}.geojson
+    matrix:
+      year: ${input.year}
+      geography:
+        - county_subdivision
+        - tract
+        - block_group
+      state: ${input.state}
+    cmd: "python ./src/create_destpoint.py
+      --year ${item.year} --geography ${item.geography} --state ${item.state}"
+    outs:
+      - ./intermediate/destpoint/year=${item.year}/geography=${item.geography}/state=${item.state}/${item.state}.parquet:
+          persist: true
+
   create_osmextract_by_state:
     deps:
       - ./input/osm/year=${item.year}/us-${item.year}.osm.pbf
