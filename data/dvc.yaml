@@ -111,17 +111,18 @@ stages:
     matrix:
       year: ${input.year}
       state: ${input.state}
+    # See: https://docs.conveyal.com/prepare-inputs#preparing-the-osm-data
     cmd: '
       OUT_DIR=./intermediate/osmextract/year=${item.year}/geography=state/state=${item.state} &&
       mkdir -p $OUT_DIR &&
       osmium extract
         --strategy complete_ways
         -p ./intermediate/osmclip/geography=state/state=${item.state}/${item.state}.geojson
-        ./input/osm/year=${item.year}/us-${item.year}.osm.pbf
+        ./input/osm/year=${item.year}/us-${item.year}.osm.pbf --overwrite
         -o "$OUT_DIR"/tmp.osm.pbf &&
       osmium tags-filter "$OUT_DIR"/tmp.osm.pbf
         w/highway w/public_transport=platform
-        w/railway=platform w/park_ride r/type=restriction
+        w/railway=platform w/park_ride r/type=restriction --overwrite
         -o "$OUT_DIR"/${item.state}.osm.pbf &&
       rm $OUT_DIR/tmp.osm.pbf
       '
