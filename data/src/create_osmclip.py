@@ -25,6 +25,7 @@ def create_osmclip(year: str, state: str, buffer: int = 0) -> None:
         Path.cwd()
         / "intermediate"
         / "osmclip"
+        / f"year={year}"
         / "geography=state"
         / f"state={state}"
     )
