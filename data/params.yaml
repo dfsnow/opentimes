@@ -65,6 +65,13 @@ input:
 
   census:
     geography:
+      all:
+        - state
+        - county
+        - county_subdivision
+        - tract
+        - block_group
+        - zcta
       national:
         - state
         - county
@@ -73,4 +80,4 @@ input:
         - county_subdivision
         - tract
         - block_group
-        - block
+        - block  # only used to fetch TIGER files

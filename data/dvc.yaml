@@ -107,10 +107,7 @@ stages:
       - ./intermediate/osmclip/year=${item.year}/geography=state/state=${item.state}/${item.state}.geojson
     matrix:
       year: ${input.year}
-      geography:
-        - county_subdivision
-        - tract
-        - block_group
+      geography: ${input.census.geography.all}
       state: ${input.state}
     cmd: "python ./src/create_destpoint.py
       --year ${item.year} --geography ${item.geography} --state ${item.state}"
