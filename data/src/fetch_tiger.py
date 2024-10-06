@@ -27,11 +27,14 @@ def fetch_shapefile(
     Fetches a TIGER/Line shapefile and saves it to a directory partitioned by
     year, geography, and (optionally) state.
 
-    :param year: The year of the TIGER/Line data.
-    :param geography: The geography type of the shapefile.
-    :param state: (Optional) The two-digit state code for the shapefile.
-    """
+    Args:
+        year: The year of the TIGER/Line data.
+        geography: The geography type of the shapefile.
+        state: The two-digit state FIPS code for the shapefile.
 
+    Returns:
+        None
+    """
     output_dir = (
         Path.cwd()
         / "input"
@@ -69,24 +72,9 @@ def fetch_shapefile(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--year",
-        required=True,
-        help="The year of the TIGER/Line data.",
-        type=str,
-    )
-    parser.add_argument(
-        "--geography",
-        required=True,
-        help="The geography type of the shapefile.",
-        type=str,
-    )
-    parser.add_argument(
-        "--state",
-        required=False,
-        help="The two-digit state code for the shapefile.",
-        type=str,
-    )
+    parser.add_argument("--year", required=True, type=str)
+    parser.add_argument("--geography", required=True, type=str)
+    parser.add_argument("--state", required=False, type=str)
     args = parser.parse_args()
 
     fetch_shapefile(year=args.year, geography=args.geography, state=args.state)

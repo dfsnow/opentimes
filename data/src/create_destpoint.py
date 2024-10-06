@@ -13,11 +13,15 @@ def create_destpoint(
     Find all centroids (weighted and unweighted) of a given Census geography
     within a buffered version of the containing state.
 
-    :param year: The year of the point data.
-    :param geography: The geography type of the point data.
-    :param state: The two-digit state code for the point data.
-    :param buffer: The amount to buffer the input shapefile (in meters) when
-        when determining destination points.
+    Args:
+        year: The year of the point data.
+        geography: The geography type of the point data.
+        state: The two-digit state FIPS code for the point data.
+        buffer: The amount to buffer the input shapefile (in meters) when
+            when determining destination points.
+
+    Returns:
+        None
     """
     cenloc_dir = (
         Path.cwd()
@@ -78,30 +82,10 @@ def create_destpoint(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--year",
-        required=True,
-        help="The year of the point data.",
-        type=str,
-    )
-    parser.add_argument(
-        "--geography",
-        required=True,
-        help="The geography type of the point data.",
-        type=str,
-    )
-    parser.add_argument(
-        "--state",
-        required=True,
-        help="The two-digit state code for the point data.",
-        type=str,
-    )
-    parser.add_argument(
-        "--buffer",
-        required=False,
-        help="The amount to buffer the input shapefile in meters.",
-        type=int,
-    )
+    parser.add_argument("--year", required=True, type=str)
+    parser.add_argument("--geography", required=True, type=str)
+    parser.add_argument("--state", required=True, type=str)
+    parser.add_argument("--buffer", required=False, type=int)
     args = parser.parse_args()
 
     create_destpoint(args.year, args.geography, args.state, args.buffer)

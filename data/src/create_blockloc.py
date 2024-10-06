@@ -8,10 +8,11 @@ from utils.census import extract_centroids, load_shapefile, split_geoid
 
 def create_blockloc(year: str, state: str) -> None:
     """
-    Combine Census block population data with block location data.
+    Combine Census block population data with block location data from
+    TIGER/Line files.
 
     :param year: The year of the decennial Census.
-    :param state: The two-digit state code.
+    :param state: The two-digit state FIPS code.
     """
 
     # Pop. data only exists for decennial years, so round down to the nearest
@@ -91,18 +92,8 @@ def create_blockloc(year: str, state: str) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--year",
-        required=True,
-        help="The year of the decennial Census.",
-        type=str,
-    )
-    parser.add_argument(
-        "--state",
-        required=False,
-        help="The two-digit state code.",
-        type=str,
-    )
+    parser.add_argument("--year", required=True, type=str)
+    parser.add_argument("--state", required=False, type=str)
     args = parser.parse_args()
 
     create_blockloc(args.year, args.state)

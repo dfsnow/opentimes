@@ -17,10 +17,13 @@ def fetch_blockpop(year: str, state: str) -> None:
     Fetches block-level population data from the Census API. Pulls from the
     PL 94-171 dataset, which is used for redistricting.
 
-    :param year: The year of the decennial Census.
-    :param state: The two-digit state code.
-    """
+    Args:
+        year: The year of the decennial Census.
+        state: The two-digit state FIPS code.
 
+    Returns:
+        None
+    """
     output_dir = (
         Path.cwd() / "input" / "blockpop" / f"year={year}" / f"state={state}"
     )
@@ -56,16 +59,9 @@ def fetch_blockpop(year: str, state: str) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--year",
-        required=True,
-        choices=["2010", "2020"],
-        help="The year of the decennial Census.",
+        "--year", required=True, choices=["2010", "2020"], type=str
     )
-    parser.add_argument(
-        "--state",
-        required=False,
-        help="The two-digit state code.",
-    )
+    parser.add_argument("--state", required=False, type=str)
     args = parser.parse_args()
 
     fetch_blockpop(args.year, args.state)
