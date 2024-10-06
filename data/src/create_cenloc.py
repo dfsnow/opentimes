@@ -11,15 +11,6 @@ from utils.census import (
     transform_5071_to_4326,
 )
 
-COLS_DICT = {
-    "state": ["state"],
-    "county": ["state", "county"],
-    "tract": ["state", "county", "tract"],
-    "block_group": ["state", "county", "tract", "block_group"],
-    "county_subdivision": ["geoid"],
-    "zcta": ["geoid"],
-}
-
 FINAL_COLS = [
     "geoid",
     "x_4326",
@@ -42,7 +33,7 @@ def create_cenloc(year: str, geography: str, state: str | None = None) -> None:
     :param geography: The geography type of the shapefile.
     :param state: (Optional) The two-digit state code for the shapefile.
     """
-    blockloc_path = Path.cwd() / "intermediate" / "blockloc" / f"year={year}"
+    blockloc_dir = Path.cwd() / "intermediate" / "blockloc" / f"year={year}"
     tiger_dir = (
         Path.cwd()
         / "input"
@@ -62,7 +53,7 @@ def create_cenloc(year: str, geography: str, state: str | None = None) -> None:
         output_file = output_dir / f"{geography}.parquet"
         tiger_file = tiger_dir / f"{geography}.zip"
     else:
-        blockloc_path = blockloc_path / f"state={state}"
+        blockloc_dir = blockloc_dir / f"state={state}"
         tiger_dir = tiger_dir / f"state={state}"
         tiger_file = tiger_dir / f"{state}.zip"
         output_dir = output_dir / f"state={state}"
@@ -79,60 +70,31 @@ def create_cenloc(year: str, geography: str, state: str | None = None) -> None:
             col for col in tiger_gdf.columns if col not in tiger_cols_to_keep
         ]
     )
+    tiger_gdf.to_crs("EPSG:5071", inplace=True)
 
     # Load the block locations and pop. data associated with the target year.
-    # Load the state value from partition key if a national file, else add it
-    # from the script arguments
-    blockloc = pd.read_parquet(blockloc_path)
-    blockloc["state"] = (
-        blockloc["state"].astype(str).str.zfill(2) if not state else state
+    # Convert the block location point columns to geometry
+    blockloc = pd.read_parquet(blockloc_dir)
+    blockloc = points_to_gdf(blockloc, "x_5071", "y_5071", "EPSG:5071")
+    blockloc = blockloc[["x_5071", "y_5071", "geometry", "population"]]
+
+    # Spatially join the block-level data to the original TIGER polygon. Need
+    # a spatial join here since GEOIDs (for an attribute join) can change over
+    # time e.g. all Connecticut counties changed GEOID in 2022, so their 2020
+    # county GEOID substrings don't match their 2022 county GEOIDs
+    gdf = tiger_gdf.sjoin(blockloc, how="inner", predicate="contains")
+    gdf.drop(columns=["index_right", "geometry"], inplace=True)
+
+    block_centroids = calculate_weighted_mean(
+        df=gdf,
+        group_cols="geoid",
+        weight_col="population",
+        value_cols=["x_5071", "y_5071"],
     )
 
-    # Find weighted centroids by joining block populations, then taking the
-    # weighted mean of the Alber's coordinates for each geography. Use
-    # attribute join for blocks if available, else spatial join
-    join_cols = COLS_DICT[geography]
-    if geography in ["state", "county", "tract", "block_group"]:
-        # Split the GEOID components in the TIGER data for later attribute join
-        # Don't need to do this in the block data since they're already split
-        tiger_gdf = split_geoid(tiger_gdf, "geoid")
-
-        block_centroids = calculate_weighted_mean(
-            df=blockloc,
-            group_cols=join_cols,
-            weight_col="population",
-            value_cols=["x_5071", "y_5071"],
-        )
-        block_centroids = transform_5071_to_4326(block_centroids)
-        block_centroids = suffix_coord_cols(block_centroids)
-
-        # Join the weighted centroid from the blocks back to the TIGER data
-        gdf = tiger_gdf.merge(
-            block_centroids, left_on=join_cols, right_on=join_cols, how="inner"
-        )
-    else:
-        # If the geography is not part of the Census hierarchy then we need to
-        # do a spatial join, since block GEOIDs won't contain the FIPS codes
-        # necessary for an attribute join
-        blockloc = points_to_gdf(blockloc, "x_5071", "y_5071", "EPSG:5071")
-        blockloc = blockloc[["x_5071", "y_5071", "geometry", "population"]]
-
-        tiger_gdf.to_crs("EPSG:5071", inplace=True)
-        gdf = tiger_gdf.sjoin(blockloc, how="inner", predicate="contains")
-        gdf.drop(columns=["index_right", "geometry"], inplace=True)
-
-        block_centroids = calculate_weighted_mean(
-            df=gdf,
-            group_cols=join_cols,
-            weight_col="population",
-            value_cols=["x_5071", "y_5071"],
-        )
-
-        block_centroids = transform_5071_to_4326(block_centroids)
-        block_centroids = suffix_coord_cols(block_centroids)
-        gdf = tiger_gdf.merge(
-            block_centroids, left_on=join_cols, right_on=join_cols, how="inner"
-        )
+    block_centroids = transform_5071_to_4326(block_centroids)
+    block_centroids = suffix_coord_cols(block_centroids)
+    gdf = tiger_gdf.merge(block_centroids, on="geoid", how="inner")
 
     # Extract the original centroid of the TIGER data from the INTPT cols
     gdf = gdf.join(
