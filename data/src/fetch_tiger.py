@@ -68,9 +68,7 @@ def fetch_shapefile(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Fetch TIGER/Line shapefiles."
-    )
+    parser = argparse.ArgumentParser()
     parser.add_argument(
         "--year",
         required=True,
@@ -89,7 +87,6 @@ if __name__ == "__main__":
         help="The two-digit state code for the shapefile.",
         type=str,
     )
-
     args = parser.parse_args()
 
     fetch_shapefile(year=args.year, geography=args.geography, state=args.state)

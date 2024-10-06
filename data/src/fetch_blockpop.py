@@ -54,9 +54,7 @@ def fetch_blockpop(year: str, state: str) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Fetch decennial Census block populations"
-    )
+    parser = argparse.ArgumentParser()
     parser.add_argument(
         "--year",
         required=True,
@@ -68,7 +66,6 @@ if __name__ == "__main__":
         required=False,
         help="The two-digit state code.",
     )
-
     args = parser.parse_args()
 
     fetch_blockpop(args.year, args.state)

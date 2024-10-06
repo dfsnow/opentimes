@@ -90,9 +90,7 @@ def create_blockloc(year: str, state: str) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Combine Census block population data with block location data"
-    )
+    parser = argparse.ArgumentParser()
     parser.add_argument(
         "--year",
         required=True,
@@ -105,7 +103,6 @@ if __name__ == "__main__":
         help="The two-digit state code.",
         type=str,
     )
-
     args = parser.parse_args()
 
     create_blockloc(args.year, args.state)

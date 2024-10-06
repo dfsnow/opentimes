@@ -44,9 +44,7 @@ def create_osmclip(year: str, state: str, buffer: int = 0) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Create a buffered clipping boundary for the OSM road network"
-    )
+    parser = argparse.ArgumentParser()
     parser.add_argument(
         "--year",
         required=True,
@@ -65,7 +63,6 @@ if __name__ == "__main__":
         help="The amount to buffer the input shapefile in meters.",
         type=int,
     )
-
     args = parser.parse_args()
 
     create_osmclip(args.year, args.state, args.buffer)

@@ -156,9 +156,7 @@ def suffix_coord_cols(df: pd.DataFrame) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Combine TIGER shapefiles with Census block populations"
-    )
+    parser = argparse.ArgumentParser()
     parser.add_argument(
         "--year",
         required=True,
@@ -177,7 +175,6 @@ if __name__ == "__main__":
         help="The two-digit state code for the shapefile.",
         type=str,
     )
-
     args = parser.parse_args()
 
     create_cenloc(args.year, args.geography, args.state)

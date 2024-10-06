@@ -70,9 +70,7 @@ def create_destpoint(year: str, geography: str, state: str) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Create a set of destination points from a buffered state"
-    )
+    parser = argparse.ArgumentParser()
     parser.add_argument(
         "--year",
         required=True,
@@ -91,7 +89,6 @@ if __name__ == "__main__":
         help="The two-digit state code for the point data.",
         type=str,
     )
-
     args = parser.parse_args()
 
     create_destpoint(args.year, args.geography, args.state)
