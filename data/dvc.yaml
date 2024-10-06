@@ -17,7 +17,8 @@ stages:
       geography: ${input.census.geography.by_state}
       state: ${input.state}
     cmd: "python ./src/fetch_tiger.py
-      --year ${item.year} --geography ${item.geography} --state ${item.state}"
+      --year ${item.year} --geography ${item.geography}
+      --state ${item.state}"
     outs:
       - ./input/tiger/year=${item.year}/geography=${item.geography}/state=${item.state}/${item.state}.zip:
           persist: true
@@ -27,8 +28,8 @@ stages:
       year:
         - '2020'
       state: ${input.state}
-    cmd: >-
-      python ./src/fetch_blockpop.py --year ${item.year} --state ${item.state}
+    cmd: "python ./src/fetch_blockpop.py
+      --year ${item.year} --state ${item.state}"
     outs:
       - ./input/blockpop/year=${item.year}/state=${item.state}/${item.state}.parquet:
           persist: true
@@ -84,7 +85,8 @@ stages:
         - block_group
       state: ${input.state}
     cmd: "python ./src/create_cenloc.py
-      --year ${item.year} --geography ${item.geography} --state ${item.state}"
+      --year ${item.year} --geography ${item.geography}
+      --state ${item.state}"
     outs:
       - ./intermediate/cenloc/year=${item.year}/geography=${item.geography}/state=${item.state}/${item.state}.parquet:
           persist: true
@@ -96,7 +98,8 @@ stages:
       year: ${input.year}
       state: ${input.state}
     cmd: "python ./src/create_osmclip.py
-      --year ${item.year} --state ${item.state} --buffer ${input.buffer_m}"
+      --year ${item.year} --state ${item.state}
+      --buffer ${input.network_buffer_m}"
     outs:
       - ./intermediate/osmclip/year=${item.year}/geography=state/state=${item.state}/${item.state}.geojson:
           persist: true
@@ -110,7 +113,8 @@ stages:
       geography: ${input.census.geography.all}
       state: ${input.state}
     cmd: "python ./src/create_destpoint.py
-      --year ${item.year} --geography ${item.geography} --state ${item.state}"
+      --year ${item.year} --geography ${item.geography}
+      --state ${item.state} --buffer ${input.destination_buffer_m}"
     outs:
       - ./intermediate/destpoint/year=${item.year}/geography=${item.geography}/state=${item.state}/${item.state}.parquet:
           persist: true

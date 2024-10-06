@@ -13,7 +13,7 @@ def create_osmclip(year: str, state: str, buffer: int = 0) -> None:
     :param state: The two-digit state code for the shapefile.
     :param buffer: The amount to buffer the input shapefile (in meters).
     """
-    tiger_path = (
+    tiger_file = (
         Path.cwd()
         / "input"
         / "tiger"
@@ -33,11 +33,11 @@ def create_osmclip(year: str, state: str, buffer: int = 0) -> None:
 
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    gdf = load_shapefile(tiger_path)
+    gdf = load_shapefile(tiger_file)
     gdf = gdf[gdf["geoid"] == state]
     gdf = gdf[["geometry"]]
-    gdf.to_crs(crs="EPSG:5071", inplace=True)
     if buffer:
+        gdf.to_crs(crs="EPSG:5071", inplace=True)
         gdf["geometry"] = gdf["geometry"].buffer(distance=buffer)
     gdf.to_crs(crs="EPSG:4326", inplace=True)
     gdf.to_file(output_file, driver="GeoJSON")

@@ -1,7 +1,15 @@
 ---
 
 input:
-  buffer_m: 300000
+  # Distance in meters to buffer each state boundary by when clipping the
+  # national road network. Should be slightly higher than `destination_buffer_m`
+  # so that all points can be reach via the clipped network
+  network_buffer_m: 340000
+
+  # Distance in meters to buffer each state boundary when searching for
+  # destination points to route to. Larger buffer = more points = longer
+  # overall compute time
+  destination_buffer_m: 300000
 
   year:
     - '2020'
