@@ -9,9 +9,13 @@ def create_osmclip(year: str, state: str, buffer: int = 0) -> None:
     Converts TIGER/Line shapefile to a buffered GeoJSON used as a clipping
     boundary for the OpenStreetMap road network.
 
-    :param year: The year of the TIGER/Line data.
-    :param state: The two-digit state code for the shapefile.
-    :param buffer: The amount to buffer the input shapefile (in meters).
+    Args:
+        year: The year of the TIGER/Line data.
+        state: The two-digit state FIPS code for the shapefile.
+        buffer: The amount to buffer the input shapefile (in meters).
+
+    Returns:
+        None
     """
     tiger_file = (
         Path.cwd()
@@ -45,24 +49,9 @@ def create_osmclip(year: str, state: str, buffer: int = 0) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--year",
-        required=True,
-        help="The year of the TIGER/Line data.",
-        type=str,
-    )
-    parser.add_argument(
-        "--state",
-        required=True,
-        help="The two-digit state code for the shapefile.",
-        type=str,
-    )
-    parser.add_argument(
-        "--buffer",
-        required=False,
-        help="The amount to buffer the input shapefile in meters.",
-        type=int,
-    )
+    parser.add_argument("--year", required=True, type=str)
+    parser.add_argument("--state", required=True, type=str)
+    parser.add_argument("--buffer", required=False, type=int)
     args = parser.parse_args()
 
     create_osmclip(args.year, args.state, args.buffer)

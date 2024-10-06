@@ -26,12 +26,16 @@ FINAL_COLS = [
 
 def create_cenloc(year: str, geography: str, state: str | None = None) -> None:
     """
-    Combines TIGER/Line shapefiles with Census block populations to determine
+    Combines TIGER/Line shapefiles with Census block locations to determine
     the population-weighted centroid of every Census geography.
 
-    :param year: The year of the TIGER/Line data.
-    :param geography: The geography type of the shapefile.
-    :param state: (Optional) The two-digit state code for the shapefile.
+    Args:
+        year: The year of the TIGER/Line data.
+        geography: The geography type of the shapefile.
+        state: (Optional) The two-digit state FIPS code for the shapefile.
+
+    Returns:
+        None
     """
     blockloc_dir = Path.cwd() / "intermediate" / "blockloc" / f"year={year}"
     tiger_dir = (
@@ -157,24 +161,9 @@ def suffix_coord_cols(df: pd.DataFrame) -> pd.DataFrame:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--year",
-        required=True,
-        help="The year of the TIGER/Line data.",
-        type=str,
-    )
-    parser.add_argument(
-        "--geography",
-        required=True,
-        help="The geography type of the shapefile.",
-        type=str,
-    )
-    parser.add_argument(
-        "--state",
-        required=False,
-        help="The two-digit state code for the shapefile.",
-        type=str,
-    )
+    parser.add_argument("--year", required=True, type=str)
+    parser.add_argument("--geography", required=True, type=str)
+    parser.add_argument("--state", required=False, type=str)
     args = parser.parse_args()
 
     create_cenloc(args.year, args.geography, args.state)
