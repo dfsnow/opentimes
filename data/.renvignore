@@ -2,9 +2,10 @@ __pycache__/
 .venv/
 build/
 venv/
+input/
+intermediate/
+output/
 *.csv
-*.egg-info/
-*.geojson
 *.osm
 *.parquet
 *.pbf
@@ -13,4 +14,3 @@ venv/
 .env
 .gitignore
 .DS_Store
-.Rproj.user
