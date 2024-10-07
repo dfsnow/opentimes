@@ -3,8 +3,11 @@ __pycache__/
 build/
 venv/
 *.csv
+*.dat
 *.egg-info/
 *.geojson
+*.mapdb
+*.mapdb.p
 *.osm
 *.parquet
 *.pbf
