@@ -1,11 +1,14 @@
 __pycache__/
 .venv/
 build/
+rosm.cache/
 venv/
 *.csv
 *.dat
 *.egg-info/
 *.geojson
+*.jar
+*.json
 *.mapdb
 *.mapdb.p
 *.osm
