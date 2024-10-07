@@ -132,7 +132,7 @@ stages:
       mkdir -p $OUT_DIR &&
       osmium extract
         --strategy complete_ways
-        -p ./intermediate/osmclip/geography=state/state=${item.state}/${item.state}.geojson
+        -p intermediate/osmclip/year=${item.year}/geography=state/state=${item.state}/${item.state}.geojson
         ./input/osm/year=${item.year}/us-${item.year}.osm.pbf --overwrite
         -o "$OUT_DIR"/tmp.osm.pbf &&
       osmium tags-filter "$OUT_DIR"/tmp.osm.pbf
