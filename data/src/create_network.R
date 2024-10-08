@@ -33,7 +33,9 @@ opt <- parse_args(opt_parser)
 
 # If the downloaded copy of R5 used by R isn't the custom JAR with limits
 # removed, replace it
-downloaded_r5_path <- r5r::download_r5()
+r5_file_url <- r5r:::fileurl_from_metadata(r5r:::r5r_env$r5_jar_version)
+r5_filename <- basename(r5_file_url)
+downloaded_r5_path <- file.path(r5r:::r5r_env$cache_dir, r5_filename)
 downloaded_r5_md5 <- digest(object = downloaded_r5_path, algo = "md5", file = TRUE)
 custom_r5_path <- here::here("./jars/r5-custom.jar")
 custom_r5_md5 <- digest(object = custom_r5_path, algo = "md5", file = TRUE)
