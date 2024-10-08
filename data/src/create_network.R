@@ -35,11 +35,16 @@ opt <- parse_args(opt_parser)
 # removed, replace it
 r5_file_url <- r5r:::fileurl_from_metadata(r5r:::r5r_env$r5_jar_version)
 r5_filename <- basename(r5_file_url)
-downloaded_r5_path <- file.path(r5r:::r5r_env$cache_dir, r5_filename)
-downloaded_r5_md5 <- digest(object = downloaded_r5_path, algo = "md5", file = TRUE)
-custom_r5_path <- here::here("./jars/r5-custom.jar")
-custom_r5_md5 <- digest(object = custom_r5_path, algo = "md5", file = TRUE)
 
+downloaded_r5_path <- file.path(r5r:::r5r_env$cache_dir, r5_filename)
+custom_r5_path <- here::here("./jars/r5-custom.jar")
+if (!file.exists(downloaded_r5_path)) {
+  message("Downloading R5 JAR:")
+  file.copy(from = custom_r5_path, to = downloaded_r5_path, overwrite = TRUE)
+}
+
+downloaded_r5_md5 <- digest(object = downloaded_r5_path, algo = "md5", file = TRUE)
+custom_r5_md5 <- digest(object = custom_r5_path, algo = "md5", file = TRUE)
 if (downloaded_r5_md5 != custom_r5_md5) {
   file.copy(from = custom_r5_path, to = downloaded_r5_path, overwrite = TRUE)
 }
@@ -63,7 +68,7 @@ create_links(osmextract_dir, network_dir, pattern = ".*\\.osm.pbf")
 message("Creating network.dat file:")
 r5r::setup_r5(
   data_path = network_dir,
-  verbose = TRUE,
+  verbose = FALSE,
   temp_dir = FALSE,
   overwrite = TRUE
 )
