@@ -80,38 +80,6 @@
       ],
       "Hash": "7f3867df00a91c63089beb85b9ef0208"
     },
-    "arrow": {
-      "Package": "arrow",
-      "Version": "17.0.0.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "R6",
-        "assertthat",
-        "bit64",
-        "cpp11",
-        "glue",
-        "methods",
-        "purrr",
-        "rlang",
-        "stats",
-        "tidyselect",
-        "utils",
-        "vctrs"
-      ],
-      "Hash": "14af96cb2973f6a6c220ce9c3e5b02cd"
-    },
-    "assertthat": {
-      "Package": "assertthat",
-      "Version": "0.2.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "tools"
-      ],
-      "Hash": "50c838a310445e954bc13f26f26a6ecf"
-    },
     "backports": {
       "Package": "backports",
       "Version": "1.5.0",
@@ -121,30 +89,6 @@
         "R"
       ],
       "Hash": "e1e1b9d75c37401117b636b7ae50827a"
-    },
-    "bit": {
-      "Package": "bit",
-      "Version": "4.5.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R"
-      ],
-      "Hash": "5dc7b2677d65d0e874fc4aaf0e879987"
-    },
-    "bit64": {
-      "Package": "bit64",
-      "Version": "4.5.2",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "bit",
-        "methods",
-        "stats",
-        "utils"
-      ],
-      "Hash": "e84984bf5f12a18628d9a02322128dfd"
     },
     "checkmate": {
       "Package": "checkmate",
@@ -213,16 +157,6 @@
       ],
       "Hash": "6303d93b9a915fbb7dbbf31e1ba5d3a9"
     },
-    "cpp11": {
-      "Package": "cpp11",
-      "Version": "0.5.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R"
-      ],
-      "Hash": "91570bba75d0c9d3f1040c835cee8fba"
-    },
     "curl": {
       "Package": "curl",
       "Version": "5.2.3",
@@ -243,6 +177,17 @@
         "methods"
       ],
       "Hash": "fb24e05d4a91d8b1c7ff8e284bde834a"
+    },
+    "digest": {
+      "Package": "digest",
+      "Version": "0.6.37",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "utils"
+      ],
+      "Hash": "33698c4b3127fc9f506654607fb73676"
     },
     "dplyr": {
       "Package": "dplyr",
@@ -316,6 +261,16 @@
       ],
       "Hash": "a722b946e99fd7a006ab1239c0d1b2bc"
     },
+    "getopt": {
+      "Package": "getopt",
+      "Version": "1.20.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "stats"
+      ],
+      "Hash": "ed33b16c6d24f7ced1d68877ac2509ee"
+    },
     "glue": {
       "Package": "glue",
       "Version": "1.8.0",
@@ -370,6 +325,18 @@
       ],
       "Hash": "7ce2733a9826b3aeb1775d56fd305472"
     },
+    "optparse": {
+      "Package": "optparse",
+      "Version": "1.7.5",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "getopt",
+        "methods"
+      ],
+      "Hash": "ce5f8381cd2c38d1fc14c83d8b21efd0"
+    },
     "pillar": {
       "Package": "pillar",
       "Version": "1.9.0",
@@ -408,21 +375,6 @@
         "utils"
       ],
       "Hash": "e0ef355c12942cf7a6b91a6cfaea8b3e"
-    },
-    "purrr": {
-      "Package": "purrr",
-      "Version": "1.0.2",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "cli",
-        "lifecycle",
-        "magrittr",
-        "rlang",
-        "vctrs"
-      ],
-      "Hash": "1cba04a4e9414bdefc9dcaa99649a8dc"
     },
     "r5r": {
       "Package": "r5r",
