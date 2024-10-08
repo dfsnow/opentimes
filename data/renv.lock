@@ -382,11 +382,11 @@
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
-      "RemoteUsername": "ipeaGIT",
+      "RemoteUsername": "dfsnow",
       "RemoteRepo": "r5r",
       "RemoteSubdir": "r-package",
       "RemoteRef": "master",
-      "RemoteSha": "934c4acf9e8a8c84195e2f561d50a5c6fa478bab",
+      "RemoteSha": "ee2452be27e99aadebfff2d085184613ad49a028",
       "Requirements": [
         "R",
         "checkmate",
@@ -401,7 +401,7 @@
         "utils",
         "zip"
       ],
-      "Hash": "56e7d90ea1d3ba4d67f6e4219b8755a1"
+      "Hash": "58a7c1c32b396e96e4e6b9a61dcd4ff5"
     },
     "rJava": {
       "Package": "rJava",
