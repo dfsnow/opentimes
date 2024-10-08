@@ -7,6 +7,7 @@ library(here)
 library(optparse)
 library(r5r)
 library(tictoc)
+source("./src/utils/utils.R")
 
 # Parse script arguments in the style of Python and check for valid values
 option_list <- list(
@@ -62,10 +63,38 @@ destinations <- read_parquet(destinations_file) %>%
 
 # Snap lat/lon points to the street network
 snap_mode <- ifelse(opt$mode == "TRANSIT", "WALK", opt$mode)
-origins <- find_snap(r5r_core, origins, mode = snap_mode, radius = 5e5) %>%
-  rename(id = point_id)
-destinations <- find_snap(r5r_core, destinations, mode = snap_mode, radius = 5e5) %>%
-  rename(id = point_id)
+origins_snapped <- find_snap(
+  r5r_core = r5r_core,
+  points = origins,
+  mode = snap_mode,
+  radius = 5e5
+) %>%
+  rename(
+    id = point_id,
+    lat_nosnap = lat, lon_nosnap = lon,
+    lat = snap_lat, lon = snap_lon,
+    distance_m = distance, snapped = found
+  ) %>%
+  mutate(
+    lat = ifelse(is.na(lat), lat_nosnap, lat),
+    lon = ifelse(is.na(lon), lon_nosnap, lon)
+  )
+destinations_snapped <- find_snap(
+  r5r_core = r5r_core,
+  points = destinations,
+  mode = snap_mode,
+  radius = 5e5
+) %>%
+  rename(
+    id = point_id,
+    lat_nosnap = lat, lon_nosnap = lon,
+    lat = snap_lat, lon = snap_lon,
+    distance_m = distance, snapped = found
+  ) %>%
+  mutate(
+    lat = ifelse(is.na(lat), lat_nosnap, lat),
+    lon = ifelse(is.na(lon), lon_nosnap, lon)
+  )
 
 # Setup file paths for travel time outputs
 times_dir <- here::here(glue::glue(
@@ -89,8 +118,8 @@ for (dir in c(times_dir, points_dir)) {
 tictoc::tic("Generating travel time matrix")
 ttm <- travel_time_matrix(
   r5r_core = r5r_core,
-  origins = origins,
-  destinations = destinations,
+  origins = origins_snapped,
+  destinations = destinations_snapped,
   mode = opt$mode,
   walk_speed = 4.5,
   bike_speed = 15,
