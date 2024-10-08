@@ -1,12 +1,24 @@
+import sys
 import argparse
 import datetime
 from pathlib import Path
 
 import geopandas as gpd
 import pandas as pd
-import r5py
 
 from utils.census import points_to_gdf
+
+r5_path = Path.cwd() / "r5-custom.jar"
+dir_path = Path.cwd() / "temp"
+sys.argv.append("--verbose")
+sys.argv.append("--max-memory")
+sys.argv.append("16G")
+sys.argv.append("--temporary-directory")
+sys.argv.append(dir_path.as_posix())
+sys.argv.append("--r5-classpath")
+sys.argv.append(r5_path.as_posix())
+
+import r5py
 
 
 def fetch_points(
@@ -36,14 +48,14 @@ def fetch_points(
     )
 
     origins = pd.read_parquet(cenloc_file)
-    origins = points_to_gdf(origins, "x_4326_wt", "y_4326_wt", "EPSG:4326")
-    origins = origins[["geoid", "geometry"]]
+    origins = points_to_gdf(origins, "x_4326", "y_4326", "EPSG:4326")
+    origins = origins.rename(columns={"geoid": "id"})[["id", "geometry"]]
 
     destinations = pd.read_parquet(destpoint_file)
-    destinations = points_to_gdf(
-        destinations, "x_4326_wt", "y_4326_wt", "EPSG:4326"
-    )
-    destinations = destinations[["geoid", "geometry"]]
+    destinations = points_to_gdf(destinations, "x_4326", "y_4326", "EPSG:4326")
+    destinations = destinations.rename(columns={"geoid": "id"})[
+        ["id", "geometry"]
+    ]
 
     return origins, destinations
 
@@ -55,15 +67,16 @@ def load_network(
         Path.cwd()
         / "intermediate"
         / "osmextract"
-        / "year=state"
-        / f"geography={geography}"
-        / f"{state}"
+        / f"year={year}"
+        / f"geography=state"
+        / f"state={state}"
         / f"{state}.osm.pbf"
     )
 
-    network = r5py.TransportNetwork(network_file)
+    network = r5py.TransportNetwork(osm_pbf=network_file.as_posix())
 
     return network
+
 
 #
 # def calculate_times(
@@ -79,33 +92,24 @@ def load_network(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--year",
-        required=True,
-        help="The year of the point data.",
-        type=str,
-    )
-    parser.add_argument(
-        "--geography",
-        required=True,
-        help="The geography type of the point data.",
-        type=str,
-    )
-    parser.add_argument(
-        "--state",
-        required=True,
-        help="The two-digit state code for the point data.",
-        type=str,
-    )
-    args = parser.parse_args()
+    parser.add_argument("--year", required=True, type=str)
+    parser.add_argument("--geography", required=True, type=str)
+    parser.add_argument("--state", required=True, type=str)
+    args, _ = parser.parse_known_args()
 
     origins, destinations = fetch_points(args.year, args.geography, args.state)
     network = load_network(args.year, args.geography, args.state)
+    origins["geometry"] = network.snap_to_network(origins["geometry"])
+    destinations["geometry"] = network.snap_to_network(
+        destinations["geometry"]
+    )
 
     travel_time_matrix = r5py.TravelTimeMatrixComputer(
         network,
         origins=origins,
         destinations=destinations,
         transport_modes=[r5py.TransportMode.CAR],
-        departure=datetime.datetime(int(args.year), 1, 1, 14, 0, 0),
+        max_time=datetime.timedelta(seconds=30000),
     ).compute_travel_times()
+
+    travel_time_matrix.to_parquet(f"temp_{args.state}.parquet")
