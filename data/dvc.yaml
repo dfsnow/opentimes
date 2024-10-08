@@ -144,3 +144,14 @@ stages:
     outs:
       - ./intermediate/osmextract/year=${item.year}/geography=state/state=${item.state}/${item.state}.osm.pbf:
           persist: true
+
+  create_network:
+    deps:
+      - ./intermediate/osmextract/year=${item.year}/geography=state/state=${item.state}/${item.state}.osm.pbf
+    matrix:
+      year: ${input.year}
+      state: ${input.state}
+    cmd: "Rscript --year ${item.year} --state ${item.state}"
+    outs:
+      - ./intermediate/network/year=${item.year}/geography=state/state=${item.state}/network.dat:
+          persist: true
