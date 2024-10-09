@@ -1,9 +1,11 @@
 options(java.parameters = "-Xmx16G")
 
 library(arrow)
+library(digest)
 library(dplyr)
 library(glue)
 library(here)
+library(jsonlite)
 library(optparse)
 library(r5r)
 library(tictoc)
@@ -32,21 +34,20 @@ if (!opt$centroid_type %in% c("weighted", "unweighted")) {
 params <- read_yaml(here::here("params.yaml"))
 
 # Setup file paths for inputs (pre-made network file and OD points)
+input_path <- glue::glue(
+  "year={opt$year}/geography={opt$geography}/",
+  "state={opt$state}/{opt$state}.parquet"
+)
 network_dir <- here::here(glue::glue(
   "intermediate/network/",
   "year={opt$year}/geography=state/state={opt$state}"
 ))
-origins_file <- here::here(glue::glue(
-  "intermediate/cenloc/year={opt$year}/",
-  "geography={opt$geography}/state={opt$state}/{opt$state}.parquet"
-))
-destinations_file <- here::here(glue::glue(
-  "intermediate/destpoint/year={opt$year}/",
-  "geography={opt$geography}/state={opt$state}/{opt$state}.parquet"
-))
+origins_file <- here::here("intermediate/cenloc", input_path)
+destinations_file <- here::here("intermediate/destpoint", input_path)
 
-# Load the R5 JAR and network
+# Load the R5 JAR, network, and network settings
 setup_r5_jar("./jars/r5-custom.jar")
+network_settings <- read_json(here::here(network_dir, "network_settings.json"))
 r5r_core <- r5r::setup_r5(
   data_path = network_dir,
   verbose = FALSE,
@@ -70,7 +71,7 @@ origins_snapped <- find_snap(
   r5r_core = r5r_core,
   points = origins,
   mode = "WALK",
-  radius = params$times$snap_radius
+  radius = as.numeric(params$times$snap_radius)
 ) %>%
   rename(id = point_id, distance_m = distance, snapped = found) %>%
   mutate(
@@ -81,7 +82,7 @@ destinations_snapped <- find_snap(
   r5r_core = r5r_core,
   points = destinations,
   mode = "WALK",
-  radius = params$times$snap_radius
+  radius = as.numeric(params$times$snap_radius)
 ) %>%
   rename(id = point_id, distance_m = distance, snapped = found) %>%
   mutate(
@@ -90,19 +91,17 @@ destinations_snapped <- find_snap(
   )
 
 # Setup file paths for travel time outputs
-times_dir <- here::here(glue::glue(
-  "output/times/mode={opt$mode}/",
-  "year={opt$year}/geography={opt$geography}/state={opt$state}/",
-  "centroid_type={opt$centroid_type}"
-))
-points_dir <- here::here(glue::glue(
-  "output/points/mode={opt$mode}/",
-  "year={opt$year}/geography={opt$geography}/state={opt$state}/",
-  "centroid_type={opt$centroid_type}"
-))
-origins_dir <- here::here(points_dir, "point_type=origin")
-destinations_dir <- here::here(points_dir, "point_type=destination")
-for (dir in c(times_dir, origins_dir, destinations_dir)) {
+output_path <- glue::glue(
+  "mode={opt$mode}/year={opt$year}/geography={opt$geography}/",
+  "state={opt$state}/centroid_type={opt$centroid_type}"
+)
+times_dir <- here::here("output/times", output_path)
+origins_dir <- here::here("output/points", output_path, "point_type=origin")
+destinations_dir <- here::here("output/points", output_path, "point_type=destination")
+missing_pairs_dir <- here::here("output/missing_pairs", output_path)
+metadata_dir <- here::here("output/metadata", output_path)
+for (dir in c(times_dir, origins_dir,
+              destinations_dir, missing_pairs_dir, metadata_dir)) {
   if (!dir.exists(dir)) {
     dir.create(dir, recursive = TRUE)
   }
@@ -132,20 +131,56 @@ ttm <- travel_time_matrix(
     destination_id = to_id,
     time_min = travel_time_p50
   )
-tictoc::toc()
+tictoc::toc(log = TRUE)
+
+ttm_time_elapsed <- 
 
 # Check for missing point combinations
-point_pairs <- expand.grid(
-  from_id = origins_snapped$id,
-  to_id = destinations_snapped$id,
+missing_pairs <- expand.grid(
+  origin_id = origins_snapped$id,
+  destination_id = destinations_snapped$id,
   stringsAsFactors = FALSE
+) %>%
+  anti_join(ttm, by = c("origin_id", "destination_id"))
+
+# Create a metadata dataframe of all settings used for creating inputs
+# and generating times
+git_commit <- git2r::revparse_single(git2r::repository(), "HEAD")
+network_file_hash <- digest::digest(
+  here::here(network_dir, "network.dat"),
+  algo = "md5",
+  file = TRUE
 )
-missing_pairs <- point_pairs %>%
-  anti_join(ttm, by = c("from_id", "to_id")) %>%
-  mutate(
-    from_id = as.character(from_id),
-    to_id = as.character(to_id)
-  )
+metadata <- tibble::tibble(
+  r5_version = r5r:::r5r_env$r5_jar_version,
+  r5_network_version = network_settings$r5_network_version,
+  r5r_version = network_settings$r5r_version,
+  r5_max_trip_duration = params$times$r5$max_trip_duration,
+  r5_walk_speed = params$times$r5$walk_speed,
+  r5_bike_speed = params$times$r5$bike_speed,
+  r5_max_lts = params$times$r5$max_lts,
+  r5_max_rides = params$times$r5$max_rides,
+  r5_time_window = params$times$r5$time_window,
+  r5_percentiles = params$times$r5$percentiles,
+  r5_draws_per_minute = params$times$r5$draws_per_minute,
+  git_sha_short = substr(git_commit$sha, 1, 8),
+  git_sha_long = git_commit$sha,
+  git_message = gsub("\n", "", git_commit$message),
+  git_author = git_commit$author$name,
+  git_email = git_commit$author$email,
+  network_buffer_m = params$input$network_buffer_m,
+  destination_buffer_m = params$input$destination_buffer_m,
+  snap_radius = params$times$snap_radius,
+  pbf_file_name = network_settings$pbf_file_name,
+  network_file_md5 = network_file_hash,
+  use_elevation = network_settings$use_elevation,
+  elevation_cost_function = network_settings$elevation_cost_function,
+  elevation_zoom = params$input$elevation_zoom,
+  tiff_file_name = dplyr::na_if(network_settings$tiff_file_name, ""),
+  time_finished = as.POSIXct(Sys.time(), tz="UTC"),
+  time_to_generate = tictoc::tic.log(format = FALSE)[[1]]$toc -
+    tictoc::tic.log(format = FALSE)[[1]]$tic,
+)
 
 # Save the travel time matrix and input points to disk
 write_parquet(
@@ -163,6 +198,18 @@ write_parquet(
 write_parquet(
   x = destinations_snapped,
   sink = here::here(destinations_dir, "part-0.parquet"),
+  compression = params$output$compression$type,
+  compression_level = params$output$compression$level
+)
+write_parquet(
+  x = missing_pairs,
+  sink = here::here(missing_pairs_dir, "part-0.parquet"),
+  compression = params$output$compression$type,
+  compression_level = params$output$compression$level
+)
+write_parquet(
+  x = metadata,
+  sink = here::here(metadata_dir, "part-0.parquet"),
   compression = params$output$compression$type,
   compression_level = params$output$compression$level
 )

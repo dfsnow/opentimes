@@ -183,7 +183,7 @@ stages:
           persist: true
       - ./output/points/mode=${item.mode}/year=${item.year}/geography=${item.geography}/state=${item.state}/centroid_type=${item.centroid_type}/point_type=destination/part-0.parquet:
           persist: true
-      - ./output/missing_points/mode=${item.mode}/year=${item.year}/geography=${item.geography}/state=${item.state}/centroid_type=${item.centroid_type}/part-0.parquet:
+      - ./output/missing_pairs/mode=${item.mode}/year=${item.year}/geography=${item.geography}/state=${item.state}/centroid_type=${item.centroid_type}/part-0.parquet:
           persist: true
       - ./output/metadata/mode=${item.mode}/year=${item.year}/geography=${item.geography}/state=${item.state}/centroid_type=${item.centroid_type}/part-0.parquet:
           persist: true
