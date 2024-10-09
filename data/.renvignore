@@ -5,11 +5,13 @@ venv/
 input/
 intermediate/
 output/
+temp*.R
 *.csv
 *.osm
 *.parquet
 *.pbf
 *.pyc
+*.tif
 *.zip
 .env
 .gitignore
