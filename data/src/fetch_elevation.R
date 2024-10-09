@@ -27,6 +27,9 @@ elevation_dir <- here::here(glue::glue(
   "input/elevation/",
   "geography=state/state={opt$state}"
 ))
+if (!dir.exists(elevation_dir)) {
+  dir.create(elevation_dir, recursive = TRUE)
+}
 
 # Load the buffered state file
 state <- st_read(osmclip_file) %>%
