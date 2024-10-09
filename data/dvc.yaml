@@ -151,7 +151,10 @@ stages:
     matrix:
       year: ${input.year}
       state: ${input.state}
-    cmd: "Rscript src/create_network.R --year ${item.year} --state ${item.state}"
+    cmd: "Rscript src/create_network.R
+      --year ${item.year} --state ${item.state}"
     outs:
       - ./intermediate/network/year=${item.year}/geography=state/state=${item.state}/network.dat:
+          persist: true
+      - ./intermediate/network/year=${item.year}/geography=state/state=${item.state}/network_settings.json:
           persist: true
