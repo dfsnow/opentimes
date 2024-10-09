@@ -34,7 +34,7 @@ setup_r5_jar("./jars/r5-custom.jar")
 message("Creating network.dat file:")
 r5r::setup_r5(
   data_path = network_dir,
-  verbose = FALSE,
+  verbose = TRUE,
   temp_dir = FALSE,
   overwrite = TRUE
 )
