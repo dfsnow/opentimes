@@ -5,6 +5,7 @@ library(optparse)
 library(sf)
 library(terra)
 library(yaml)
+source("./src/utils/utils.R")
 
 # Parse script arguments in the style of Python
 option_list <- list(
@@ -30,12 +31,10 @@ elevation_dir <- here::here(glue::glue(
 # Load the buffered state file
 state <- st_read(osmclip_file) %>%
   st_transform(4326)
-elev <- get_elev_raster(
+elev <- fetch_elev_tiles(
   locations = state,
-  z = params$input$elevation_zoom,
-  src = "aws",
-  override_size_check = TRUE,
-  verbose = TRUE
+  prj = st_crs(state),
+  z = params$input$elevation_zoom
 )
 
 # Write the .tif output to a single giant file
@@ -45,3 +44,7 @@ terra::writeRaster(
   overwrite = TRUE,
   memfrac = 0.8
 )
+
+# Clear the temporary directory of .tif files
+tif_file_tiles <- list.files(tempdir(), pattern = ".tif", full.names = TRUE)
+invisible(file.remove(tif_file_tiles))
