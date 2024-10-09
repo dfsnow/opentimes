@@ -3,6 +3,8 @@ library(glue)
 library(here)
 library(optparse)
 library(sf)
+library(terra)
+library(yaml)
 
 # Parse script arguments in the style of Python
 option_list <- list(
@@ -11,6 +13,9 @@ option_list <- list(
 )
 opt_parser <- OptionParser(option_list = option_list)
 opt <- parse_args(opt_parser)
+
+# Load parameters from file
+params <- read_yaml(here::here("params.yaml"))
 
 # Setup file paths and outputs
 osmclip_file <- here::here(glue::glue(
@@ -24,13 +29,19 @@ elevation_dir <- here::here(glue::glue(
 
 # Load the buffered state file
 state <- st_read(osmclip_file) %>%
-  st_transform(5071)
+  st_transform(4326)
 elev <- get_elev_raster(
   locations = state,
-  z = 14,
+  z = params$input$elevation_zoom,
   src = "aws",
-  expand = 50000,  # buffer additional 50km 
   override_size_check = TRUE,
   verbose = TRUE
 )
-write_raster(elev, here::here(elevation_dir, "elevation.tif"))
+
+# Write the .tif output to a single giant file
+terra::writeRaster(
+  x = elev,
+  filename = here::here(elevation_dir, glue::glue("{opt$state}.tif")),
+  overwrite = TRUE,
+  memfrac = 0.8
+)
