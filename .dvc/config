@@ -5,3 +5,4 @@
     url = s3://opentimes-dvc
     endpointurl = https://fcb279b22cfe4c98f903ad8f9e7ccbb2.r2.cloudflarestorage.com
     profile = cloudflare
+    version_aware = false
