@@ -173,6 +173,8 @@ stages:
   calculate_times:
     deps:
       - ./intermediate/network/year=${item.year}/geography=state/state=${item.state}/network.dat
+      - ./intermediate/cenloc/year=${item.year}/geography=${item.geography}/state=${item.state}/${item.state}.parquet
+      - ./intermediate/destpoint/year=${item.year}/geography=${item.geography}/state=${item.state}/${item.state}.parquet
     params:
       - times.r5
       - times.snap_radius
