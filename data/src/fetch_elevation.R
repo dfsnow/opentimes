@@ -5,6 +5,7 @@ library(optparse)
 library(sf)
 library(terra)
 library(yaml)
+source("./src/utils/utils.R")
 
 # Parse script arguments in the style of Python
 option_list <- list(
@@ -30,17 +31,31 @@ elevation_dir <- here::here(glue::glue(
 # Load the buffered state file
 state <- st_read(osmclip_file) %>%
   st_transform(4326)
-elev <- get_elev_raster(
-  locations = state,
-  z = params$input$elevation_zoom,
-  src = "aws",
-  override_size_check = TRUE,
-  verbose = TRUE
-)
+
+# Break the state into chunks, since fetching the entire thing at once
+# doesn't really work
+state_grid <- st_make_grid(state, n = 8, what = "polygons") %>%
+  purrr::map(\(x) st_set_crs(st_bbox(x), 4326))
+
+# Grab the elevation raster for each chunk
+elev_lst <- list()
+for (i in seq_len(length(state_grid))) {
+  message(glue::glue("Collecting raster grid: {i} / {length(state_grid)}"))
+  elev <- get_aws_terrain(
+    locations = state_grid[[i]],
+    prj = st_crs(state_grid[[i]]),
+    z = params$input$elevation_zoom
+  )
+  elev_lst[[i]] <- elev
+}
+
+# Create a raster collection then merge to a single raster
+elev_sprc <- terra::sprc(elev_lst)
+elev_final <- merge(elev_sprc)
 
 # Write the .tif output to a single giant file
 terra::writeRaster(
-  x = elev,
+  x = elev_final,
   filename = here::here(elevation_dir, glue::glue("{opt$state}.tif")),
   overwrite = TRUE,
   memfrac = 0.8
