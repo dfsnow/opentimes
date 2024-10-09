@@ -102,6 +102,16 @@
       ],
       "Hash": "14af96cb2973f6a6c220ce9c3e5b02cd"
     },
+    "askpass": {
+      "Package": "askpass",
+      "Version": "1.2.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "sys"
+      ],
+      "Hash": "c39f4155b3ceb1a9a2799d700fbd4b6a"
+    },
     "assertthat": {
       "Package": "assertthat",
       "Version": "0.2.1",
@@ -197,6 +207,16 @@
         "utils"
       ],
       "Hash": "b21916dd77a27642b447374a5d30ecf3"
+    },
+    "codetools": {
+      "Package": "codetools",
+      "Version": "0.2-20",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "61e097f35917d342622f21cdc79c256e"
     },
     "concaveman": {
       "Package": "concaveman",
@@ -294,6 +314,29 @@
       ],
       "Hash": "27a09ca40266a1066d62ef5402dd51d6"
     },
+    "elevatr": {
+      "Package": "elevatr",
+      "Version": "0.99.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "curl",
+        "furrr",
+        "future",
+        "httr",
+        "jsonlite",
+        "methods",
+        "progressr",
+        "purrr",
+        "raster",
+        "sf",
+        "slippymath",
+        "terra",
+        "units"
+      ],
+      "Hash": "f5a648116dfa343b1c76c40d33a8e834"
+    },
     "fansi": {
       "Package": "fansi",
       "Version": "1.0.6",
@@ -305,6 +348,37 @@
         "utils"
       ],
       "Hash": "962174cf2aeb5b9eea581522286a911f"
+    },
+    "furrr": {
+      "Package": "furrr",
+      "Version": "0.3.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "future",
+        "globals",
+        "lifecycle",
+        "purrr",
+        "rlang",
+        "vctrs"
+      ],
+      "Hash": "da7a4c32196cb2262a41dd5a25d486ff"
+    },
+    "future": {
+      "Package": "future",
+      "Version": "1.34.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "digest",
+        "globals",
+        "listenv",
+        "parallel",
+        "parallelly",
+        "utils"
+      ],
+      "Hash": "475771e3edb711591476be387c9a8c2e"
     },
     "generics": {
       "Package": "generics",
@@ -337,6 +411,29 @@
       ],
       "Hash": "ed33b16c6d24f7ced1d68877ac2509ee"
     },
+    "git2r": {
+      "Package": "git2r",
+      "Version": "0.33.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "graphics",
+        "utils"
+      ],
+      "Hash": "cdec9964efeda730d1b2cd3d5dd27747"
+    },
+    "globals": {
+      "Package": "globals",
+      "Version": "0.16.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "codetools"
+      ],
+      "Hash": "2580567908cafd4f187c1e5a91e98b7f"
+    },
     "glue": {
       "Package": "glue",
       "Version": "1.8.0",
@@ -358,6 +455,21 @@
       ],
       "Hash": "24b224366f9c2e7534d2344d10d59211"
     },
+    "httr": {
+      "Package": "httr",
+      "Version": "1.4.7",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "R6",
+        "curl",
+        "jsonlite",
+        "mime",
+        "openssl"
+      ],
+      "Hash": "ac107251d9d9fd72f0ca8049988f1d7f"
+    },
     "jsonlite": {
       "Package": "jsonlite",
       "Version": "1.8.9",
@@ -367,6 +479,21 @@
         "methods"
       ],
       "Hash": "4e993b65c2c3ffbffce7bb3e2c6f832b"
+    },
+    "lattice": {
+      "Package": "lattice",
+      "Version": "0.22-6",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "grDevices",
+        "graphics",
+        "grid",
+        "stats",
+        "utils"
+      ],
+      "Hash": "cc5ac1ba4c238c7ca9fa6a87ca11a7e2"
     },
     "lifecycle": {
       "Package": "lifecycle",
@@ -381,6 +508,16 @@
       ],
       "Hash": "b8552d117e1b808b09a832f589b79035"
     },
+    "listenv": {
+      "Package": "listenv",
+      "Version": "0.9.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "e2fca3e12e4db979dccc6e519b10a7ee"
+    },
     "magrittr": {
       "Package": "magrittr",
       "Version": "2.0.3",
@@ -390,6 +527,26 @@
         "R"
       ],
       "Hash": "7ce2733a9826b3aeb1775d56fd305472"
+    },
+    "mime": {
+      "Package": "mime",
+      "Version": "0.12",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "tools"
+      ],
+      "Hash": "18e9c28c1d3ca1560ce30658b22ce104"
+    },
+    "openssl": {
+      "Package": "openssl",
+      "Version": "2.2.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "askpass"
+      ],
+      "Hash": "d413e0fef796c9401a4419485f709ca1"
     },
     "optparse": {
       "Package": "optparse",
@@ -402,6 +559,18 @@
         "methods"
       ],
       "Hash": "ce5f8381cd2c38d1fc14c83d8b21efd0"
+    },
+    "parallelly": {
+      "Package": "parallelly",
+      "Version": "1.38.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "parallel",
+        "tools",
+        "utils"
+      ],
+      "Hash": "6e8b139c1904f5e9e14c69db64453bbe"
     },
     "pillar": {
       "Package": "pillar",
@@ -429,6 +598,28 @@
         "utils"
       ],
       "Hash": "01f28d4278f15c76cddbea05899c5d6f"
+    },
+    "png": {
+      "Package": "png",
+      "Version": "0.1-8",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "bd54ba8a0a5faded999a7aab6e46b374"
+    },
+    "progressr": {
+      "Package": "progressr",
+      "Version": "0.14.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "digest",
+        "utils"
+      ],
+      "Hash": "ac50c4ffa8f6a46580dd4d7813add3c4"
     },
     "proxy": {
       "Package": "proxy",
@@ -494,6 +685,20 @@
         "methods"
       ],
       "Hash": "524167e771b81342f8dd7a891ed3afa8"
+    },
+    "raster": {
+      "Package": "raster",
+      "Version": "3.6-30",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "Rcpp",
+        "methods",
+        "sp",
+        "terra"
+      ],
+      "Hash": "0e2829df8cb74a98179c886b023ffea8"
     },
     "renv": {
       "Package": "renv",
@@ -572,6 +777,56 @@
         "geometries"
       ],
       "Hash": "d63e904c63deda45f3f9149c7dcf8703"
+    },
+    "slippymath": {
+      "Package": "slippymath",
+      "Version": "0.3.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "png",
+        "purrr",
+        "raster",
+        "stats"
+      ],
+      "Hash": "abdaf883004a4791545655d79ca3aae0"
+    },
+    "sp": {
+      "Package": "sp",
+      "Version": "2.1-4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "grDevices",
+        "graphics",
+        "grid",
+        "lattice",
+        "methods",
+        "stats",
+        "utils"
+      ],
+      "Hash": "75940133cca2e339afce15a586f85b11"
+    },
+    "sys": {
+      "Package": "sys",
+      "Version": "3.4.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "de342ebfebdbf40477d0758d05426646"
+    },
+    "terra": {
+      "Package": "terra",
+      "Version": "1.7-78",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "Rcpp",
+        "methods"
+      ],
+      "Hash": "8f020def0792119cb98bd8f696dab22d"
     },
     "tibble": {
       "Package": "tibble",
@@ -675,6 +930,13 @@
         "R"
       ],
       "Hash": "9ca478d7cb1450b42dcb8af2ea5681cc"
+    },
+    "yaml": {
+      "Package": "yaml",
+      "Version": "2.3.10",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "51dab85c6c98e50a18d7551e9d49f76c"
     },
     "zip": {
       "Package": "zip",
