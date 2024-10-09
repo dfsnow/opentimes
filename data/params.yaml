@@ -1,9 +1,18 @@
 ---
 
+times:
+  # Parameters corresponding directly to those of travel_time_matrix() in r5r.
+  # See: https://ipeagit.github.io/r5r/reference/travel_time_matrix.html
+  r5:
+    max_trip_duration: 600  # minutes
+    walk_speed: 4.5  # kph
+    bike_speed: 15  # kph
+    max_lts: 3  # Level of travel stress, see docs
+
 input:
   # Distance in meters to buffer each state boundary by when clipping the
   # national road network. Should be slightly higher than `destination_buffer_m`
-  # so that all points can be reach via the clipped network
+  # so that all points can be reached via the clipped network
   network_buffer_m: 340000
 
   # Distance in meters to buffer each state boundary when searching for
@@ -11,6 +20,13 @@ input:
   # overall compute time
   destination_buffer_m: 300000
 
+  # Level of elevation zoom for .tif elevation data. See Tilezen GitHub:
+  # https://github.com/tilezen/joerd/blob/master/docs/data-sources.md
+  elevation_zoom: 14
+
+  # Years for which to collect input data. Each year will grab the
+  # corresponding TIGER/Line Census files, the Jan 1 Geofabrik North America
+  # OSM extract, and all appropriate GTFS feeds
   year:
     - '2020'
     - '2021'
@@ -18,6 +34,8 @@ input:
     - '2023'
     - '2024'
 
+  # States are treated as the "unit of work" in the pipeline. Each state gets
+  # origin/destination points, a GeoJSON buffer, and an OSM extract/network
   state:
     - '01'
     - '02'
@@ -71,6 +89,9 @@ input:
     - '55'
     - '56'
 
+  # Census geographies to create travel times. All routing is performed between
+  # geographic units of the same type, never between geography (i.e. tract to
+  # tract)
   census:
     geography:
       all:
@@ -88,4 +109,10 @@ input:
         - county_subdivision
         - tract
         - block_group
-        - block  # only used to fetch TIGER files
+        - block  # only used to fetch TIGER files (not used for routing)
+
+output:
+  # Compression type and level to use for final output Parquet files
+  compression:
+    type: zstd
+    level: 12
