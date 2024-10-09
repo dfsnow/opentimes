@@ -15,19 +15,17 @@ opt_parser <- OptionParser(option_list = option_list)
 opt <- parse_args(opt_parser)
 
 # Setup file paths and symlinks
-osmextract_dir <- here::here(glue::glue(
-  "intermediate/osmextract/",
-  "year={opt$year}/geography=state/state={opt$state}"
-))
-network_dir <- here::here(glue::glue(
-  "intermediate/network/",
-  "year={opt$year}/geography=state/state={opt$state}"
-))
+file_path <- glue::glue("year={opt$year}/geography=state/state={opt$state}")
+osmextract_dir <- here::here("intermediate/osmextract", file_path)
+network_dir <- here::here("intermediate/network", file_path)
+elevation_dir <- here::here("input/elevation", file_path)
 
+# Create directories and symlinks (if missing)
 if (!dir.exists(network_dir)) {
   dir.create(network_dir, recursive = TRUE)
 }
 create_links(osmextract_dir, network_dir, pattern = ".*\\.osm.pbf")
+create_links(elevation_dir, network_dir, pattern = ".*\\.tif")
 
 # Create the network.dat file
 setup_r5_jar("./jars/r5-custom.jar")

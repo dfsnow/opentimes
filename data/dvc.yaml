@@ -25,8 +25,7 @@ stages:
 
   fetch_blockpop_by_state:
     matrix:
-      year:
-        - '2020'
+      year: ['2020']
       state: ${input.state}
     cmd: "python ./src/fetch_blockpop.py
       --year ${item.year} --state ${item.state}"
@@ -102,6 +101,18 @@ stages:
       --buffer ${input.network_buffer_m}"
     outs:
       - ./intermediate/osmclip/year=${item.year}/geography=state/state=${item.state}/${item.state}.geojson:
+          persist: true
+
+  fetch_elevation:
+    deps:
+      - ./intermediate/osmclip/year=${item.year}/geography=state/state=${item.state}/${item.state}.geojson
+    matrix:
+      year: ['2020']
+      state: ${input.state}
+    cmd: "Rscript ./src/fetch_elevation.R
+      --year ${item.year} --state ${item.state}"
+    outs:
+      - ./input/elevation/geography=state/state=${item.state}/${item.state}.tif:
           persist: true
 
   create_destpoint_by_state:
