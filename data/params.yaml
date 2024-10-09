@@ -1,13 +1,28 @@
 ---
 
 times:
+  # Travel modes in R5. TRANSIT automatically includes all public transit modes
+  mode:
+    - car
+    - bicycle
+    - transit
+    - walk
+
   # Parameters corresponding directly to those of travel_time_matrix() in r5r.
   # See: https://ipeagit.github.io/r5r/reference/travel_time_matrix.html
   r5:
     max_trip_duration: 600  # minutes
     walk_speed: 4.5  # kph
-    bike_speed: 15  # kph
+    bike_speed: 15.0  # kph
     max_lts: 3  # Level of travel stress, see docs
+    max_rides: 3
+    time_window: 10
+    percentiles: [50]
+    draws_per_minute: [5]
+
+  # Maximum distance to search for roads to snap origins/destinations to
+  snap_radius: 500000  # meters
+  verbose: True
 
 input:
   # Distance in meters to buffer each state boundary by when clipping the
