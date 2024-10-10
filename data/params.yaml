@@ -28,7 +28,10 @@ times:
 
   # Maximum distance to search for roads to snap origins/destinations to
   snap_radius: 500000  # meters
-  verbose: True
+
+  # Whether to use verbose output when generating times. False will enable
+  # the built-in r5r progress bar instead
+  verbose: False
 
 input:
   # Distance in meters to buffer each state boundary by when clipping the
