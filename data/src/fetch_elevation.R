@@ -38,8 +38,7 @@ state <- st_read(osmclip_file) %>%
 elev <- fetch_elev_tiles(
   locations = state,
   prj = st_crs(state),
-  z = params$input$elevation_zoom,
-  ncpu = 2
+  z = params$input$elevation_zoom
 )
 
 # Write the .tif output to a single giant file
