@@ -126,6 +126,7 @@ ttm <- travel_time_matrix(
   time_window = params$times$r5$time_window,
   percentiles = params$times$r5$percentiles,
   draws_per_minute = params$times$r5$draws_per_minute,
+  progress = !params$times$verbose,
   verbose = params$times$verbose
 ) %>%
   rename(
@@ -211,7 +212,7 @@ metadata <- tibble::tibble(
   file_in_network_md5 = md5_list$network_file,
   file_in_origins_md5 = md5_list$origins_file,
   file_in_destinations_md5 = md5_list$destinations_file,
-  file_out_times_md5 = md5_list$times_file, 
+  file_out_times_md5 = md5_list$times_file,
   file_out_origins_md5 = md5_list$origins_snapped_file,
   file_out_destinations_md5 = md5_list$destinations_snapped_file,
   file_out_missing_pairs_md5 = md5_list$missing_pairs_file,
