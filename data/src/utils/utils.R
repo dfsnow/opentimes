@@ -5,7 +5,7 @@ create_links <- function(source_dir, target_dir, pattern) {
     message("Removing existing symlinks:")
     sapply(existing_links, unlink)
   }
-  
+
   files <- list.files(source_dir, pattern = pattern, full.names = TRUE)
   if (length(files) > 0) {
     sapply(files, function(file) {
@@ -18,7 +18,7 @@ create_links <- function(source_dir, target_dir, pattern) {
 # Simplified version of the tile fetching code from:
 # https://github.com/USEPA/elevatr/blob/main/R/get_elev_raster.R
 fetch_elev_tiles <- function(locations, z, prj, expand = NULL,
-                             ncpu = future::availableCores() - 1,
+                             ncpu = min(future::availableCores() - 1, 4),
                              tmp_dir = tempdir(), ...) {
   bbx <- elevatr:::proj_expand(locations, prj, expand)
   base_url <- "https://s3.amazonaws.com/elevation-tiles-prod/geotiff"
@@ -26,7 +26,7 @@ fetch_elev_tiles <- function(locations, z, prj, expand = NULL,
   urls <- sprintf("%s/%s/%s/%s.tif", base_url, z, tiles[, 1], tiles[, 2])
   nurls <- length(urls)
   dir <- tempdir()
-  
+
   progressr::handlers(
     progressr::handler_progress(
       format = " Accessing raster elevation [:bar] :percent",
@@ -35,7 +35,7 @@ fetch_elev_tiles <- function(locations, z, prj, expand = NULL,
       enable = TRUE
     )
   )
-  
+
   progressr::with_progress(
     {
       future::plan(future::multisession, workers = ncpu)
@@ -61,7 +61,7 @@ fetch_elev_tiles <- function(locations, z, prj, expand = NULL,
     delay_stdout = TRUE,
     delay_conditions = "condition"
   )
-  
+
   merged_elevation_grid <- merge_rasters_mc(dem_list, target_prj = prj)
   merged_elevation_grid
 }
@@ -77,7 +77,7 @@ merge_rasters_mc <- function(raster_list,
   temp_files <- list()
   chunks <- split(seq_along(files), ceiling(seq_along(files) / chunk_size))
   message(paste("Mosaicing and projecting", length(files), "files"))
-  
+
   # Split files into chunks, then merge the splits
   for (i in seq_along(chunks)) {
     message(paste("Processing chunk:", i, "/", length(chunks)))
@@ -89,14 +89,14 @@ merge_rasters_mc <- function(raster_list,
     )
     temp_files <- c(temp_files, temp_destfile)
   }
-  
+
   # Merge all temporary .tif files into a single final file
   final_destfile <- tempfile(fileext = ".tif")
   sf::gdal_utils(
     util = "warp", source = unlist(temp_files), destination = final_destfile,
     options = c("-r", method, "-multi", "-wo", "NUM_THREADS=ALL_CPUS")
   )
-  
+
   final_destfile2 <- tempfile(fileext = ".tif")
   sf::gdal_utils(
     util = "warp", source = final_destfile, destination = final_destfile2,
@@ -105,7 +105,7 @@ merge_rasters_mc <- function(raster_list,
       "-multi", "-wo", "NUM_THREADS=ALL_CPUS"
     )
   )
-  
+
   return(terra::rast(final_destfile2))
 }
 
@@ -116,14 +116,14 @@ setup_r5_jar <- function(path) {
   # removed, replace it
   r5_file_url <- r5r:::fileurl_from_metadata(r5r:::r5r_env$r5_jar_version)
   r5_filename <- basename(r5_file_url)
-  
+
   downloaded_r5_path <- file.path(r5r:::r5r_env$cache_dir, r5_filename)
   custom_r5_path <- here::here(path)
   if (!file.exists(downloaded_r5_path)) {
     message("Downloading R5 JAR:")
     file.copy(from = custom_r5_path, to = downloaded_r5_path, overwrite = TRUE)
   }
-  
+
   downloaded_r5_md5 <- digest::digest(
     object = downloaded_r5_path,
     algo = "md5",
