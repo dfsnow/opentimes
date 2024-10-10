@@ -31,7 +31,8 @@ fetch_elev_tiles <- function(locations, z, prj, expand = NULL,
     progressr::handler_progress(
       format = " Accessing raster elevation [:bar] :percent",
       clear = FALSE,
-      width = 60
+      width = 60,
+      enable = TRUE
     )
   )
   
@@ -54,7 +55,7 @@ fetch_elev_tiles <- function(locations, z, prj, expand = NULL,
         tmpfile
       }
     )
-  })
+  }, enable = TRUE, delay_stdout=TRUE, delay_conditions="condition")
   
   merged_elevation_grid <- elevatr:::merge_rasters(dem_list, target_prj = prj)
   merged_elevation_grid
