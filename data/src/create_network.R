@@ -18,7 +18,10 @@ opt <- parse_args(opt_parser)
 file_path <- glue::glue("year={opt$year}/geography=state/state={opt$state}")
 osmextract_dir <- here::here("intermediate/osmextract", file_path)
 network_dir <- here::here("intermediate/network", file_path)
-elevation_dir <- here::here("input/elevation", file_path)
+elevation_dir <- here::here(
+  "input/elevation",
+  glue::glue("geography=state/state={opt$state}")
+)
 
 # Create directories and symlinks (if missing)
 if (!dir.exists(network_dir)) {
