@@ -14,10 +14,11 @@ source("./src/utils/utils.R")
 
 # Parse script arguments in the style of Python and check for valid values
 option_list <- list(
+  make_option("--version", type = "character"),
+  make_option("--mode", type = "character"),
   make_option("--year", type = "character"),
   make_option("--geography", type = "character"),
   make_option("--state", type = "character"),
-  make_option("--mode", type = "character"),
   make_option("--centroid_type", type = "character")
 )
 opt_parser <- OptionParser(option_list = option_list)
@@ -92,8 +93,9 @@ destinations_snapped <- find_snap(
 
 # Setup file paths for travel time outputs
 output_path <- glue::glue(
-  "mode={opt$mode}/year={opt$year}/geography={opt$geography}/",
-  "state={opt$state}/centroid_type={opt$centroid_type}"
+  "version={opt$version}/mode={opt$mode}/year={opt$year}/",
+  "geography={opt$geography}/state={opt$state}/",
+  "centroid_type={opt$centroid_type}"
 )
 times_dir <- here::here("output/times", output_path)
 origins_dir <- here::here("output/points", output_path, "point_type=origin")
@@ -133,8 +135,6 @@ ttm <- travel_time_matrix(
   )
 tictoc::toc(log = TRUE)
 
-ttm_time_elapsed <- 
-
 # Check for missing point combinations
 missing_pairs <- expand.grid(
   origin_id = origins_snapped$id,
@@ -143,46 +143,7 @@ missing_pairs <- expand.grid(
 ) %>%
   anti_join(ttm, by = c("origin_id", "destination_id"))
 
-# Create a metadata dataframe of all settings used for creating inputs
-# and generating times
-git_commit <- git2r::revparse_single(git2r::repository(), "HEAD")
-network_file_hash <- digest::digest(
-  here::here(network_dir, "network.dat"),
-  algo = "md5",
-  file = TRUE
-)
-metadata <- tibble::tibble(
-  r5_version = r5r:::r5r_env$r5_jar_version,
-  r5_network_version = network_settings$r5_network_version,
-  r5r_version = network_settings$r5r_version,
-  r5_max_trip_duration = params$times$r5$max_trip_duration,
-  r5_walk_speed = params$times$r5$walk_speed,
-  r5_bike_speed = params$times$r5$bike_speed,
-  r5_max_lts = params$times$r5$max_lts,
-  r5_max_rides = params$times$r5$max_rides,
-  r5_time_window = params$times$r5$time_window,
-  r5_percentiles = params$times$r5$percentiles,
-  r5_draws_per_minute = params$times$r5$draws_per_minute,
-  git_sha_short = substr(git_commit$sha, 1, 8),
-  git_sha_long = git_commit$sha,
-  git_message = gsub("\n", "", git_commit$message),
-  git_author = git_commit$author$name,
-  git_email = git_commit$author$email,
-  network_buffer_m = params$input$network_buffer_m,
-  destination_buffer_m = params$input$destination_buffer_m,
-  snap_radius = params$times$snap_radius,
-  pbf_file_name = network_settings$pbf_file_name,
-  network_file_md5 = network_file_hash,
-  use_elevation = network_settings$use_elevation,
-  elevation_cost_function = network_settings$elevation_cost_function,
-  elevation_zoom = params$input$elevation_zoom,
-  tiff_file_name = dplyr::na_if(network_settings$tiff_file_name, ""),
-  time_finished = as.POSIXct(Sys.time(), tz="UTC"),
-  time_to_generate = tictoc::tic.log(format = FALSE)[[1]]$toc -
-    tictoc::tic.log(format = FALSE)[[1]]$tic,
-)
-
-# Save the travel time matrix and input points to disk
+# Save the travel time matrix, input points, and missing pairs to disk
 write_parquet(
   x = ttm,
   sink = here::here(times_dir, "part-0.parquet"),
@@ -207,6 +168,59 @@ write_parquet(
   compression = params$output$compression$type,
   compression_level = params$output$compression$level
 )
+
+# Capture the repo state via git and input/output file hashes
+git_commit <- git2r::revparse_single(git2r::repository(), "HEAD")
+file_list <- c(
+  network_file = here::here(network_dir, "network.dat"),
+  origins_file = origins_file,
+  destinations_file = destinations_file,
+  times_file = here::here(times_dir, "part-0.parquet"),
+  origins_snapped_file = here::here(origins_dir, "part-0.parquet"),
+  destinations_snapped_file = here::here(destinations_dir, "part-0.parquet"),
+  missing_pairs_file = here::here(missing_pairs_dir, "part-0.parquet")
+)
+md5_list <- lapply(file_list, digest::digest, algo = "md5")
+
+# Create a metadata dataframe of all settings and data used for creating inputs
+# and generating times
+metadata <- tibble::tibble(
+  r5_version = r5r:::r5r_env$r5_jar_version,
+  r5_network_version = network_settings$r5_network_version,
+  r5r_version = network_settings$r5r_version,
+  r5_max_trip_duration = params$times$r5$max_trip_duration,
+  r5_walk_speed = params$times$r5$walk_speed,
+  r5_bike_speed = params$times$r5$bike_speed,
+  r5_max_lts = params$times$r5$max_lts,
+  r5_max_rides = params$times$r5$max_rides,
+  r5_time_window = params$times$r5$time_window,
+  r5_percentiles = params$times$r5$percentiles,
+  r5_draws_per_minute = params$times$r5$draws_per_minute,
+  git_sha_short = substr(git_commit$sha, 1, 8),
+  git_sha_long = git_commit$sha,
+  git_message = gsub("\n", "", git_commit$message),
+  git_author = git_commit$author$name,
+  git_email = git_commit$author$email,
+  param_network_buffer_m = params$input$network_buffer_m,
+  param_destination_buffer_m = params$input$destination_buffer_m,
+  param_snap_radius = params$times$snap_radius,
+  param_use_elevation = network_settings$use_elevation,
+  param_elevation_cost_function = network_settings$elevation_cost_function,
+  param_elevation_zoom = params$input$elevation_zoom,
+  file_pbf_path = network_settings$pbf_file_name,
+  file_in_network_md5 = md5_list$network_file,
+  file_in_origins_md5 = md5_list$origins_file,
+  file_in_destinations_md5 = md5_list$destinations_file,
+  file_out_times_md5 = md5_list$times_file, 
+  file_out_origins_md5 = md5_list$origins_snapped_file,
+  file_out_destinations_md5 = md5_list$destinations_snapped_file,
+  file_out_missing_pairs_md5 = md5_list$missing_pairs_file,
+  file_tiff_path = dplyr::na_if(network_settings$tiff_file_name, ""),
+  time_finished = as.POSIXct(Sys.time(), tz="UTC"),
+  time_elapsed = tictoc::tic.log(format = FALSE)[[1]]$toc -
+    tictoc::tic.log(format = FALSE)[[1]]$tic,
+)
+
 write_parquet(
   x = metadata,
   sink = here::here(metadata_dir, "part-0.parquet"),

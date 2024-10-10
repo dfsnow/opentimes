@@ -1,6 +1,12 @@
 ---
 
 times:
+  # Travel times output version. Follows SemVer (kind of):
+  # 1. MAJOR version increments for incompatible API changes
+  # 2. MINOR version increments when new data or fields are added
+  # 3. PATCH version increments for backwards-compatible data updates
+  version: '1.0.0'
+
   # Travel modes in R5. TRANSIT automatically includes all public transit modes
   mode:
     - car
