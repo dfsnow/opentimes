@@ -45,10 +45,13 @@ fetch_elev_tiles <- function(locations, z, prj, expand = NULL,
         function(x) {
           p()
           tmpfile <- tempfile(tmpdir = tmp_dir, fileext = ".tif")
-          resp <- httr::GET(
+          resp <- httr::RETRY(
+            "GET",
             x,
             httr::user_agent("elevatr R package (https://github.com/jhollist/elevatr)"),
-            httr::write_disk(tmpfile, overwrite = TRUE), ...
+            httr::write_disk(tmpfile, overwrite = TRUE),
+            times = 5,
+            ...
           )
           if (!grepl("image/tif", httr::http_type(resp))) {
             stop(paste("This url:", x, "did not return a tif"), call. = FALSE)
