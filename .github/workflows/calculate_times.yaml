@@ -94,6 +94,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install Linux dependencies
+        run: sudo apt-get install -y libudunits2-dev
+
       - name: Setup python 3.12
         uses: actions/setup-python@v5
         with:
@@ -104,6 +107,7 @@ jobs:
         run: pip install .[data]
 
       - name: Setup R
+        # Pinned to commit with working-directory support
         uses: r-lib/actions/setup-r@607b3ffaee2e0e54cacd36fab06ada0a120c8c0c
         with:
           r-version: 'renv'
@@ -114,3 +118,9 @@ jobs:
         uses: r-lib/actions/setup-renv@v2
         with:
           working-directory: 'data'
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
