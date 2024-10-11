@@ -1,0 +1,116 @@
+---
+
+name: calculate_times
+
+on:
+  workflow_dispatch:
+    inputs:
+      # Input values match those in params.yaml
+      year:
+        required: true
+        description: Census data year
+        default: '2020'
+        type: string
+        options:
+          - '2020'
+          - '2021'
+          - '2022'
+          - '2023'
+          - '2024'
+      geography:
+        required: true
+        description: Census data geography
+        default: county
+        type: string
+        options:
+          - state
+          - county
+          - county_subdivision
+          - tract
+          - block_group
+          - zcta
+      state:
+        required: true
+        description: State to generate times for
+        default: '01'
+        type: string
+        options:
+          - '01'
+          - '02'
+          - '04'
+          - '05'
+          - '06'
+          - '08'
+          - '09'
+          - '10'
+          - '11'
+          - '12'
+          - '13'
+          - '15'
+          - '16'
+          - '17'
+          - '18'
+          - '19'
+          - '20'
+          - '21'
+          - '22'
+          - '23'
+          - '24'
+          - '25'
+          - '26'
+          - '27'
+          - '28'
+          - '29'
+          - '30'
+          - '31'
+          - '32'
+          - '33'
+          - '34'
+          - '35'
+          - '36'
+          - '37'
+          - '38'
+          - '39'
+          - '40'
+          - '41'
+          - '42'
+          - '44'
+          - '45'
+          - '46'
+          - '47'
+          - '48'
+          - '49'
+          - '50'
+          - '51'
+          - '53'
+          - '54'
+          - '55'
+          - '56'
+
+jobs:
+  setup_environment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        run: pip install .[data]
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@607b3ffaee2e0e54cacd36fab06ada0a120c8c0c
+        with:
+          r-version: 'renv'
+          working-directory: 'data'
+          use-public-rspm: true
+
+      - name: Setup R dependencies
+        uses: r-lib/actions/setup-renv@v2
+        with:
+          working-directory: 'data'
