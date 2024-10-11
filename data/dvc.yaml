@@ -159,6 +159,7 @@ stages:
   create_network:
     deps:
       - ./intermediate/osmextract/year=${item.year}/geography=state/state=${item.state}/${item.state}.osm.pbf
+      - ./input/elevation/geography=state/state=${item.state}/${item.state}.tif
     matrix:
       year: ${input.year}
       state: ${input.state}
