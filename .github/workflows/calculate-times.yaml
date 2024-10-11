@@ -10,7 +10,7 @@ on:
         required: true
         description: Census data year
         default: '2020'
-        type: string
+        type: choice
         options:
           - '2020'
           - '2021'
@@ -21,7 +21,7 @@ on:
         required: true
         description: Census data geography
         default: county
-        type: string
+        type: choice
         options:
           - state
           - county
@@ -33,7 +33,7 @@ on:
         required: true
         description: State to generate times for
         default: '01'
-        type: string
+        type: choice
         options:
           - '01'
           - '02'
