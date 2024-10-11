@@ -98,7 +98,7 @@ jobs:
         run: |
           sudo apt-get install -y libudunits2-dev=2.2.28-3 \
               proj-bin=8.2.1-1 gdal-bin=3.4.1+dfsg-1build4 \
-              libgeos-dev=3.10.2-1
+              libgeos-dev=3.10.2-1 libgit2-1.1=1.1.0+dfsg.1-4.1build1
 
       - name: Setup Python 3.12
         uses: actions/setup-python@v5
