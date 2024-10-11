@@ -88,7 +88,7 @@ on:
           - '56'
 
 jobs:
-  setup-environment:
+  setup-jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -106,7 +106,7 @@ jobs:
       - name: Pull DVC objects
         shell: bash
         working-directory: 'data'
-        run: dvc pull fetch-elevation@${{ inputs.year }}-${{ inputs.state }}
+        run: dvc pull fetch_elevation@${{ inputs.year }}-${{ inputs.state }}
 
 # Run setup
 #   - Cache all deps
