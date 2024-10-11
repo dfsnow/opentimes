@@ -1,6 +1,6 @@
 ---
 
-name: calculate_times
+name: calculate-times
 
 on:
   workflow_dispatch:
@@ -88,42 +88,12 @@ on:
           - '56'
 
 jobs:
-  setup_environment:
+  setup-environment:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Linux dependencies
-        run: |
-          sudo apt-get install -y libudunits2-dev=2.2.28-3 \
-              proj-bin=8.2.1-1 gdal-bin=3.4.1+dfsg-1build4 \
-              libgeos-dev=3.10.2-1 libgit2-1.1=1.1.0+dfsg.1-4.1build1
-
-      - name: Setup Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'pip'
-
-      - name: Install Python dependencies
-        run: pip install .[data]
-
-      - name: Setup R
-        # Pinned to commit with working-directory support
-        uses: r-lib/actions/setup-r@607b3ffaee2e0e54cacd36fab06ada0a120c8c0c
-        with:
-          r-version: 'renv'
-          working-directory: 'data'
-          use-public-rspm: true
-
-      - name: Setup R dependencies
-        uses: r-lib/actions/setup-renv@v2
-        with:
-          working-directory: 'data'
-
-      - name: Setup Java 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
+      - name: Setup time calculation dependencies
+        id: setup_time_deps
+        uses: ./.github/actions/setup-time-calculation-dependencies
