@@ -99,6 +99,9 @@ jobs:
 
       - name: Setup Cloudflare credentials
         uses: ./.github/actions/setup-cloudflare-s3
+        with:
+          CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
+          CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
 
       - name: Pull DVC objects
         shell: bash
