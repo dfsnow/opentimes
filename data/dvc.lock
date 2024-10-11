@@ -66793,3 +66793,19 @@ stages:
       hash: md5
       md5: f1d055c63836ce8ac79afff947490cbb
       size: 3337382417
+  create_network@2020-01:
+    cmd: Rscript src/create_network.R --year 2020 --state 01
+    deps:
+    - path: ./intermediate/osmextract/year=2020/geography=state/state=01/01.osm.pbf
+      hash: md5
+      md5: d975d7d275f8fc184a100168c58814d1
+      size: 316408001
+    outs:
+    - path: ./intermediate/network/year=2020/geography=state/state=01/network.dat
+      hash: md5
+      md5: 67d77f30a47591301179dc752fbe9bac
+      size: 622562137
+    - path: ./intermediate/network/year=2020/geography=state/state=01/network_settings.json
+      hash: md5
+      md5: c81ce238932def257913acc49d57acc9
+      size: 321

@@ -6,6 +6,17 @@ on:
   workflow_dispatch:
     inputs:
       # Input values match those in params.yaml
+      mode:
+        required: true
+        description: Travel mode
+        default: 'car'
+        type: choice
+        options:
+          - car
+          - bicycle
+          - transit
+          - walk
+
       year:
         required: true
         description: Census data year
@@ -17,6 +28,7 @@ on:
           - '2022'
           - '2023'
           - '2024'
+
       geography:
         required: true
         description: Census data geography
@@ -29,6 +41,7 @@ on:
           - tract
           - block_group
           - zcta
+
       state:
         required: true
         description: State to generate times for
@@ -87,6 +100,15 @@ on:
           - '55'
           - '56'
 
+      centroid_type:
+        required: true
+        description: Weighted or unweighted
+        default: weighted
+        type: choice
+        options:
+          - weighted
+          - unweighted
+
 jobs:
   setup-jobs:
     runs-on: ubuntu-latest
@@ -106,7 +128,9 @@ jobs:
       - name: Pull DVC objects
         shell: bash
         working-directory: 'data'
-        run: dvc pull fetch_elevation@${{ inputs.year }}-${{ inputs.state }}
+        run: |
+          dvc pull \
+          calculate_times@${{ inputs.mode }}-${{ inputs.year }}-${{ inputs.geography }}-${{ inputs.state }}-${{ inputs.centroid_type }}
 
 # Run setup
 #   - Cache all deps
