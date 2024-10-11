@@ -17,7 +17,7 @@ times:
   # Parameters corresponding directly to those of travel_time_matrix() in r5r.
   # See: https://ipeagit.github.io/r5r/reference/travel_time_matrix.html
   r5:
-    max_trip_duration: 600  # minutes
+    max_trip_duration: 6000  # 100 hours
     walk_speed: 4.5  # kph
     bike_speed: 15.0  # kph
     max_lts: 3  # Level of travel stress, see docs

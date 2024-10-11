@@ -85,7 +85,10 @@ merge_rasters_mc <- function(raster_list,
     temp_destfile <- tempfile(fileext = ".tif")
     sf::gdal_utils(
       util = "warp", source = unlist(chunk), destination = temp_destfile,
-      options = c("-r", method, "-multi", "-wo", "NUM_THREADS=ALL_CPUS")
+      options = c(
+        "-r", method, "-multi", "-wo", "NUM_THREADS=ALL_CPUS",
+        "-wm", "4G"
+      )
     )
     temp_files <- c(temp_files, temp_destfile)
   }
@@ -94,7 +97,10 @@ merge_rasters_mc <- function(raster_list,
   final_destfile <- tempfile(fileext = ".tif")
   sf::gdal_utils(
     util = "warp", source = unlist(temp_files), destination = final_destfile,
-    options = c("-r", method, "-multi", "-wo", "NUM_THREADS=ALL_CPUS")
+    options = c(
+      "-r", method, "-multi", "-wo", "NUM_THREADS=ALL_CPUS",
+        "-wm", "4G"
+    )
   )
 
   final_destfile2 <- tempfile(fileext = ".tif")
@@ -102,7 +108,8 @@ merge_rasters_mc <- function(raster_list,
     util = "warp", source = final_destfile, destination = final_destfile2,
     options = c(
       "-r", method, "-t_srs", sf::st_crs(target_prj)$wkt,
-      "-multi", "-wo", "NUM_THREADS=ALL_CPUS"
+      "-multi", "-wo", "NUM_THREADS=ALL_CPUS",
+        "-wm", "4G"
     )
   )
 
