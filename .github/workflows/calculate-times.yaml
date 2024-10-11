@@ -95,5 +95,25 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup time calculation dependencies
-        id: setup_time_deps
         uses: ./.github/actions/setup-time-calculation-dependencies
+
+      - name: Setup Cloudflare credentials
+        uses: ./.github/actions/setup-cloudflare-s3
+
+      - name: Pull DVC objects
+        shell: bash
+        working-directory: 'data'
+        run: dvc pull fetch-elevation@${{ inputs.year }}-${{ inputs.state }}
+
+# Run setup
+#   - Cache all deps
+#   - Cloudflare auth
+#   - DVC pull
+#   - Load origins file
+#   - Create splits with script
+#   - Send splits to GITHUB_OUTPUT
+# Run job matrix
+#   - Setup deps for each job
+#   - Cloudflare auth
+#   - DVC pull
+#   - Push output to CF
