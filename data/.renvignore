@@ -1,10 +1,11 @@
 __pycache__/
 .venv/
 build/
-venv/
+eda/
 input/
 intermediate/
 output/
+venv/
 temp*.R
 *.csv
 *.osm
