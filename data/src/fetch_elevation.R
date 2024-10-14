@@ -32,13 +32,38 @@ if (!dir.exists(elevation_dir)) {
   dir.create(elevation_dir, recursive = TRUE)
 }
 
-# Load the buffered state file
+# Lower the elevation zoom for Alaska, since most of it contains no roads
+# and the state is enormous
+zoom_level <- ifelse(
+  opt$state == "02",
+  as.numeric(params$input$elevation_zoom) - 2,
+  params$input$elevation_zoom
+)
+
+# Load the buffered state file and use a dumb intersection trick to remove any
+# parts of the buffer that cross dateline, otherwise the bbox will wrap around
+# the entire earth
 state <- st_read(osmclip_file) %>%
-  st_transform(4326)
+  st_transform(4326) %>%
+  st_make_valid() %>%
+  st_intersection(
+    st_as_sfc(st_bbox(
+      c(
+        xmin = -179.999,
+        xmax = 0,
+        ymax = 90,
+        ymin = -90
+      ),
+      crs = st_crs(4326)
+    ))
+  )
+
+# Fetch the actual raster elevation tiles within the buffer
 elev <- fetch_elev_tiles(
   locations = state,
   prj = st_crs(state),
-  z = params$input$elevation_zoom
+  z = zoom_level,
+  expand = 0
 )
 
 # Write the .tif output to a single giant file
