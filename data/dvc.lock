@@ -66857,3 +66857,135 @@ stages:
       hash: md5
       md5: 387d3dca2df6472ec84aaf0866847478
       size: 3934883508
+  fetch_elevation@2020-04:
+    cmd: Rscript ./src/fetch_elevation.R --year 2020 --state 04
+    deps:
+    - path: ./intermediate/osmclip/year=2020/geography=state/state=04/04.geojson
+      hash: md5
+      md5: cbc192adf6b6a9ac0f616f598bb1002c
+      size: 38672
+    outs:
+    - path: ./input/elevation/geography=state/state=04/04.tif
+      hash: md5
+      md5: d90ab3a1307486e96773b95cb76c1b53
+      size: 8471583945
+  fetch_elevation@2020-44:
+    cmd: Rscript ./src/fetch_elevation.R --year 2020 --state 44
+    deps:
+    - path: ./intermediate/osmclip/year=2020/geography=state/state=44/44.geojson
+      hash: md5
+      md5: d49c9b90e352f4efbc24c000bb6caada
+      size: 5982
+    outs:
+    - path: ./input/elevation/geography=state/state=44/44.tif
+      hash: md5
+      md5: fef38f55985f21194bbfde2c82611123
+      size: 2136503276
+  fetch_elevation@2020-38:
+    cmd: Rscript ./src/fetch_elevation.R --year 2020 --state 38
+    deps:
+    - path: ./intermediate/osmclip/year=2020/geography=state/state=38/38.geojson
+      hash: md5
+      md5: c656b50206475b96ede9c0ca6c23a566
+      size: 31744
+    outs:
+    - path: ./input/elevation/geography=state/state=38/38.tif
+      hash: md5
+      md5: 3f2a6e6adf194c510e65886c9e57cbd7
+      size: 4122319774
+  fetch_elevation@2020-37:
+    cmd: Rscript ./src/fetch_elevation.R --year 2020 --state 37
+    deps:
+    - path: ./intermediate/osmclip/year=2020/geography=state/state=37/37.geojson
+      hash: md5
+      md5: bd13c26605ecb12179617698549e3518
+      size: 21779
+    outs:
+    - path: ./input/elevation/geography=state/state=37/37.tif
+      hash: md5
+      md5: 3f1798ef6067137ceaa6aad2f2dc17cc
+      size: 4712438432
+  fetch_elevation@2020-49:
+    cmd: Rscript ./src/fetch_elevation.R --year 2020 --state 49
+    deps:
+    - path: ./intermediate/osmclip/year=2020/geography=state/state=49/49.geojson
+      hash: md5
+      md5: 9d4b903e1b3bbef138b35f5386893994
+      size: 39630
+    outs:
+    - path: ./input/elevation/geography=state/state=49/49.tif
+      hash: md5
+      md5: 1456943c61e043ed2070a16449a5c063
+      size: 8292325134
+  fetch_elevation@2020-55:
+    cmd: Rscript ./src/fetch_elevation.R --year 2020 --state 55
+    deps:
+    - path: ./intermediate/osmclip/year=2020/geography=state/state=55/55.geojson
+      hash: md5
+      md5: b683afc5f9c50d238e723c11b9280b57
+      size: 17723
+    outs:
+    - path: ./input/elevation/geography=state/state=55/55.tif
+      hash: md5
+      md5: 1ba76d9e4faf0d5c0afe8afdaef02cfb
+      size: 3753068840
+  fetch_elevation@2020-08:
+    cmd: Rscript ./src/fetch_elevation.R --year 2020 --state 08
+    deps:
+    - path: ./intermediate/osmclip/year=2020/geography=state/state=08/08.geojson
+      hash: md5
+      md5: b7eb4c945a515854fc477d5415d3d6ff
+      size: 45341
+    outs:
+    - path: ./input/elevation/geography=state/state=08/08.tif
+      hash: md5
+      md5: 63670999ee11e2ac7bc023d534cf5f6f
+      size: 6644851854
+  fetch_elevation@2020-32:
+    cmd: Rscript ./src/fetch_elevation.R --year 2020 --state 32
+    deps:
+    - path: ./intermediate/osmclip/year=2020/geography=state/state=32/32.geojson
+      hash: md5
+      md5: 951abedfa0ed14ac9836ed9727cc9aaa
+      size: 46298
+    outs:
+    - path: ./input/elevation/geography=state/state=32/32.tif
+      hash: md5
+      md5: 01022f6d3e95702e81ebff07ab5dd889
+      size: 10582906508
+  fetch_elevation@2020-01:
+    cmd: Rscript ./src/fetch_elevation.R --year 2020 --state 01
+    deps:
+    - path: ./intermediate/osmclip/year=2020/geography=state/state=01/01.geojson
+      hash: md5
+      md5: 02054a83c23ab73f465c33cf25fa31f5
+      size: 20928
+    outs:
+    - path: ./input/elevation/geography=state/state=01/01.tif
+      hash: md5
+      md5: 2b03bc963ec721387bc89cc7cff999b8
+      size: 3360209120
+  fetch_elevation@2020-29:
+    cmd: Rscript ./src/fetch_elevation.R --year 2020 --state 29
+    deps:
+    - path: ./intermediate/osmclip/year=2020/geography=state/state=29/29.geojson
+      hash: md5
+      md5: 18947b716ba0523042bc976feaf9e6fa
+      size: 22009
+    outs:
+    - path: ./input/elevation/geography=state/state=29/29.tif
+      hash: md5
+      md5: 2fce0a772ca35ba3b8326307d2e66f05
+      size: 4228415396
+  fetch_elevation@2020-26:
+    cmd: Rscript ./src/fetch_elevation.R --year 2020 --state 26
+    deps:
+    - path: ./intermediate/osmclip/year=2020/geography=state/state=26/26.geojson
+      hash: md5
+      md5: de3243275d47d010aae5363eeab10056
+      size: 18470
+    outs:
+    - path: ./input/elevation/geography=state/state=26/26.tif
+      hash: md5
+      md5: 8e52c8394fa77d07ee0f11e5420a60fd
+      size: 5280129600
