@@ -170,24 +170,3 @@ stages:
           persist: true
       - ./intermediate/network/year=${item.year}/geography=state/state=${item.state}/network_settings.json:
           persist: true
-
-  calculate_times:
-    deps:
-      - ./intermediate/network/year=${item.year}/geography=state/state=${item.state}/network.dat
-      - ./intermediate/cenloc/year=${item.year}/geography=${item.geography}/state=${item.state}/${item.state}.parquet
-      - ./intermediate/destpoint/year=${item.year}/geography=${item.geography}/state=${item.state}/${item.state}.parquet
-    params:
-      - times.version
-      - times.r5
-      - times.snap_radius
-    matrix:
-      mode: ${times.mode}
-      year: ${input.year}
-      geography: ${input.census.geography.all}
-      state: ${input.state}
-      centroid_type:
-        - weighted
-        - unweighted
-    cmd: "Rscript src/calculate_times.R --version ${times.version}
-      --mode ${item.mode} --year ${item.year} --geography ${item.geography}
-      --state ${item.state} --centroid_type ${item.centroid_type}"
