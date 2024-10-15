@@ -1,6 +1,20 @@
 import math
+from pathlib import Path
 
-def split_range(n: int, n_chunks: int = 256, min_chunk_size = 5) -> list[tuple]:
+import pandas as pd
+
+
+def split_file(file: str | Path, n_chunks: int = 256) -> str:
+    origins_df = pd.read_parquet(file)
+
+    chunk_idx = split_range(len(origins_df), n_chunks)
+    chunk_str = [f"{start}-{end}" for start, end in chunk_idx]
+    chunk_out = '["' + '", "'.join(chunk_str) + '"]'
+
+    return chunk_out
+
+
+def split_range(n: int, n_chunks: int = 256, min_chunk_size=5) -> list[tuple]:
     """
     Splits a range of integers into smaller chunks.
 
@@ -31,5 +45,4 @@ def split_range(n: int, n_chunks: int = 256, min_chunk_size = 5) -> list[tuple]:
         start, _ = chunk_ranges[-1]
         chunk_ranges[-1] = (start, n - 1)
 
-    return(chunk_ranges)
-
+    return chunk_ranges
