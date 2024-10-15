@@ -4,12 +4,12 @@ from pathlib import Path
 import pandas as pd
 
 
-def split_file(file: str | Path, n_chunks: int = 256) -> str:
+def split_file_to_str(file: str | Path, n_chunks: int = 256) -> str:
     origins_df = pd.read_parquet(file)
 
     chunk_idx = split_range(len(origins_df), n_chunks)
     chunk_str = [f"{start}-{end}" for start, end in chunk_idx]
-    chunk_out = '["' + '", "'.join(chunk_str) + '"]'
+    chunk_out = 'chunks=["' + '", "'.join(chunk_str) + '"]'
 
     return chunk_out
 

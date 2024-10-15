@@ -112,6 +112,10 @@ on:
 jobs:
   setup-jobs:
     runs-on: ubuntu-latest
+
+    outputs:
+      chunks: ${{ steps.create-job-chunks.outputs.chunks }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -138,6 +142,7 @@ jobs:
             ./intermediate/network/year=${{ inputs.year }}/geography=state/state=${{ inputs.state }}/network.dat
 
       - name: Create job chunks
+        id: create-job-chunks
         shell: bash
         working-directory: 'data'
         run: "python ./src/split_origin.py \
