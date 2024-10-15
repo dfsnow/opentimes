@@ -1,1 +1,1 @@
-*.jar filter=lfs diff=lfs merge=lfs -text
+data/jars/r5-custom.jar filter=lfs diff=lfs merge=lfs -text
