@@ -16,11 +16,14 @@ def calculate_weighted_mean(
     Calculate the weighted mean of specified columns. Returns the unweighted
     mean if the total weight is zero.
 
-    :param df: The DataFrame containing the data.
-    :param group_cols: The columns to group by.
-    :param weight_col: The column to use as weights.
-    :param value_cols: The columns to calculate the weighted mean for.
-    :return: A DataFrame with the weighted means.
+    Args:
+        df: The DataFrame containing the data.
+        group_cols: The columns to group by.
+        weight_col: The column to use as weights.
+        value_cols: The columns to calculate the weighted mean for.
+
+    Returns:
+        A DataFrame with the weighted means.
     """
 
     def weighted_mean(group, weight_col, value_col):
@@ -62,8 +65,11 @@ def load_shapefile(path: str | Path) -> gpd.GeoDataFrame:
     Load a shapefile into as a GeoDataFrame by first unpacking into a
     temporary directory.
 
-    :param path: Path to the shapefile.
-    :return: A GeoDataFrame containing the shapefile contents.
+    Args:
+        path: Path to the shapefile.
+
+    Returns:
+        A GeoDataFrame containing the shapefile contents.
     """
     with tempfile.TemporaryDirectory() as tmpdirname:
         shutil.unpack_archive(path, tmpdirname)
@@ -99,9 +105,12 @@ def split_geoid(df: pd.DataFrame, geoid_col: str) -> pd.DataFrame:
     """
     Split a Census GEOID into component parts and append them as new columns.
 
-    :param df: A pandas DataFrame containing county, tract, or block GEOIDs.
-    :param geoid_col: The column name containing the GEOIDs.
-    :return: The DataFrame with the split components appended as new columns.
+    Args:
+        df: A pandas DataFrame containing county, tract, or block GEOIDs.
+        geoid_col: The column name containing the GEOIDs.
+
+    Returns:
+        The DataFrame with the split components appended as new columns.
     """
 
     def split_geoid_value(geoid):

@@ -11,8 +11,12 @@ def create_blockloc(year: str, state: str) -> None:
     Combine Census block population data with block location data from
     TIGER/Line files.
 
-    :param year: The year of the decennial Census.
-    :param state: The two-digit state FIPS code.
+    Args:
+        year: The year of the decennial Census.
+        state: The two-digit state FIPS code.
+
+    Returns:
+        None
     """
 
     # Pop. data only exists for decennial years, so round down to the nearest
