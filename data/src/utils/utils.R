@@ -130,7 +130,7 @@ setup_r5_jar <- function(path) {
   downloaded_r5_path <- file.path(r5r:::r5r_env$cache_dir, r5_filename)
   custom_r5_path <- here::here(path)
   if (!file.exists(downloaded_r5_path)) {
-    message("Downloading R5 JAR:")
+    message("Copying R5 JAR:")
     file.copy(from = custom_r5_path, to = downloaded_r5_path, overwrite = TRUE)
   }
 
