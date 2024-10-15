@@ -130,16 +130,17 @@ jobs:
       - name: Pull DVC objects
         shell: bash
         working-directory: 'data'
-        run: "dvc pull \
-          calculate_times@\
-          ${{ inputs.mode }}-${{ inputs.year }}-${{ inputs.geography }}-\
-          ${{ inputs.state }}-${{ inputs.centroid_type }}"
+        run: |
+          od_path=year=${{ inputs.year }}/geography=${{ inputs.geography }}/state=${{ inputs.state }}/${{ inputs.state }}.parquet
+          dvc pull --no-run-cache \
+            ./intermediate/cenloc/"$od_path" \
+            ./intermediate/destpoint/"$od_path" \
+            ./intermediate/network/year=${{ inputs.year }}/geography=state/state=${{ inputs.state }}/network.dat
 
       - name: Create job chunks
         shell: bash
         working-directory: 'data'
-        run: "
-          python ../.github/scripts/split_origins.py \
+        run: "python ./src/split_origin.py \
           --year ${{ inputs.year }} --geography ${{ inputs.geography }}
           --state ${{ inputs.state }} >> $GITHUB_OUTPUT"
 
