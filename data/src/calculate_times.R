@@ -19,20 +19,55 @@ option_list <- list(
   make_option("--year", type = "character"),
   make_option("--geography", type = "character"),
   make_option("--state", type = "character"),
-  make_option("--centroid_type", type = "character")
+  make_option("--centroid_type", type = "character"),
+  make_option("--chunk", type = "character"),
+  make_option(
+    "--write-local", type = "logical",
+    action = "store_true", dest = "local",
+    default = FALSE
+  )
 )
 opt_parser <- OptionParser(option_list = option_list)
 opt <- parse_args(opt_parser)
 
+# Check for valid values of the script arguments
 if (!opt$mode %in% c("car", "walk", "bicycle", "transit")) {
   stop("Invalid mode argument. Must be one of 'car', 'walk', 'bicycle', or 'transit'.")
 }
 if (!opt$centroid_type %in% c("weighted", "unweighted")) {
   stop("Invalid centroid_type argument. Must be one of 'weighted' or 'unweighted'.")
 }
+if (!is.null(opt$chunk)) {
+  if (!grepl("^\\d+-\\d+$", opt$chunk)) {
+    stop("Invalid chunk argument. Must be two numbers separated by a dash (e.g., '1-2').")
+  }
+}
+
+# Recover the chunk indices from the script argument if present. Must add one to
+# the indices to match R's 1-based indexing
+start_msg <- glue::glue(
+  "Starting routing for version: {opt$version}, mode: {opt$mode}, ",
+  "year: {opt$year}, geography: {opt$geography}, state: {opt$state}, ",
+  "centroid type: {opt$centroid_type}"
+)
+if (!is.null(opt$chunk)) {
+  chunk_used <- TRUE
+  chunk_indices <- as.numeric(strsplit(opt$chunk, "-")[[1]]) + 1
+  message(start_msg, ", chunk: ", opt$chunk)
+} else {
+  chunk_used <- FALSE
+  message(start_msg)
+}
 
 # Load parameters from file
 params <- read_yaml(here::here("params.yaml"))
+
+# Setup the R2 bucket connection. Requires a custom profile and endpoint
+Sys.setenv("AWS_PROFILE" = params$s3$profile)
+data_bucket <- arrow::s3_bucket(
+  bucket = params$s3$bucket,
+  endpoint_override = params$s3$endpoint
+)
 
 # Setup file paths for inputs (pre-made network file and OD points)
 input_path <- glue::glue(
@@ -47,6 +82,9 @@ origins_file <- here::here("intermediate/cenloc", input_path)
 destinations_file <- here::here("intermediate/destpoint", input_path)
 
 # Load the R5 JAR, network, and network settings
+if (!file.exists(here::here(network_dir, "network.dat"))) {
+  stop("Network file not found. Run 'dvc repro' to create the network file.")
+}
 setup_r5_jar("./jars/r5-custom.jar")
 network_settings <- read_json(here::here(network_dir, "network_settings.json"))
 r5r_core <- r5r::setup_r5(
@@ -56,7 +94,7 @@ r5r_core <- r5r::setup_r5(
   overwrite = FALSE
 )
 
-# Select columns based on centroid type
+# Select columns based on centroid type (pop. weighted or unweighted)
 od_cols <- switch(
   opt$centroid_type,
   weighted = c("id" = "geoid", "lon" = "x_4326_wt", "lat" = "y_4326_wt"),
@@ -66,51 +104,85 @@ origins = read_parquet(origins_file) %>%
   select(all_of(od_cols))
 destinations <- read_parquet(destinations_file) %>%
   select(all_of(od_cols))
+n_origins <- nrow(origins)
+n_destinations <- nrow(destinations)
+
+# If a chunk is used, subset the origins to the chunk indices
+if (chunk_used) {
+  origins <- origins %>% slice(chunk_indices[1]:chunk_indices[2])
+}
+message(glue::glue(
+  "Routing from {nrow(origins)} origins ",
+  "to {nrow(destinations)} destinations"
+))
 
 # Snap lat/lon points to the street network
-origins_snapped <- find_snap(
-  r5r_core = r5r_core,
-  points = origins,
-  mode = "WALK",
-  radius = as.numeric(params$times$snap_radius)
-) %>%
+origins_snapped <- origins %>%
+  find_snap(
+    r5r_core = r5r_core,
+    points = .,
+    mode = "WALK",
+    radius = as.numeric(params$times$snap_radius)
+  ) %>%
   rename(id = point_id, distance_m = distance, snapped = found) %>%
   mutate(
     snap_lat = ifelse(is.na(snap_lat), lat, snap_lat),
     snap_lon = ifelse(is.na(snap_lon), lon, snap_lon)
   )
-destinations_snapped <- find_snap(
-  r5r_core = r5r_core,
-  points = destinations,
-  mode = "WALK",
-  radius = as.numeric(params$times$snap_radius)
-) %>%
+destinations_snapped <- destinations %>%
+  find_snap(
+    r5r_core = r5r_core,
+    points = .,
+    mode = "WALK",
+    radius = as.numeric(params$times$snap_radius)
+  ) %>%
   rename(id = point_id, distance_m = distance, snapped = found) %>%
   mutate(
     snap_lat = ifelse(is.na(snap_lat), lat, snap_lat),
     snap_lon = ifelse(is.na(snap_lon), lon, snap_lon)
   )
 
-# Setup file paths for travel time outputs
+# Setup file paths for travel time outputs. If a chunk is used, include it in
+# the output path as a partition key
 output_path <- glue::glue(
   "version={opt$version}/mode={opt$mode}/year={opt$year}/",
   "geography={opt$geography}/state={opt$state}/",
   "centroid_type={opt$centroid_type}"
 )
-times_dir <- here::here("output/times", output_path)
-origins_dir <- here::here("output/points", output_path, "point_type=origin")
-destinations_dir <- here::here("output/points", output_path, "point_type=destination")
-missing_pairs_dir <- here::here("output/missing_pairs", output_path)
-metadata_dir <- here::here("output/metadata", output_path)
-for (dir in c(times_dir, origins_dir,
-              destinations_dir, missing_pairs_dir, metadata_dir)) {
-  if (!dir.exists(dir)) {
-    dir.create(dir, recursive = TRUE)
+if (chunk_used) {
+  output_path <- file.path(output_path, glue::glue("chunk={opt$chunk}"))
+}
+
+times_dir <- file.path("times", output_path)
+origins_dir <- file.path("points", output_path, "point_type=origin")
+destinations_dir <- file.path("points", output_path, "point_type=destination")
+missing_pairs_dir <- file.path("missing_pairs", output_path)
+metadata_dir <- file.path("metadata", output_path)
+
+# If the output is local, create the necessary directories if they don't exist.
+# Otherwise, convert the dirs to S3 paths
+if (opt$local) {
+  for (dir in c(times_dir, origins_dir,
+                destinations_dir, missing_pairs_dir, metadata_dir)) {
+    if (!dir.exists(dir)) {
+      dir.create(here::here(dir), recursive = TRUE)
+    }
   }
+  times_file <- here::here("output", times_dir, "part-0.parquet")
+  origins_file <- here::here("output", origins_dir, "part-0.parquet")
+  destinations_file <- here::here("output", destinations_dir, "part-0.parquet")
+  missing_pairs_file <- here::here("output", missing_pairs_dir, "part-0.parquet")
+  metadata_file <- here::here("output", metadata_dir, "part-0.parquet")
+} else {
+  times_file <- data_bucket$path(file.path(times_dir, "part-0.parquet"))
+  origins_file <- data_bucket$path(file.path(origins_dir, "part-0.parquet"))
+  destinations_file <- data_bucket$path(file.path(destinations_dir, "part-0.parquet"))
+  missing_pairs_file <- data_bucket$path(file.path(missing_pairs_dir, "part-0.parquet"))
+  metadata_file <- data_bucket$path(file.path(metadata_dir, "part-0.parquet"))
 }
 
 # Generate the actual travel time matrix. Use the snapped lat/lon points
-tictoc::tic("Generating travel time matrix")
+tictoc::tic("Generated travel time matrix")
 ttm <- travel_time_matrix(
   r5r_core = r5r_core,
   origins = origins_snapped %>%
@@ -147,25 +219,25 @@ missing_pairs <- expand.grid(
 # Save the travel time matrix, input points, and missing pairs to disk
 write_parquet(
   x = ttm,
-  sink = here::here(times_dir, "part-0.parquet"),
+  sink = times_file,
   compression = params$output$compression$type,
   compression_level = params$output$compression$level
 )
 write_parquet(
   x = origins_snapped,
-  sink = here::here(origins_dir, "part-0.parquet"),
+  sink = origins_file,
   compression = params$output$compression$type,
   compression_level = params$output$compression$level
 )
 write_parquet(
   x = destinations_snapped,
-  sink = here::here(destinations_dir, "part-0.parquet"),
+  sink = destinations_file,
   compression = params$output$compression$type,
   compression_level = params$output$compression$level
 )
 write_parquet(
   x = missing_pairs,
-  sink = here::here(missing_pairs_dir, "part-0.parquet"),
+  sink = missing_pairs_file,
   compression = params$output$compression$type,
   compression_level = params$output$compression$level
 )
@@ -217,14 +289,23 @@ metadata <- tibble::tibble(
   file_out_destinations_md5 = md5_list$destinations_snapped_file,
   file_out_missing_pairs_md5 = md5_list$missing_pairs_file,
   file_tiff_path = dplyr::na_if(network_settings$tiff_file_name, ""),
-  time_finished = as.POSIXct(Sys.time(), tz="UTC"),
-  time_elapsed = tictoc::tic.log(format = FALSE)[[1]]$toc -
+  calc_n_origins = n_origins,
+  calc_n_destinations = n_destinations,
+  calc_chunk_id = opt$chunk,
+  calc_chunk_n_origins = nrow(origins_snapped),
+  calc_chunk_n_destinations = nrow(destinations_snapped),
+  calc_time_finished = as.POSIXct(Sys.time(), tz="UTC"),
+  calc_time_elapsed_sec = tictoc::tic.log(format = FALSE)[[1]]$toc -
     tictoc::tic.log(format = FALSE)[[1]]$tic,
 )
 
 write_parquet(
   x = metadata,
-  sink = here::here(metadata_dir, "part-0.parquet"),
+  sink = metadata_file,
   compression = params$output$compression$type,
   compression_level = params$output$compression$level
 )
+
+# Cleanup Java connection and memory
+r5r::stop_r5(r5r_core)
+rJava::.jgc(R.gc = TRUE)

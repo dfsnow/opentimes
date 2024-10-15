@@ -1,5 +1,12 @@
 ---
 
+# S3 bucket and prefix to write output data to. Uses Cloudflare so requires
+# a custom S3 endpoint
+s3:
+  profile: 'cloudflare'
+  bucket: 'opentimes-data'
+  endpoint: 'https://fcb279b22cfe4c98f903ad8f9e7ccbb2.r2.cloudflarestorage.com'
+
 times:
   # Travel times output version. Follows SemVer (kind of):
   # 1. MAJOR version increments for incompatible API changes
