@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 
-from utils.inventory import split_file
+from utils.inventory import split_file_to_str
 
 
 def split_origin(
@@ -17,7 +17,7 @@ def split_origin(
         / f"{state}.parquet"
     )
 
-    file_chunks = split_file(origins_file, n_chunks)
+    file_chunks = split_file_to_str(origins_file, n_chunks)
 
     print(file_chunks)
 
