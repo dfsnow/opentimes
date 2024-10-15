@@ -36,7 +36,7 @@ if (!dir.exists(elevation_dir)) {
 # and the state is enormous
 zoom_level <- ifelse(
   opt$state == "02",
-  as.numeric(params$input$elevation_zoom) - 2,
+  as.numeric(params$input$elevation_zoom) - 1,
   params$input$elevation_zoom
 )
 
