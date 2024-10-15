@@ -136,16 +136,13 @@ jobs:
         working-directory: 'data'
         run: |
           od_path=year=${{ inputs.year }}/geography=${{ inputs.geography }}/state=${{ inputs.state }}/${{ inputs.state }}.parquet
-          dvc pull --no-run-cache \
-            ./intermediate/cenloc/"$od_path" \
-            ./intermediate/destpoint/"$od_path" \
-            ./intermediate/network/year=${{ inputs.year }}/geography=state/state=${{ inputs.state }}/network.dat
+          dvc pull --no-run-cache ./intermediate/cenloc/"$od_path"
 
       - name: Create job chunks
         id: create-job-chunks
         shell: bash
         working-directory: 'data'
-        run: "python ./src/split_origin.py \
+        run: "python ./src/split_origin.py
           --year ${{ inputs.year }} --geography ${{ inputs.geography }}
           --state ${{ inputs.state }} >> $GITHUB_OUTPUT"
 
@@ -157,20 +154,37 @@ jobs:
         chunk: ${{ fromJSON(needs.setup-jobs.outputs.chunks) }}
 
     steps:
-      - name: Run job chunks
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup time calculation dependencies
+        uses: ./.github/actions/setup-time-calculation-dependencies
+
+      - name: Setup Cloudflare credentials
+        uses: ./.github/actions/setup-cloudflare-s3
+        with:
+          CLOUDFLARE_S3_API_ACCESS_KEY_ID: |
+            ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
+          CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: |
+            ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
+
+      - name: Pull DVC objects
         shell: bash
         working-directory: 'data'
-        run: "echo ${{ matrix.chunk }}"
+        run: |
+          od_path=year=${{ inputs.year }}/geography=${{ inputs.geography }}/state=${{ inputs.state }}/${{ inputs.state }}.parquet
+          dvc pull --no-run-cache \
+            ./intermediate/cenloc/"$od_path" \
+            ./intermediate/destpoint/"$od_path" \
+            ./intermediate/network/year=${{ inputs.year }}/geography=state/state=${{ inputs.state }}/network.dat \
+            ./intermediate/network/year=${{ inputs.year }}/geography=state/state=${{ inputs.state }}/network_settings.json
 
-# Run setup
-#   - Cache all deps
-#   - Cloudflare auth
-#   - DVC pull
-#   - Load origins file
-#   - Create splits with script
-#   - Send splits to GITHUB_OUTPUT
-# Run job matrix
-#   - Setup deps for each job
-#   - Cloudflare auth
-#   - DVC pull
-#   - Push output to CF
+      - name: Run job chunk
+        shell: bash
+        working-directory: 'data'
+        run: "Rscript src/calculate_times.R
+          --mode ${{ inputs.mode }} --year ${{ inputs.year }}
+          --geography ${{ inputs.geography }} --state ${{ inputs.state }}
+          --centroid_type ${{ inputs.centroid_type }}
+          --chunk ${{ matrix.chunk }}
+          "

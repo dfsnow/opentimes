@@ -14,7 +14,6 @@ source("./src/utils/utils.R")
 
 # Parse script arguments in the style of Python and check for valid values
 option_list <- list(
-  make_option("--version", type = "character"),
   make_option("--mode", type = "character"),
   make_option("--year", type = "character"),
   make_option("--geography", type = "character"),
@@ -43,10 +42,13 @@ if (!is.null(opt$chunk)) {
   }
 }
 
+# Load parameters from file
+params <- read_yaml(here::here("params.yaml"))
+
 # Recover the chunk indices from the script argument if present. Must add one to
 # the indices to match R's 1-based indexing
 start_msg <- glue::glue(
-  "Starting routing for version: {opt$version}, mode: {opt$mode}, ",
+  "Starting routing for version: {params$times$version}, mode: {opt$mode}, ",
   "year: {opt$year}, geography: {opt$geography}, state: {opt$state}, ",
   "centroid type: {opt$centroid_type}"
 )
@@ -58,9 +60,6 @@ if (!is.null(opt$chunk)) {
   chunk_used <- FALSE
   message(start_msg)
 }
-
-# Load parameters from file
-params <- read_yaml(here::here("params.yaml"))
 
 # Setup the R2 bucket connection. Requires a custom profile and endpoint
 Sys.setenv("AWS_PROFILE" = params$s3$profile)
@@ -145,7 +144,7 @@ destinations_snapped <- destinations %>%
 # Setup file paths for travel time outputs. If a chunk is used, include it in
 # the output path as a partition key
 output_path <- glue::glue(
-  "version={opt$version}/mode={opt$mode}/year={opt$year}/",
+  "version={params$times$version}/mode={opt$mode}/year={opt$year}/",
   "geography={opt$geography}/state={opt$state}/",
   "centroid_type={opt$centroid_type}"
 )
