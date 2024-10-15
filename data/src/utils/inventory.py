@@ -10,7 +10,7 @@ def split_range(n: int, n_chunks: int = 256, min_chunk_size = 5) -> list[tuple]:
         min_chunk_size: The minimum size of each chunk. Defaults to 5.
 
     Returns:
-        list[tuple]: A list of tuples, where each tuple represents
+        A list of tuples, where each tuple represents
             the start and end indices of a chunk.
     """
     chunk_ranges = []
