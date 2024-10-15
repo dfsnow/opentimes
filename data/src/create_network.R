@@ -33,7 +33,7 @@ create_links(elevation_dir, network_dir, pattern = ".*\\.tif")
 # Create the network.dat file
 setup_r5_jar("./jars/r5-custom.jar")
 message("Creating network.dat file:")
-r5r::setup_r5(
+r5r_core <- r5r::setup_r5(
   data_path = network_dir,
   verbose = TRUE,
   temp_dir = FALSE,
@@ -50,3 +50,7 @@ if (length(mapdb_files) > 0) {
   message("Removing unneeded files:")
   sapply(mapdb_files, unlink)
 }
+
+# Cleanup Java connection and memory
+r5r::stop_r5(r5r_core)
+rJava::.jgc(R.gc = TRUE)
