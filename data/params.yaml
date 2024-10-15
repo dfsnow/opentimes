@@ -48,7 +48,7 @@ input:
   # https://github.com/tilezen/joerd/blob/master/docs/data-sources.md
   # NOTE: Zoom levels over 12 result in MASSIVE files given the scale of the
   # state-level clips. Recommend using 12 or less
-  elevation_zoom: 12
+  elevation_zoom: 10
 
   # Years for which to collect input data. Each year will grab the
   # corresponding TIGER/Line Census files, the Jan 1 Geofabrik North America
