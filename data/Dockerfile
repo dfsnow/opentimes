@@ -37,7 +37,7 @@ RUN apt-get update && \
 
 # Install Python dependencies
 COPY ./pyproject.toml .
-RUN pip install --no-cache-dir .[data]
+RUN pip install --upgrade pip && pip install --no-cache-dir .[data]
 
 # Install R dependencies
 COPY ./data/renv/activate.R ./renv/activate.R
