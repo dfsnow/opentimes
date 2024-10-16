@@ -139,7 +139,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ./data/intermediate/network
-          key: network-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./dvc.lock') }}
+          key: network-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
 
       - name: Cache restore location input data
         id: cache-restore-location-input
@@ -148,11 +148,11 @@ jobs:
           path: |
             ./data/intermediate/cenloc
             ./data/intermediate/destpoint
-          key: network-${{ inputs.year }}-${{ inputs.geography }}-${{ inputs.state }}-${{ hashFiles('./dvc.lock') }}
+          key: network-${{ inputs.year }}-${{ inputs.geography }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
 
       - name: Pull DVC objects
-        if: ${{ steps.cache-restore-network-input.outputs.cache-hit == 'false' ||
-                steps.cache-restore-location-input.outputs.cache-hit == 'false' }}
+        if: ${{ steps.cache-restore-network-input.outputs.cache-hit != 'true' ||
+                steps.cache-restore-location-input.outputs.cache-hit != 'true' }}
         shell: bash
         working-directory: 'data'
         run: |
@@ -168,7 +168,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: ./data/intermediate/network
-          key: network-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./dvc.lock') }}
+          key: network-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
 
       - name: Cache save location input data
         id: cache-save-location-input
@@ -177,7 +177,7 @@ jobs:
           path: |
             ./data/intermediate/cenloc
             ./data/intermediate/destpoint
-          key: network-${{ inputs.year }}-${{ inputs.geography }}-${{ inputs.state }}-${{ hashFiles('./dvc.lock') }}
+          key: network-${{ inputs.year }}-${{ inputs.geography }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
 
       - name: Create job chunks
         id: create-job-chunks
@@ -223,7 +223,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ./data/intermediate/network
-          key: network-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./dvc.lock') }}
+          key: network-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
 
       - name: Cache restore location input data
         id: cache-restore-location-input-job
@@ -232,7 +232,7 @@ jobs:
           path: |
             ./data/intermediate/cenloc
             ./data/intermediate/destpoint
-          key: network-${{ inputs.year }}-${{ inputs.geography }}-${{ inputs.state }}-${{ hashFiles('./dvc.lock') }}
+          key: network-${{ inputs.year }}-${{ inputs.geography }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
 
       - name: Run job chunk
         shell: bash
