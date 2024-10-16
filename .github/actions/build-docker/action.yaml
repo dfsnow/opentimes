@@ -38,6 +38,7 @@ runs:
     - name: Build and push Docker image
       uses: docker/build-push-action@v6
       with:
+        file: ./data/Dockerfile
         context: .
         push: ${{ env.PUSH_IMAGE }}
         tags: ghcr.io/${{ github.repository }}:${{ env.IMAGE_TAG }}
