@@ -1,0 +1,18 @@
+---
+
+services:
+  opentimes:
+    image: ghcr.io/dfsnow/opentimes:latest
+    container_name: opentimes
+    hostname: opentimes
+    build:
+      context: .
+      dockerfile: data/Dockerfile
+    restart: never
+    volumes:
+      - $HOME/.aws/credentials:$HOME/.aws/credentials:ro
+      - ./data/src:/times/src:ro
+      - ./data/intermediate:/times/intermediate:rw
+      - ./data/output:/times/output:rw
+      - ./data/jars:/times/jars:ro
+      - ./data/params.yaml:/times/params.yaml
