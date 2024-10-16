@@ -2,7 +2,7 @@
 
 services:
   opentimes:
-    image: ghcr.io/dfsnow/opentimes:latest
+    image: opentimes:latest
     container_name: opentimes
     hostname: opentimes
     build:
