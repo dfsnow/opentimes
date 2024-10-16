@@ -182,8 +182,7 @@ jobs:
       - name: Create job chunks
         id: create-job-chunks
         shell: bash
-        working-directory: 'data'
-        run: "python ./src/split_origin.py
+        run: "docker compose run opentimes python3 ./src/split_origin.py
           --year ${{ inputs.year }} --geography ${{ inputs.geography }}
           --state ${{ inputs.state }} >> $GITHUB_OUTPUT"
 
