@@ -1,0 +1,54 @@
+---
+
+name: Setup time calculation dependencies in Docker
+description: Builds and caches a Docker container of all r5r dependencies
+inputs:
+  GITHUB_TOKEN:
+    description: A GitHub access token
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Mask secrets in logs
+      shell: bash
+      run: |
+        echo "::add-mask::${{ inputs.GITHUB_TOKEN }}"
+
+    - name: Setup variables
+      shell: bash
+      run: |
+        echo "IMAGE_TAG=$(if [ ${{ github.ref_name }} == main ]; then echo latest; elif [ ${{ github.event_name }} == release ]; then echo ${{ github.ref_name }}; else echo staging; fi)" >> "$GITHUB_ENV"
+        echo "SHA_SHORT=$(git rev-parse --short HEAD)" >> "$GITHUB_ENV"
+        echo "PUSH_IMAGE=$(if [ ${{ github.event_name }} != pull_request ]; then echo true; else echo false; fi)" >> "$GITHUB_ENV"
+
+    - name: Setup Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Docker registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ inputs.GITHUB_TOKEN }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        push: ${{ env.PUSH_IMAGE }}
+        tags: ghcr.io/${{ github.repository }}:${{ env.IMAGE_TAG }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        provenance: false
+        build-args: |
+          VCS_NAME=${{ github.repository }}
+          VCS_URL=${{ github.server_url}}/${{ github.repository }}
+          VCS_REF=${{ github.sha }}
+          VCS_REF_SHORT=${{ env.SHA_SHORT }}
+          VCS_VER=${{ github.ref_name }}
+          VCS_ID=${{ github.repository_id }}
+          VCS_NAMESPACE=${{ github.repository_owner }}
