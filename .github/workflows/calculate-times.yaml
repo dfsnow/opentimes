@@ -120,55 +120,39 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup time calculation dependencies
-        uses: ./.github/actions/setup-time-calculation-dependencies
+      - name: Install DVC
+        uses: ./.github/actions/setup-dvc
+
+      - name: Build Dockerized dependencies
+        uses: ./.github/actions/build-docker
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Cloudflare credentials
         uses: ./.github/actions/setup-cloudflare-s3
         with:
-          CLOUDFLARE_S3_API_ACCESS_KEY_ID: |
-            ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
-          CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: |
-            ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
+          CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
+          CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
 
-      - name: Pull DVC objects
-        shell: bash
-        working-directory: 'data'
-        run: |
-          od_path=year=${{ inputs.year }}/geography=${{ inputs.geography }}/state=${{ inputs.state }}/${{ inputs.state }}.parquet
-          dvc pull --no-run-cache ./intermediate/cenloc/"$od_path"
-
-      - name: Create job chunks
-        id: create-job-chunks
-        shell: bash
-        working-directory: 'data'
-        run: "python ./src/split_origin.py
-          --year ${{ inputs.year }} --geography ${{ inputs.geography }}
-          --state ${{ inputs.state }} >> $GITHUB_OUTPUT"
-
-  run-jobs:
-    runs-on: ubuntu-latest
-    needs: setup-jobs
-    strategy:
-      matrix:
-        chunk: ${{ fromJSON(needs.setup-jobs.outputs.chunks) }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup time calculation dependencies
-        uses: ./.github/actions/setup-time-calculation-dependencies
-
-      - name: Setup Cloudflare credentials
-        uses: ./.github/actions/setup-cloudflare-s3
+      - name: Cache restore network input data
+        id: cache-restore-network-input
+        uses: actions/cache/restore@v4
         with:
-          CLOUDFLARE_S3_API_ACCESS_KEY_ID: |
-            ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
-          CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: |
-            ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
+          path: ./data/intermediate/network
+          key: network-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./dvc.lock') }}
+
+      - name: Cache restore location input data
+        id: cache-restore-location-input
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ./data/intermediate/cenloc
+            ./data/intermediate/destpoint
+          key: network-${{ inputs.year }}-${{ inputs.geography }}-${{ inputs.state }}-${{ hashFiles('./dvc.lock') }}
 
       - name: Pull DVC objects
+        if: ${{ steps.cache-restore-network-input.outputs.cache-hit == 'false' ||
+                steps.cache-restore-location-input.outputs.cache-hit == 'false' }}
         shell: bash
         working-directory: 'data'
         run: |
@@ -179,10 +163,81 @@ jobs:
             ./intermediate/network/year=${{ inputs.year }}/geography=state/state=${{ inputs.state }}/network.dat \
             ./intermediate/network/year=${{ inputs.year }}/geography=state/state=${{ inputs.state }}/network_settings.json
 
+      - name: Cache save network input data
+        id: cache-save-network-input
+        uses: actions/cache/save@v4
+        with:
+          path: ./data/intermediate/network
+          key: network-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./dvc.lock') }}
+
+      - name: Cache save location input data
+        id: cache-save-location-input
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ./data/intermediate/cenloc
+            ./data/intermediate/destpoint
+          key: network-${{ inputs.year }}-${{ inputs.geography }}-${{ inputs.state }}-${{ hashFiles('./dvc.lock') }}
+
+      - name: Create job chunks
+        id: create-job-chunks
+        shell: bash
+        working-directory: 'data'
+        run: "python ./src/split_origin.py
+          --year ${{ inputs.year }} --geography ${{ inputs.geography }}
+          --state ${{ inputs.state }} >> $GITHUB_OUTPUT"
+
+  run-job:
+    runs-on: ubuntu-latest
+    needs: setup-jobs
+    strategy:
+      matrix:
+        chunk: ${{ fromJSON(needs.setup-jobs.outputs.chunks) }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Load Dockerized dependencies
+        uses: ./.github/actions/build-docker
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Cloudflare credentials
+        uses: ./.github/actions/setup-cloudflare-s3
+        with:
+          CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
+          CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
+
+      - name: Fetch custom R5 jar
+        shell: bash
+        working-directory: 'data'
+        run: |
+          aws s3 cp --endpoint-url \
+          https://fcb279b22cfe4c98f903ad8f9e7ccbb2.r2.cloudflarestorage.com \
+          s3://opentimes-resources/jars/r5-custom.jar ./jars/r5-custom.jar \
+          --profile cloudflare
+
+      - name: Cache restore network input data
+        id: cache-restore-network-input-job
+        uses: actions/cache/restore@v4
+        with:
+          path: ./data/intermediate/network
+          key: network-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./dvc.lock') }}
+
+      - name: Cache restore location input data
+        id: cache-restore-location-input-job
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ./data/intermediate/cenloc
+            ./data/intermediate/destpoint
+          key: network-${{ inputs.year }}-${{ inputs.geography }}-${{ inputs.state }}-${{ hashFiles('./dvc.lock') }}
+
       - name: Run job chunk
         shell: bash
         working-directory: 'data'
-        run: "Rscript src/calculate_times.R
+        run: "docker compose run opentimes Rscript ./src/calculate_times.R
           --mode ${{ inputs.mode }} --year ${{ inputs.year }}
           --geography ${{ inputs.geography }} --state ${{ inputs.state }}
           --centroid_type ${{ inputs.centroid_type }}
