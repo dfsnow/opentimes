@@ -15,4 +15,6 @@ services:
       - ./data/intermediate:/times/intermediate:rw
       - ./data/output:/times/output:rw
       - ./data/jars:/times/jars:ro
-      - ./data/params.yaml:/times/params.yaml
+      - ./data/params.yaml:/times/params.yaml:ro
+      # So git2r in Docker can read git info and add it to output metadata
+      - ./.git:/times/.git:ro
