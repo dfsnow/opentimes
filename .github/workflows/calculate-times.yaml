@@ -182,7 +182,7 @@ jobs:
       - name: Create job chunks
         id: create-job-chunks
         shell: bash
-        run: "docker compose run opentimes python3 ./src/split_origin.py
+        run: "docker compose run --quiet-pull opentimes python3 ./src/split_origin.py
           --year ${{ inputs.year }} --geography ${{ inputs.geography }}
           --state ${{ inputs.state }} >> $GITHUB_OUTPUT"
 
@@ -231,7 +231,7 @@ jobs:
       - name: Run job chunk
         shell: bash
         working-directory: 'data'
-        run: "docker compose run opentimes Rscript ./src/calculate_times.R
+        run: "docker compose run --quiet-pull opentimes Rscript ./src/calculate_times.R
           --mode ${{ inputs.mode }} --year ${{ inputs.year }}
           --geography ${{ inputs.geography }} --state ${{ inputs.state }}
           --centroid_type ${{ inputs.centroid_type }}
