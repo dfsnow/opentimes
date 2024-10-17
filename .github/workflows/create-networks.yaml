@@ -1,0 +1,188 @@
+---
+
+name: create-networks
+run-name: create-networks-${{ inputs.year }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      year:
+        required: true
+        description: OSM data year
+        default: '2020'
+        type: choice
+        options:
+          - '2020'
+          - '2021'
+          - '2022'
+          - '2023'
+          - '2024'
+
+      override_states:
+        required: false
+        description: |
+          Comma-separated state codes to run e.g. 01,06.
+          Will run all if null
+        type: string
+
+env:
+  AWS_DEFAULT_REGION: us-east-1
+  # See: https://github.com/aws/aws-cli/issues/5262#issuecomment-705832151
+  AWS_EC2_METADATA_DISABLED: true
+
+jobs:
+  setup-jobs:
+    runs-on: ubuntu-22.04
+
+    outputs:
+      states: ${{ steps.create-job-chunks.outputs.states }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Dockerized dependencies
+        uses: ./.github/actions/build-docker
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Cloudflare credentials
+        uses: ./.github/actions/setup-cloudflare-s3
+        with:
+          CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
+          CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
+
+      - name: Cache restore custom JAR
+        id: cache-restore-custom-jar
+        uses: actions/cache/restore@v4
+        with:
+          path: ./data/jars
+          key: jar-${{ hashFiles('./data/jars/r5-custom.jar.md5') }}
+
+      - name: Fetch custom R5 jar
+        if: ${{ steps.cache-restore-custom-jar.outputs.cache-hit != 'true' }}
+        shell: bash
+        working-directory: 'data'
+        run: |
+          aws s3 cp --quiet --endpoint-url \
+            https://${{ vars.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com \
+            s3://opentimes-resources/jars/r5-custom.jar ./jars/r5-custom.jar \
+            --profile cloudflare
+
+      - name: Cache save custom JAR
+        if: ${{ steps.cache-restore-custom-jar.outputs.cache-hit != 'true' }}
+        id: cache-save-custom-jar
+        uses: actions/cache/save@v4
+        with:
+          path: ./data/jars
+          key: jar-${{ hashFiles('./data/jars/r5-custom.jar.md5') }}
+
+      - name: Create job chunks
+        id: create-job-chunks
+        shell: bash
+        run: |
+          states=$(yq e -o=json '.input.state' ./data/params.yaml | jq -c -s .[])
+          echo "states=$(echo $states)" >> $GITHUB_OUTPUT
+
+          # If override states are set, use those instead
+          states_parsed=($(echo "$states" | jq -r '.[]'))
+          if [ -n "${{ inputs.override_states }}" ]; then
+            override_states_parsed=($(echo "${{ inputs.override_states }}" | tr -d ' ' | tr ',' ' '))
+            for state in "${override_states_parsed[@]}"; do
+              if [[ ! " ${states_parsed[@]} " =~ " ${state} " ]]; then
+                echo "Error: Override state ${state} is not in the states for this workflow"
+                echo "States include: ${states_parsed[@]}"
+                exit 1
+              fi
+            done
+            states_json=$(printf '%s\n' "${override_states_parsed[@]}" | jq -c -R . | jq -c -s .)
+            echo "Creating jobs for states: ${override_states_parsed[@]}"
+            echo "states=$states_json" > $GITHUB_OUTPUT
+          else
+            echo "Creating jobs for states: ${states_parsed[@]}"
+          fi
+
+  run-job:
+    runs-on: ubuntu-22.04
+    needs: setup-jobs
+    strategy:
+      matrix:
+        state: ${{ fromJSON(needs.setup-jobs.outputs.states) }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install DVC
+        uses: ./.github/actions/setup-dvc
+
+      - name: Setup Cloudflare credentials
+        uses: ./.github/actions/setup-cloudflare-s3
+        with:
+          CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
+          CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
+
+      - name: Cache restore custom JAR
+        id: cache-restore-custom-jar
+        uses: actions/cache/restore@v4
+        with:
+          path: ./data/jars
+          key: jar-${{ hashFiles('./data/jars/r5-custom.jar.md5') }}
+
+      - name: Cache restore osmextract input data
+        id: cache-restore-osmextract-input
+        uses: actions/cache/restore@v4
+        with:
+          path: ./data/intermediate/osmextract
+          key: osmextract-${{ inputs.year }}-${{ matrix.state }}-${{ hashFiles('./data/dvc.lock') }}
+
+      - name: Cache restore elevation input data
+        id: cache-restore-elevation-input
+        uses: actions/cache/restore@v4
+        with:
+          path: ./data/input/elevation
+          key: elevation-${{ matrix.state }}-${{ hashFiles('./data/dvc.lock') }}
+
+      - name: Pull DVC objects
+        if: ${{ steps.cache-restore-osmextract-input.outputs.cache-hit != 'true' ||
+                steps.cache-restore-elevation-input.outputs.cache-hit != 'true' }}
+        shell: bash
+        working-directory: 'data'
+        run: |
+          dvc pull --no-run-cache \
+            ./intermediate/osmextract/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/${{ matrix.state }}.osm.pbf \
+            ./input/elevation/geography=state/state=${{ matrix.state }}/${{ matrix.state }}.tif
+
+      - name: Cache save osmextract input data
+        if: ${{ steps.cache-restore-osmextract-input.outputs.cache-hit != 'true' }}
+        id: cache-save-osmextract-input
+        uses: actions/cache/save@v4
+        with:
+          path: ./data/intermediate/osmextract
+          key: osmextract-${{ inputs.year }}-${{ matrix.state }}-${{ hashFiles('./data/dvc.lock') }}
+
+      - name: Cache save elevation input data
+        if: ${{ steps.cache-restore-elevation-input.outputs.cache-hit != 'true' }}
+        id: cache-save-elevation-input
+        uses: actions/cache/save@v4
+        with:
+          path: ./data/input/elevation
+          key: elevation-${{ matrix.state }}-${{ hashFiles('./data/dvc.lock') }}
+
+      - name: Run job chunk
+        shell: bash
+        run: |
+          docker compose run --quiet-pull opentimes Rscript ./src/create_network.R \
+            --year ${{ inputs.year }} --state ${{ matrix.state }}
+
+      - name: Write network files to S3
+        shell: bash
+        working-directory: 'data'
+        run: |
+          for file in 'network.dat' 'network_settings.json'; do
+            aws s3 cp --quiet --endpoint-url \
+              https://${{ vars.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com \
+               ./intermediate/network/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/"$file" \
+               s3://opentimes-resources/networks/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/"$file" \
+              --profile cloudflare
+          done
