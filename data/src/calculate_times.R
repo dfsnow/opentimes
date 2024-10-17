@@ -142,14 +142,16 @@ destinations_snapped <- destinations %>%
   )
 
 # Setup file paths for travel time outputs. If a chunk is used, include it in
-# the output path as a partition key
+# the output file name
 output_path <- glue::glue(
   "version={params$times$version}/mode={opt$mode}/year={opt$year}/",
   "geography={opt$geography}/state={opt$state}/",
   "centroid_type={opt$centroid_type}"
 )
 if (chunk_used) {
-  output_path <- file.path(output_path, glue::glue("chunk={opt$chunk}"))
+  output_file <- glue::glue("part-{opt$chunk}.parquet")
+} else {
+  output_file <- "part-0.parquet"
 }
 
 times_dir <- file.path("times", output_path)
@@ -167,17 +169,17 @@ if (opt$local) {
       dir.create(here::here(dir), recursive = TRUE)
     }
   }
-  times_file <- here::here("output", times_dir, "part-0.parquet")
-  origins_file <- here::here("output", origins_dir, "part-0.parquet")
-  destinations_file <- here::here("output", destinations_dir, "part-0.parquet")
-  missing_pairs_file <- here::here("output", missing_pairs_dir, "part-0.parquet")
-  metadata_file <- here::here("output", metadata_dir, "part-0.parquet")
+  times_file <- here::here("output", times_dir, output_file)
+  origins_file <- here::here("output", origins_dir, output_file)
+  destinations_file <- here::here("output", destinations_dir, output_file)
+  missing_pairs_file <- here::here("output", missing_pairs_dir, output_file)
+  metadata_file <- here::here("output", metadata_dir, output_file)
 } else {
-  times_file <- data_bucket$path(file.path(times_dir, "part-0.parquet"))
-  origins_file <- data_bucket$path(file.path(origins_dir, "part-0.parquet"))
-  destinations_file <- data_bucket$path(file.path(destinations_dir, "part-0.parquet"))
-  missing_pairs_file <- data_bucket$path(file.path(missing_pairs_dir, "part-0.parquet"))
-  metadata_file <- data_bucket$path(file.path(metadata_dir, "part-0.parquet"))
+  times_file <- data_bucket$path(file.path(times_dir, output_file))
+  origins_file <- data_bucket$path(file.path(origins_dir, output_file))
+  destinations_file <- data_bucket$path(file.path(destinations_dir, output_file))
+  missing_pairs_file <- data_bucket$path(file.path(missing_pairs_dir, output_file))
+  metadata_file <- data_bucket$path(file.path(metadata_dir, output_file))
 }
 
 # Generate the actual travel time matrix. Use the snapped lat/lon points
@@ -247,10 +249,10 @@ file_list <- c(
   network_file = here::here(network_dir, "network.dat"),
   origins_file = origins_file,
   destinations_file = destinations_file,
-  times_file = here::here(times_dir, "part-0.parquet"),
-  origins_snapped_file = here::here(origins_dir, "part-0.parquet"),
-  destinations_snapped_file = here::here(destinations_dir, "part-0.parquet"),
-  missing_pairs_file = here::here(missing_pairs_dir, "part-0.parquet")
+  times_file = here::here(times_dir, output_file),
+  origins_snapped_file = here::here(origins_dir, output_file),
+  destinations_snapped_file = here::here(destinations_dir, output_file),
+  missing_pairs_file = here::here(missing_pairs_dir, output_file)
 )
 md5_list <- lapply(file_list, digest::digest, algo = "md5")
 
