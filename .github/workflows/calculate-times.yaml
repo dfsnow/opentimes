@@ -162,13 +162,15 @@ jobs:
         working-directory: 'data'
         run: |
           od_path=year=${{ inputs.year }}/geography=${{ inputs.geography }}/state=${{ inputs.state }}/${{ inputs.state }}.parquet
+          net_path=year=${{ inputs.year }}/geography=state/state=${{ inputs.state }}
           dvc pull --no-run-cache \
             ./intermediate/cenloc/"$od_path" \
             ./intermediate/destpoint/"$od_path" \
-            ./intermediate/network/year=${{ inputs.year }}/geography=state/state=${{ inputs.state }}/network.dat \
-            ./intermediate/network/year=${{ inputs.year }}/geography=state/state=${{ inputs.state }}/network_settings.json
+            ./intermediate/network/"$net_path"/network.dat \
+            ./intermediate/network/"$net_path"/network_settings.json
 
       - name: Cache save network input data
+        if: ${{ steps.cache-restore-network-input.outputs.cache-hit != 'true' }}
         id: cache-save-network-input
         uses: actions/cache/save@v4
         with:
@@ -176,6 +178,7 @@ jobs:
           key: network-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
 
       - name: Cache save location input data
+        if: ${{ steps.cache-restore-location-input.outputs.cache-hit != 'true' }}
         id: cache-save-location-input
         uses: actions/cache/save@v4
         with:
@@ -187,9 +190,10 @@ jobs:
       - name: Create job chunks
         id: create-job-chunks
         shell: bash
-        run: "docker compose run --quiet-pull opentimes python3 ./src/split_origin.py
-          --year ${{ inputs.year }} --geography ${{ inputs.geography }}
-          --state ${{ inputs.state }} >> $GITHUB_OUTPUT"
+        run: |
+          docker compose run --quiet-pull opentimes python3 ./src/split_origin.py \
+            --year ${{ inputs.year }} --geography ${{ inputs.geography }} \
+            --state ${{ inputs.state }} >> $GITHUB_OUTPUT
 
   run-job:
     runs-on: ubuntu-latest
@@ -213,9 +217,9 @@ jobs:
         working-directory: 'data'
         run: |
           aws s3 cp --quiet --endpoint-url \
-          https://fcb279b22cfe4c98f903ad8f9e7ccbb2.r2.cloudflarestorage.com \
-          s3://opentimes-resources/jars/r5-custom.jar ./jars/r5-custom.jar \
-          --profile cloudflare
+            https://fcb279b22cfe4c98f903ad8f9e7ccbb2.r2.cloudflarestorage.com \
+            s3://opentimes-resources/jars/r5-custom.jar ./jars/r5-custom.jar \
+            --profile cloudflare
 
       - name: Cache restore network input data
         id: cache-restore-network-input-job
@@ -236,9 +240,9 @@ jobs:
       - name: Run job chunk
         shell: bash
         working-directory: 'data'
-        run: "docker compose run --quiet-pull opentimes Rscript ./src/calculate_times.R
-          --mode ${{ inputs.mode }} --year ${{ inputs.year }}
-          --geography ${{ inputs.geography }} --state ${{ inputs.state }}
-          --centroid_type ${{ inputs.centroid_type }}
-          --chunk ${{ matrix.chunk }}
-          "
+        run: |
+          docker compose run --quiet-pull opentimes Rscript ./src/calculate_times.R \
+            --mode ${{ inputs.mode }} --year ${{ inputs.year }} \
+            --geography ${{ inputs.geography }} --state ${{ inputs.state }} \
+            --centroid_type ${{ inputs.centroid_type }} \
+            --chunk ${{ matrix.chunk }}
