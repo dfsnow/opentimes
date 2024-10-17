@@ -26,3 +26,6 @@ runs:
         echo "[cloudflare]" > ~/.aws/credentials
         echo "aws_access_key_id=${{ inputs.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}" >> ~/.aws/credentials
         echo "aws_secret_access_key=${{ inputs.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
+        echo "[default]" > ~/.aws/config
+        echo "region = us-east-1" >> ~/.aws/config
+        echo "output = json" >> ~/.aws/config
