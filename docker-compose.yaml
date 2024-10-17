@@ -12,6 +12,7 @@ services:
     volumes:
       - $HOME/.aws/credentials:/root/.aws/credentials:ro
       - ./data/src:/times/src:ro
+      - ./data/input:/times/input:rw
       - ./data/intermediate:/times/intermediate:rw
       - ./data/output:/times/output:rw
       - ./data/jars:/times/jars:ro

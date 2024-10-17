@@ -20,7 +20,7 @@ on:
 
       year:
         required: true
-        description: Census data year
+        description: Census/OSM data year
         default: '2020'
         type: choice
         options:
@@ -124,7 +124,7 @@ env:
 
 jobs:
   setup-jobs:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     outputs:
       chunks: ${{ steps.create-job-chunks.outputs.chunks }}
@@ -190,7 +190,7 @@ jobs:
         working-directory: 'data'
         run: |
           aws s3 cp --quiet --endpoint-url \
-            https://fcb279b22cfe4c98f903ad8f9e7ccbb2.r2.cloudflarestorage.com \
+            https://${{ vars.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com \
             s3://opentimes-resources/jars/r5-custom.jar ./jars/r5-custom.jar \
             --profile cloudflare
 
@@ -230,13 +230,13 @@ jobs:
           echo "chunks=$chunks" >> $GITHUB_OUTPUT
 
           # If override chunks are set, use those instead
+          chunks_parsed=($(echo "$chunks" | jq -r '.[]'))
           if [ -n "${{ inputs.override_chunks }}" ]; then
-            chunks_parsed=($(echo "$chunks" | jq -r '.[]'))
             override_chunks_parsed=($(echo "${{ inputs.override_chunks }}" | tr -d ' ' | tr ',' ' '))
             for chunk in "${override_chunks_parsed[@]}"; do
               if [[ ! " ${chunks_parsed[@]} " =~ " ${chunk} " ]]; then
                 echo "Error: Override chunk ${chunk} is not in the chunks for this origin"
-                echo "Chunks include: ${chunks_parsed}"
+                echo "Chunks include: ${chunks_parsed[@]}"
                 exit 1
               fi
             done
@@ -244,11 +244,11 @@ jobs:
             echo "Creating jobs for chunks: ${override_chunks_parsed[@]}"
             echo "chunks=$chunks_json" > $GITHUB_OUTPUT
           else
-            echo "Creating jobs for chunks: $chunks"
+            echo "Creating jobs for chunks: ${chunks_parsed[@]}"
           fi
 
   run-job:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: setup-jobs
     strategy:
       # Don't fail all chunks if one fails
