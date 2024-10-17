@@ -148,7 +148,7 @@ jobs:
           path: |
             ./data/intermediate/cenloc
             ./data/intermediate/destpoint
-          key: network-${{ inputs.year }}-${{ inputs.geography }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
+          key: location-${{ inputs.year }}-${{ inputs.geography }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
 
       - name: Pull DVC objects
         if: ${{ steps.cache-restore-network-input.outputs.cache-hit != 'true' ||
@@ -177,7 +177,7 @@ jobs:
           path: |
             ./data/intermediate/cenloc
             ./data/intermediate/destpoint
-          key: network-${{ inputs.year }}-${{ inputs.geography }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
+          key: location-${{ inputs.year }}-${{ inputs.geography }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
 
       - name: Create job chunks
         id: create-job-chunks
@@ -226,7 +226,7 @@ jobs:
           path: |
             ./data/intermediate/cenloc
             ./data/intermediate/destpoint
-          key: network-${{ inputs.year }}-${{ inputs.geography }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
+          key: location-${{ inputs.year }}-${{ inputs.geography }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
 
       - name: Run job chunk
         shell: bash
