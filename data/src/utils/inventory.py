@@ -10,7 +10,7 @@ def split_file_to_str(file: str | Path, n_chunks: int = 256) -> str:
     chunk_idx = split_range(len(origins_df), n_chunks)
     zfill_size = len(str(chunk_idx[-1][1]))
     chunk_str = [f"{str(start).zfill(zfill_size)}-{str(end).zfill(zfill_size)}" for start, end in chunk_idx]
-    chunk_out = 'chunks=["' + '", "'.join(chunk_str) + '"]'
+    chunk_out = '["' + '", "'.join(chunk_str) + '"]'
 
     return chunk_out
 

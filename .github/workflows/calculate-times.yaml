@@ -9,7 +9,7 @@ on:
       # Input values match those in params.yaml
       mode:
         required: true
-        description: Travel mode
+        description: Mode of travel in R5
         default: 'car'
         type: choice
         options:
@@ -45,7 +45,7 @@ on:
 
       state:
         required: true
-        description: State to generate times for
+        description: Target Census state
         default: '01'
         type: choice
         options:
@@ -103,12 +103,19 @@ on:
 
       centroid_type:
         required: true
-        description: Weighted or unweighted
+        description: Whether or not to use population-weighted locations
         default: weighted
         type: choice
         options:
           - weighted
           - unweighted
+
+      override_chunks:
+        required: false
+        description: |
+          Comma-separated chunks to run e.g. 0-5,6-11.
+          Will run all chunks if null
+        type: string
 
 env:
   AWS_DEFAULT_REGION: us-east-1
@@ -217,9 +224,28 @@ jobs:
         id: create-job-chunks
         shell: bash
         run: |
-          docker compose run --quiet-pull opentimes python3 ./src/split_origin.py \
+          chunks=$(docker compose run --quiet-pull opentimes python3 ./src/split_origin.py \
             --year ${{ inputs.year }} --geography ${{ inputs.geography }} \
-            --state ${{ inputs.state }} >> $GITHUB_OUTPUT
+            --state ${{ inputs.state }})
+          echo "chunks=$chunks" >> $GITHUB_OUTPUT
+
+          # If override chunks are set, use those instead
+          if [ -n "${{ inputs.override_chunks }}" ]; then
+            chunks_parsed=($(echo "$chunks" | jq -r '.[]'))
+            override_chunks_parsed=($(echo "${{ inputs.override_chunks }}" | tr -d ' ' | tr ',' ' '))
+            for chunk in "${override_chunks_parsed[@]}"; do
+              if [[ ! " ${chunks_parsed[@]} " =~ " ${chunk} " ]]; then
+                echo "Error: Override chunk ${chunk} is not in the chunks for this origin"
+                echo "Chunks include: ${chunks_parsed}"
+                exit 1
+              fi
+            done
+            chunks_json=$(printf '%s\n' "${override_chunks_parsed[@]}" | jq -c -R . | jq -c -s .)
+            echo "Creating jobs for chunks: ${override_chunks_parsed[@]}"
+            echo "chunks=$chunks_json" > $GITHUB_OUTPUT
+          else
+            echo "Creating jobs for chunks: $chunks"
+          fi
 
   run-job:
     runs-on: ubuntu-latest
