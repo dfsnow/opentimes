@@ -212,7 +212,7 @@ jobs:
         shell: bash
         working-directory: 'data'
         run: |
-          aws s3 cp --endpoint-url \
+          aws s3 cp --quiet --endpoint-url \
           https://fcb279b22cfe4c98f903ad8f9e7ccbb2.r2.cloudflarestorage.com \
           s3://opentimes-resources/jars/r5-custom.jar ./jars/r5-custom.jar \
           --profile cloudflare
