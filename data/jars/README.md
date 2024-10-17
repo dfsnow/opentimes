@@ -13,3 +13,6 @@ aws s3 mv jars/r5-custom.jar s3://opentimes-resources/jars/ \
     --endpoint-url https://fcb279b22cfe4c98f903ad8f9e7ccbb2.r2.cloudflarestorage.com \
     --profile cloudflare
 ```
+
+The `jars/r5-custom.jar.md5` file is used as a cache key during CI runs.
+Update it if the JAR file is changed.
