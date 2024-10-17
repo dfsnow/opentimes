@@ -66807,11 +66807,11 @@ stages:
     outs:
     - path: ./intermediate/network/year=2020/geography=state/state=01/network.dat
       hash: md5
-      md5: 03faa8fb305cc8013cbbf15754c070ad
+      md5: 1db5b9ca6565f46cf3bf1cf3c951069c
       size: 1008770710
     - path: ./intermediate/network/year=2020/geography=state/state=01/network_settings.json
       hash: md5
-      md5: 0068f95346b18eabab54375cd599cf61
+      md5: 1ac086bfbee5e34264f70a105ab913c1
       size: 422
   fetch_elevation@2020-19:
     cmd: Rscript ./src/fetch_elevation.R --year 2020 --state 19
