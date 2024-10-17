@@ -178,6 +178,7 @@ jobs:
             ./intermediate/network/"$net_path"/network_settings.json
 
       - name: Fetch custom R5 jar
+        if: ${{ steps.cache-restore-custom-jar.outputs.cache-hit != 'true' }}
         shell: bash
         working-directory: 'data'
         run: |
@@ -205,6 +206,7 @@ jobs:
           key: location-${{ inputs.year }}-${{ inputs.geography }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
 
       - name: Cache save custom JAR
+        if: ${{ steps.cache-restore-custom-jar.outputs.cache-hit != 'true' }}
         id: cache-save-custom-jar
         uses: actions/cache/save@v4
         with:
