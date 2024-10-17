@@ -1,6 +1,7 @@
 ---
 
 name: calculate-times
+run-name: calculate-times-${{ inputs.mode }}-${{ inputs.year }}-${{ inputs.geography }}-${{ inputs.state }}-${{ inputs.centroid_type }}
 
 on:
   workflow_dispatch:
