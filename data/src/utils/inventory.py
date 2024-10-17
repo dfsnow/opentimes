@@ -36,10 +36,12 @@ def split_range(n: int, n_chunks: int = 256, min_chunk_size=5) -> list[tuple]:
             end = ((i + 1) * chunk_size) - 1
             chunk_ranges.append((start, end))
     else:
-        n_chunks_small = n // min_chunk_size
+        n_chunks_small = max(1, n // min_chunk_size)
         for i in range(n_chunks_small):
             start = i * min_chunk_size
             end = ((i + 1) * min_chunk_size) - 1
+            if end >= n:
+                end = n - 1
             chunk_ranges.append((start, end))
 
     if chunk_ranges[-1][1] < n:
