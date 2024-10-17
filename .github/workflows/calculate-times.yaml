@@ -197,11 +197,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Load Dockerized dependencies
-        uses: ./.github/actions/build-docker
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Setup Cloudflare credentials
         uses: ./.github/actions/setup-cloudflare-s3
         with:
