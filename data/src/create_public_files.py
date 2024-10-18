@@ -5,6 +5,19 @@ from utils.inventory import create_duckdb_connection
 
 
 def create_public_files(version: str, mode: str, year: str) -> None:
+    """
+    Janky function to pull data from the S3 output bucket and repartition it
+    into files that live on a public-facing bucket. Goal is to consolidate
+    many small files into a deterministic set of Parquet and CSV files.
+
+    Args:
+        version: The version of the data to pull.
+        mode: The travel mode to pull.
+        year: The year of the data to pull.
+
+    Returns:
+        None
+    """
     params = yaml.safe_load(open("params.yaml"))
     con = create_duckdb_connection()
 
