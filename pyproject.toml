@@ -34,6 +34,7 @@ test = [
   "pytest-cov >= 4.1.0",
 ]
 data = [
+  "duckdb==1.1.2",
   "dvc[s3]==3.55.2",
   "geopandas[all]==1.0.1",
   "osmium==4.0.1",
