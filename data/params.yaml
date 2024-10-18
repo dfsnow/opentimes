@@ -7,6 +7,15 @@ s3:
   bucket: 'opentimes-data'
   endpoint: 'https://fcb279b22cfe4c98f903ad8f9e7ccbb2.r2.cloudflarestorage.com'
 
+# Parameters used to control the chunking of work on GitHub Actions
+actions:
+  # The max number of jobs to create for a workflow. GitHub allows up to 256
+  n_chunks: 256
+
+  # The minimum number of origins to include in a job. Higher = fewer jobs
+  # that take longer. Lower = more jobs that finish quicker
+  min_chunk_size: 5
+
 times:
   # Travel times output version. Follows SemVer (kind of):
   # 1. MAJOR version increments for incompatible API changes
