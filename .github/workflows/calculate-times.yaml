@@ -297,4 +297,4 @@ jobs:
             --mode ${{ inputs.mode }} --year ${{ inputs.year }} \
             --geography ${{ inputs.geography }} --state ${{ inputs.state }} \
             --centroid_type ${{ inputs.centroid_type }} \
-            --chunk ${{ matrix.chunk }}
+            --chunk ${{ matrix.chunk }} --write-to-s3

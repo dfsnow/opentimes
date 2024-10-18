@@ -1,5 +1,5 @@
+##### SETUP #####
 options(java.parameters = "-Xmx16G")
-
 library(arrow)
 library(digest)
 library(dplyr)
@@ -21,8 +21,8 @@ option_list <- list(
   make_option("--centroid_type", type = "character"),
   make_option("--chunk", type = "character"),
   make_option(
-    "--write-local", type = "logical",
-    action = "store_true", dest = "local",
+    "--write-to-s3", type = "logical",
+    action = "store_true", dest = "write_to_s3",
     default = FALSE
   )
 )
@@ -61,33 +61,92 @@ if (!is.null(opt$chunk)) {
   message(start_msg)
 }
 
-# Setup the R2 bucket connection. Requires a custom profile and endpoint
-Sys.setenv("AWS_PROFILE" = params$s3$profile)
-data_bucket <- arrow::s3_bucket(
-  bucket = params$s3$bucket,
-  endpoint_override = params$s3$endpoint
-)
+
+##### FILE PATHS #####
 
 # Setup file paths for inputs (pre-made network file and OD points)
-input_path <- glue::glue(
+input <- list()
+input$path <- glue::glue(
   "year={opt$year}/geography={opt$geography}/",
   "state={opt$state}/{opt$state}.parquet"
 )
-network_dir <- here::here(glue::glue(
+input$network_dir <- here::here(glue::glue(
   "intermediate/network/",
   "year={opt$year}/geography=state/state={opt$state}"
 ))
-origins_file <- here::here("intermediate/cenloc", input_path)
-destinations_file <- here::here("intermediate/destpoint", input_path)
+input$origins_file <- here::here("intermediate/cenloc", input$path)
+input$destinations_file <- here::here("intermediate/destpoint", input$path)
+
+# Setup file paths for outputs. If a chunk is used, include it in
+# the output file name
+output <- list()
+output$path <- glue::glue(
+  "version={params$times$version}/mode={opt$mode}/year={opt$year}/",
+  "geography={opt$geography}/state={opt$state}/",
+  "centroid_type={opt$centroid_type}"
+)
+if (chunk_used) {
+  output$file <- glue::glue("part-{opt$chunk}.parquet")
+  times_file_patten <- glue::glue("part-{opt$chunk}-[0-9]*.parquet")
+  times_basename_template <- glue::glue(
+    "part-<<opt$chunk>>-{i}.parquet",
+    .open = "<<",
+    .close = ">>"
+  )
+} else {
+  output$file <- "part-0.parquet"
+  times_file_patten <- "part-[0-9]*.parquet"
+  times_basename_template <- "part-{i}.parquet"
+}
+
+# Create directories pointers to check for existence and create if necessary
+output$dirs$times <- file.path("times", output$path)
+output$dirs$origins <- file.path("points", output$path, "point_type=origin")
+output$dirs$destinations <- file.path("points", output$path, "point_type=destination")
+output$dirs$missing_pairs <- file.path("missing_pairs", output$path)
+output$dirs$metadata <- file.path("metadata", output$path)
+for (dir in output$dirs) {
+  if (!dir.exists(dir)) {
+    dir.create(here::here("output", dir), recursive = TRUE, showWarnings = FALSE)
+  }
+}
+
+# Create paths for output file relative to the project root
+output$local$times_dir <- here::here("output", output$dirs$times)
+output$local$origins_file <- here::here("output", output$dirs$origins, output$file)
+output$local$destinations_file <- here::here("output", output$dirs$destinations, output$file)
+output$local$missing_pairs_file <- here::here("output", output$dirs$missing_pairs, output$file)
+output$local$metadata_file <- here::here("output", output$dirs$metadata, output$file)
+
+# If the output gets written to S3, then also create S3 paths
+if (opt$write_to_s3) {
+  # Setup the R2 bucket connection. Requires a custom profile and endpoint
+  Sys.setenv("AWS_PROFILE" = params$s3$profile)
+  data_bucket <- arrow::s3_bucket(
+    bucket = params$s3$bucket,
+    endpoint_override = params$s3$endpoint
+  )
+  output$s3$times_dir <- data_bucket$path(output$dirs$times)
+  output$s3$origins_file <- data_bucket$path(file.path(output$dirs$origins, output$file))
+  output$s3$destinations_file <- data_bucket$path(file.path(output$dirs$destinations, output$file))
+  output$s3$missing_pairs_file <- data_bucket$path(file.path(output$dirs$missing_pairs, output$file))
+  output$s3$metadata_file <- data_bucket$path(file.path(output$dirs$metadata, output$file))
+}
+
+
+##### DATA PREP #####
 
 # Load the R5 JAR, network, and network settings
-if (!file.exists(here::here(network_dir, "network.dat"))) {
+if (!file.exists(here::here(input$network_dir, "network.dat"))) {
   stop("Network file not found. Run 'dvc repro' to create the network file.")
 }
 setup_r5_jar("./jars/r5-custom.jar")
-network_settings <- read_json(here::here(network_dir, "network_settings.json"))
+network_settings <- read_json(here::here(
+  input$network_dir,
+  "network_settings.json"
+))
 r5r_core <- r5r::setup_r5(
-  data_path = network_dir,
+  data_path = input$network_dir,
   verbose = FALSE,
   temp_dir = FALSE,
   overwrite = FALSE
@@ -99,9 +158,9 @@ od_cols <- switch(
   weighted = c("id" = "geoid", "lon" = "x_4326_wt", "lat" = "y_4326_wt"),
   unweighted = c("id" = "geoid", "lon" = "x_4326", "lat" = "y_4326")
 )
-origins = read_parquet(origins_file) %>%
+origins = read_parquet(input$origins_file) %>%
   select(all_of(od_cols))
-destinations <- read_parquet(destinations_file) %>%
+destinations <- read_parquet(input$destinations_file) %>%
   select(all_of(od_cols))
 n_origins <- nrow(origins)
 n_destinations <- nrow(destinations)
@@ -141,46 +200,8 @@ destinations_snapped <- destinations %>%
     snap_lon = ifelse(is.na(snap_lon), lon, snap_lon)
   )
 
-# Setup file paths for travel time outputs. If a chunk is used, include it in
-# the output file name
-output_path <- glue::glue(
-  "version={params$times$version}/mode={opt$mode}/year={opt$year}/",
-  "geography={opt$geography}/state={opt$state}/",
-  "centroid_type={opt$centroid_type}"
-)
-if (chunk_used) {
-  output_file <- glue::glue("part-{opt$chunk}.parquet")
-} else {
-  output_file <- "part-0.parquet"
-}
 
-times_dir <- file.path("times", output_path)
-origins_dir <- file.path("points", output_path, "point_type=origin")
-destinations_dir <- file.path("points", output_path, "point_type=destination")
-missing_pairs_dir <- file.path("missing_pairs", output_path)
-metadata_dir <- file.path("metadata", output_path)
-
-# If the output is local, create the necessary directories if they don't exist.
-# Otherwise, convert the dirs to S3 paths
-if (opt$local) {
-  for (dir in c(times_dir, origins_dir,
-                destinations_dir, missing_pairs_dir, metadata_dir)) {
-    if (!dir.exists(dir)) {
-      dir.create(here::here(dir), recursive = TRUE)
-    }
-  }
-  times_file <- here::here("output", times_dir, output_file)
-  origins_file <- here::here("output", origins_dir, output_file)
-  destinations_file <- here::here("output", destinations_dir, output_file)
-  missing_pairs_file <- here::here("output", missing_pairs_dir, output_file)
-  metadata_file <- here::here("output", metadata_dir, output_file)
-} else {
-  times_file <- data_bucket$path(times_dir)
-  origins_file <- data_bucket$path(file.path(origins_dir, output_file))
-  destinations_file <- data_bucket$path(file.path(destinations_dir, output_file))
-  missing_pairs_file <- data_bucket$path(file.path(missing_pairs_dir, output_file))
-  metadata_file <- data_bucket$path(file.path(metadata_dir, output_file))
-}
+##### CALCULATE TIMES #####
 
 # Generate the actual travel time matrix. Use the snapped lat/lon points
 tictoc::tic("Generated travel time matrix")
@@ -217,54 +238,77 @@ missing_pairs <- expand.grid(
 ) %>%
   anti_join(ttm, by = c("origin_id", "destination_id"))
 
-# Save the travel time matrix, input points, and missing pairs to disk
-write_dataset(
-  dataset = ttm,
-  path = times_dir,
-  format = "parquet",
-  hive_style = TRUE,
-  partitioning = "origin_id",
-  existing_data_behavior = "overwrite",
-  max_partitions = 1048576L,
-  compression = params$output$compression$type,
-  compression_level = params$output$compression$level,
-  basename_template = glue::glue(
-    "chunk-<<opt$chunk>>-part-{i}.parquet",
-    .open = "<<",
-    .close = ">>"
+
+##### SAVE OUTPUTS #####
+
+# Local outputs are always saved to disk. If the write-to-s3 flag is set, then
+# outputs are also saved to their S3 equivalent location
+paths <- list()
+paths[[1]] <- output$local
+if (opt$write_to_s3) {
+  paths[[2]] <- output$s3
+}
+
+
+# Save the travel time matrix, input points, and missing pairs to disk.
+# The times dataset is partitioned by origin_id for better query performance
+for (path in paths) {
+  write_dataset(
+    dataset = ttm,
+    path = path$times_dir,
+    format = "parquet",
+    hive_style = TRUE,
+    partitioning = "origin_id",
+    existing_data_behavior = "overwrite",
+    max_partitions = 1048576L,
+    compression = params$output$compression$type,
+    compression_level = params$output$compression$level,
+    basename_template = times_basename_template
   )
-)
-write_parquet(
-  x = origins_snapped,
-  sink = origins_file,
-  compression = params$output$compression$type,
-  compression_level = params$output$compression$level
-)
-write_parquet(
-  x = destinations_snapped,
-  sink = destinations_file,
-  compression = params$output$compression$type,
-  compression_level = params$output$compression$level
-)
-write_parquet(
-  x = missing_pairs,
-  sink = missing_pairs_file,
-  compression = params$output$compression$type,
-  compression_level = params$output$compression$level
-)
+  write_parquet(
+    x = origins_snapped,
+    sink = path$origins_file,
+    compression = params$output$compression$type,
+    compression_level = params$output$compression$level
+  )
+  write_parquet(
+    x = destinations_snapped,
+    sink = path$destinations_file,,
+    compression = params$output$compression$type,
+    compression_level = params$output$compression$level
+  )
+  write_parquet(
+    x = missing_pairs,
+    sink = path$missing_pairs_file,
+    compression = params$output$compression$type,
+    compression_level = params$output$compression$level
+  )
+}
 
 # Capture the repo state via git and input/output file hashes
 git_commit <- git2r::revparse_single(git2r::repository(), "HEAD")
-file_list <- c(
-  network_file = here::here(network_dir, "network.dat"),
-  origins_file = origins_file,
-  destinations_file = destinations_file,
-  times_file = here::here(times_dir, output_file),
-  origins_snapped_file = here::here(origins_dir, output_file),
-  destinations_snapped_file = here::here(destinations_dir, output_file),
-  missing_pairs_file = here::here(missing_pairs_dir, output_file)
+main_file_list <- c(
+  input_network_file = here::here(input$network_dir, "network.dat"),
+  input_origins_file = input$origins_file,
+  input_destinations_file = input$destinations_file,
+  output_origins_file = output$local$origins_file,
+  output_destinations_file = output$local$destinations_file,
+  output_missing_pairs_file = output$local$missing_pairs_file
 )
-md5_list <- lapply(file_list, digest::digest, algo = "md5")
+main_md5_list <- lapply(main_file_list, digest::digest, algo = "md5", file = TRUE)
+times_file_list_full <- list.files(
+  output$local$times_dir,
+  pattern = times_file_patten,
+  recursive = TRUE,
+  full.names = TRUE
+)
+times_file_list_short <- list.files(
+  output$local$times_dir,
+  pattern = times_file_patten,
+  recursive = TRUE,
+  full.names = FALSE
+)
+times_md5_list <- lapply(times_file_list_full, digest::digest, algo = "md5", file = TRUE)
 
 # Create a metadata dataframe of all settings and data used for creating inputs
 # and generating times
@@ -291,31 +335,34 @@ metadata <- tibble::tibble(
   param_use_elevation = network_settings$use_elevation,
   param_elevation_cost_function = network_settings$elevation_cost_function,
   param_elevation_zoom = params$input$elevation_zoom,
-  file_pbf_path = network_settings$pbf_file_name,
-  file_in_network_md5 = md5_list$network_file,
-  file_in_origins_md5 = md5_list$origins_file,
-  file_in_destinations_md5 = md5_list$destinations_file,
-  file_out_times_md5 = md5_list$times_file,
-  file_out_origins_md5 = md5_list$origins_snapped_file,
-  file_out_destinations_md5 = md5_list$destinations_snapped_file,
-  file_out_missing_pairs_md5 = md5_list$missing_pairs_file,
-  file_tiff_path = dplyr::na_if(network_settings$tiff_file_name, ""),
+  file_input_pbf_path = network_settings$pbf_file_name,
+  file_input_tiff_path = dplyr::na_if(network_settings$tiff_file_name, ""),
+  file_input_network_md5 = main_md5_list$input_network_file,
+  file_input_origins_md5 = main_md5_list$input_origins_file,
+  file_input_destinations_md5 = main_md5_list$input_destinations_file,
+  file_output_origins_md5 = main_md5_list$output_origins_file,
+  file_output_destinations_md5 = main_md5_list$output_destinations_file,
+  file_output_missing_pairs_md5 = main_md5_list$output_missing_pairs_file,
+  file_output_times_file = list(times_file_list_short),
+  file_output_times_md5 = list(times_md5_list),
   calc_n_origins = n_origins,
   calc_n_destinations = n_destinations,
-  calc_chunk_id = opt$chunk,
+  calc_chunk_id = ifelse(is.null(opt$chunk), NA_character_, opt$chunk),
   calc_chunk_n_origins = nrow(origins_snapped),
   calc_chunk_n_destinations = nrow(destinations_snapped),
   calc_time_finished = as.POSIXct(Sys.time(), tz="UTC"),
   calc_time_elapsed_sec = tictoc::tic.log(format = FALSE)[[1]]$toc -
-    tictoc::tic.log(format = FALSE)[[1]]$tic,
+    tictoc::tic.log(format = FALSE)[[1]]$tic
 )
 
-write_parquet(
-  x = metadata,
-  sink = metadata_file,
-  compression = params$output$compression$type,
-  compression_level = params$output$compression$level
-)
+for (path in paths) {
+  write_parquet(
+    x = metadata,
+    sink = path$metadata_file,
+    compression = params$output$compression$type,
+    compression_level = params$output$compression$level
+  )
+}
 
 # Cleanup Java connection and memory
 r5r::stop_r5(r5r_core)
