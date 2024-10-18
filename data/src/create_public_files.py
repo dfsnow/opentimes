@@ -10,7 +10,7 @@ def create_public_files(version: str, mode: str, year: str) -> None:
 
     # Dictionary of datasets and their respective number of partition folders
     datasets = {
-        "times": 7,
+        "times": 6,
         "points": 7,
         "missing_pairs": 6,
         "metadata": 6
