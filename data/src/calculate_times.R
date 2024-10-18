@@ -87,16 +87,8 @@ output$path <- glue::glue(
 )
 if (chunk_used) {
   output$file <- glue::glue("part-{opt$chunk}.parquet")
-  times_file_patten <- glue::glue("part-{opt$chunk}-[0-9]*.parquet")
-  times_basename_template <- glue::glue(
-    "part-<<opt$chunk>>-{i}.parquet",
-    .open = "<<",
-    .close = ">>"
-  )
 } else {
   output$file <- "part-0.parquet"
-  times_file_patten <- "part-[0-9]*.parquet"
-  times_basename_template <- "part-{i}.parquet"
 }
 
 # Create directories pointers to check for existence and create if necessary
@@ -112,7 +104,7 @@ for (dir in output$dirs) {
 }
 
 # Create paths for output file relative to the project root
-output$local$times_dir <- here::here("output", output$dirs$times)
+output$local$times_file <- here::here("output", output$dirs$times, output$file)
 output$local$origins_file <- here::here("output", output$dirs$origins, output$file)
 output$local$destinations_file <- here::here("output", output$dirs$destinations, output$file)
 output$local$missing_pairs_file <- here::here("output", output$dirs$missing_pairs, output$file)
@@ -126,7 +118,7 @@ if (opt$write_to_s3) {
     bucket = params$s3$bucket,
     endpoint_override = params$s3$endpoint
   )
-  output$s3$times_dir <- data_bucket$path(output$dirs$times)
+  output$s3$times_file <- data_bucket$path(file.path(output$dirs$times, output$file))
   output$s3$origins_file <- data_bucket$path(file.path(output$dirs$origins, output$file))
   output$s3$destinations_file <- data_bucket$path(file.path(output$dirs$destinations, output$file))
   output$s3$missing_pairs_file <- data_bucket$path(file.path(output$dirs$missing_pairs, output$file))
@@ -253,17 +245,11 @@ if (opt$write_to_s3) {
 # Save the travel time matrix, input points, and missing pairs to disk.
 # The times dataset is partitioned by origin_id for better query performance
 for (path in paths) {
-  write_dataset(
-    dataset = ttm,
-    path = path$times_dir,
-    format = "parquet",
-    hive_style = TRUE,
-    partitioning = "origin_id",
-    existing_data_behavior = "overwrite",
-    max_partitions = 1048576L,
+  write_parquet(
+    x = ttm,
+    sink = path$times_file,
     compression = params$output$compression$type,
-    compression_level = params$output$compression$level,
-    basename_template = times_basename_template
+    compression_level = params$output$compression$level
   )
   write_parquet(
     x = origins_snapped,
@@ -291,24 +277,12 @@ main_file_list <- c(
   input_network_file = here::here(input$network_dir, "network.dat"),
   input_origins_file = input$origins_file,
   input_destinations_file = input$destinations_file,
+  output_times_file = output$local$times_file,
   output_origins_file = output$local$origins_file,
   output_destinations_file = output$local$destinations_file,
   output_missing_pairs_file = output$local$missing_pairs_file
 )
 main_md5_list <- lapply(main_file_list, digest::digest, algo = "md5", file = TRUE)
-times_file_list_full <- list.files(
-  output$local$times_dir,
-  pattern = times_file_patten,
-  recursive = TRUE,
-  full.names = TRUE
-)
-times_file_list_short <- list.files(
-  output$local$times_dir,
-  pattern = times_file_patten,
-  recursive = TRUE,
-  full.names = FALSE
-)
-times_md5_list <- lapply(times_file_list_full, digest::digest, algo = "md5", file = TRUE)
 
 # Create a metadata dataframe of all settings and data used for creating inputs
 # and generating times
@@ -340,11 +314,10 @@ metadata <- tibble::tibble(
   file_input_network_md5 = main_md5_list$input_network_file,
   file_input_origins_md5 = main_md5_list$input_origins_file,
   file_input_destinations_md5 = main_md5_list$input_destinations_file,
+  file_output_times_md5 = main_md5_list$output_times_file,
   file_output_origins_md5 = main_md5_list$output_origins_file,
   file_output_destinations_md5 = main_md5_list$output_destinations_file,
   file_output_missing_pairs_md5 = main_md5_list$output_missing_pairs_file,
-  file_output_times_file = list(times_file_list_short),
-  file_output_times_md5 = list(times_md5_list),
   calc_n_origins = n_origins,
   calc_n_destinations = n_destinations,
   calc_chunk_id = ifelse(is.null(opt$chunk), NA_character_, opt$chunk),
