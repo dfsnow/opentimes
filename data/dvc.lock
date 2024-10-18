@@ -67281,3 +67281,23 @@ stages:
       hash: md5
       md5: 7c401a599b132012f8d4e0ef2f639810
       size: 422
+  create_network@2024-51:
+    cmd: Rscript src/create_network.R --year 2024 --state 51
+    deps:
+    - path: ./input/elevation/geography=state/state=51/51.tif
+      hash: md5
+      md5: 1201ef398884b8303496c3177b7bffae
+      size: 435399240
+    - path: ./intermediate/osmextract/year=2024/geography=state/state=51/51.osm.pbf
+      hash: md5
+      md5: 3edf9081e52329419358e1ab58f909e5
+      size: 926858002
+    outs:
+    - path: ./intermediate/network/year=2024/geography=state/state=51/network.dat
+      hash: md5
+      md5: 07d5748275de932d6d0aa5fa5ff390de
+      size: 2587449058
+    - path: ./intermediate/network/year=2024/geography=state/state=51/network_settings.json
+      hash: md5
+      md5: 9ca79a85ecdfea0f9f8d0fcfef9e20fc
+      size: 422
