@@ -4,10 +4,10 @@ from pathlib import Path
 import pandas as pd
 
 
-def split_file_to_str(file: str | Path, n_chunks: int = 256) -> str:
+def split_file_to_str(file: str | Path, **kwargs) -> str:
     origins_df = pd.read_parquet(file)
 
-    chunk_idx = split_range(len(origins_df), n_chunks)
+    chunk_idx = split_range(len(origins_df), **kwargs)
     zfill_size = len(str(chunk_idx[-1][1]))
     chunk_str = [f"{str(start).zfill(zfill_size)}-{str(end).zfill(zfill_size)}" for start, end in chunk_idx]
     chunk_out = '["' + '", "'.join(chunk_str) + '"]'
@@ -15,7 +15,7 @@ def split_file_to_str(file: str | Path, n_chunks: int = 256) -> str:
     return chunk_out
 
 
-def split_range(n: int, n_chunks: int = 256, min_chunk_size=5) -> list[tuple]:
+def split_range(n: int, n_chunks: int = 256, min_chunk_size: int = 5) -> list[tuple]:
     """
     Splits a range of integers into smaller chunks.
 
