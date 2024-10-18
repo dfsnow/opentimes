@@ -175,7 +175,7 @@ if (opt$local) {
   missing_pairs_file <- here::here("output", missing_pairs_dir, output_file)
   metadata_file <- here::here("output", metadata_dir, output_file)
 } else {
-  times_file <- data_bucket$path(file.path(times_dir, output_file))
+  times_file <- data_bucket$path(times_dir)
   origins_file <- data_bucket$path(file.path(origins_dir, output_file))
   destinations_file <- data_bucket$path(file.path(destinations_dir, output_file))
   missing_pairs_file <- data_bucket$path(file.path(missing_pairs_dir, output_file))
@@ -218,11 +218,21 @@ missing_pairs <- expand.grid(
   anti_join(ttm, by = c("origin_id", "destination_id"))
 
 # Save the travel time matrix, input points, and missing pairs to disk
-write_parquet(
-  x = ttm,
-  sink = times_file,
+write_dataset(
+  dataset = ttm,
+  path = times_dir,
+  format = "parquet",
+  hive_style = TRUE,
+  partitioning = "origin_id",
+  existing_data_behavior = "overwrite",
+  max_partitions = 1048576L,
   compression = params$output$compression$type,
-  compression_level = params$output$compression$level
+  compression_level = params$output$compression$level,
+  basename_template = glue::glue(
+    "chunk-<<opt$chunk>>-part-{i}.parquet",
+    .open = "<<",
+    .close = ">>"
+  )
 )
 write_parquet(
   x = origins_snapped,
