@@ -5,6 +5,7 @@ rosm.cache/
 venv/
 *.csv
 *.dat
+*.duckdb
 *.egg-info/
 *.geojson
 *.jar
@@ -17,6 +18,7 @@ venv/
 *.pyc
 *.tif
 *.tiff
+*.wal
 *.zip
 .env
 .gitignore

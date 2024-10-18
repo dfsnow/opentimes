@@ -16,8 +16,7 @@ buff <- read_sf("intermediate/osmclip/year=2020/geography=state/state=01/01.geoj
 ttm <- read_parquet("output/times/mode=car/year=2020/geography=county/state=01/centroid_type=weighted/part-0.parquet")
 missing <- read_parquet("output/missing_pairs/mode=car/year=2020/geography=county/state=01/centroid_type=weighted/part-0.parquet")
 
-jeff <- ttm %>%
-  filter(origin_id == "01071")
+jeff <- ttm
 
 jeff_sf <- counties %>%
   inner_join(jeff, by = c("GEOID" = "destination_id")) %>%
