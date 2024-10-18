@@ -106,6 +106,8 @@ jobs:
     runs-on: ubuntu-22.04
     needs: setup-jobs
     strategy:
+      # Don't fail all chunks if one fails
+      fail-fast: false
       matrix:
         state: ${{ fromJSON(needs.setup-jobs.outputs.states) }}
 
