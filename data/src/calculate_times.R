@@ -115,7 +115,7 @@ if (opt$write_to_s3) {
   # Setup the R2 bucket connection. Requires a custom profile and endpoint
   Sys.setenv("AWS_PROFILE" = params$s3$profile)
   data_bucket <- arrow::s3_bucket(
-    bucket = params$s3$bucket,
+    bucket = params$s3$data_bucket,
     endpoint_override = params$s3$endpoint
   )
   output$s3$times_file <- data_bucket$path(file.path(output$dirs$times, output$file))
