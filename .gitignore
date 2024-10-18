@@ -1,4 +1,5 @@
 __pycache__/
+.terraform/
 .venv/
 build/
 rosm.cache/
@@ -8,6 +9,7 @@ venv/
 *.duckdb
 *.egg-info/
 *.geojson
+*.hcl
 *.jar
 *.json
 *.mapdb
@@ -20,6 +22,7 @@ venv/
 *.tiff
 *.wal
 *.zip
+plan
 .env
 .gitignore
 .DS_Store
