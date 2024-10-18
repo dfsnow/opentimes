@@ -4,8 +4,10 @@
 # a custom S3 endpoint
 s3:
   profile: 'cloudflare'
-  bucket: 'opentimes-data'
+  data_bucket: 'opentimes-data'
+  public_bucket: 'opentimes-public'
   endpoint: 'https://fcb279b22cfe4c98f903ad8f9e7ccbb2.r2.cloudflarestorage.com'
+  account_id: 'fcb279b22cfe4c98f903ad8f9e7ccbb2'
 
 # Parameters used to control the chunking of work on GitHub Actions
 actions:
