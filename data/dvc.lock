@@ -69061,3 +69061,1023 @@ stages:
       hash: md5
       md5: c385e19509dc95b679e54be8ca225b59
       size: 363
+  create_network@2021-01:
+    cmd: Rscript src/create_network.R --year 2021 --state 01
+    deps:
+    - path: ./input/elevation/geography=state/state=01/01.tif
+      hash: md5
+      md5: cabc0d738a50ddd084e880a870112b19
+      size: 314611270
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=01/01.osm.pbf
+      hash: md5
+      md5: a2cdc60504005e165024497b96d1aace
+      size: 356277236
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=01/network.dat
+      hash: md5
+      md5: c7bc5f2c9b75421f818dda3373f841d8
+      size: 1134393182
+    - path: ./intermediate/network/year=2021/geography=state/state=01/network_settings.json
+      hash: md5
+      md5: 66cdd9b51984e2533cb51768935bf006
+      size: 363
+  create_network@2021-02:
+    cmd: Rscript src/create_network.R --year 2021 --state 02
+    deps:
+    - path: ./input/elevation/geography=state/state=02/02.tif
+      hash: md5
+      md5: df2cae52685aa862b74e720222998ccd
+      size: 1846859635
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=02/02.osm.pbf
+      hash: md5
+      md5: df9cdcf42898dde49028ac901e4e236f
+      size: 154159847
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=02/network.dat
+      hash: md5
+      md5: 9bff557fa40bd6643f30cd6bca3ad44f
+      size: 574360334
+    - path: ./intermediate/network/year=2021/geography=state/state=02/network_settings.json
+      hash: md5
+      md5: 3bc05e83d1670dedc62bcb9d198885de
+      size: 363
+  create_network@2021-04:
+    cmd: Rscript src/create_network.R --year 2021 --state 04
+    deps:
+    - path: ./input/elevation/geography=state/state=04/04.tif
+      hash: md5
+      md5: bbbd7bc6adca56b47220772d9470baac
+      size: 703710689
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=04/04.osm.pbf
+      hash: md5
+      md5: 5cbb0f9cdf58f68842a909533e24b57b
+      size: 236578911
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=04/network.dat
+      hash: md5
+      md5: c1006359b485ebcbec02e8943a6a5155
+      size: 776273540
+    - path: ./intermediate/network/year=2021/geography=state/state=04/network_settings.json
+      hash: md5
+      md5: 892740baaa0e2cb4786309c405076f31
+      size: 363
+  create_network@2021-05:
+    cmd: Rscript src/create_network.R --year 2021 --state 05
+    deps:
+    - path: ./input/elevation/geography=state/state=05/05.tif
+      hash: md5
+      md5: d5d7933ec6e72a5639455171690b6298
+      size: 305077998
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=05/05.osm.pbf
+      hash: md5
+      md5: 61ae1f92707e49540cb1e572a0cdb5f9
+      size: 378901402
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=05/network.dat
+      hash: md5
+      md5: 61e846e9212a0b70e440a9a88e9fe868
+      size: 1240242695
+    - path: ./intermediate/network/year=2021/geography=state/state=05/network_settings.json
+      hash: md5
+      md5: 7c22fe58e88a2bcf2446cc0daf0cd39f
+      size: 363
+  create_network@2021-06:
+    cmd: Rscript src/create_network.R --year 2021 --state 06
+    deps:
+    - path: ./input/elevation/geography=state/state=06/06.tif
+      hash: md5
+      md5: 033fd39c20642b2c2699e57aa6b74eaf
+      size: 1191751691
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=06/06.osm.pbf
+      hash: md5
+      md5: 5dfa699d8a013a2e35b941c64e6c7da4
+      size: 375237331
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=06/network.dat
+      hash: md5
+      md5: 632787e35d9f8064017cd8f77b4afefd
+      size: 1168306586
+    - path: ./intermediate/network/year=2021/geography=state/state=06/network_settings.json
+      hash: md5
+      md5: 21151404eb1f4315b75d66063cb06295
+      size: 363
+  create_network@2021-08:
+    cmd: Rscript src/create_network.R --year 2021 --state 08
+    deps:
+    - path: ./input/elevation/geography=state/state=08/08.tif
+      hash: md5
+      md5: ab241868d32142e07f58785079c86e74
+      size: 592470353
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=08/08.osm.pbf
+      hash: md5
+      md5: c54b41cea4b32e4a08f5366f8338f523
+      size: 209118217
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=08/network.dat
+      hash: md5
+      md5: 2d3247d5eb8238f8bee6ddf4b0831d14
+      size: 751989896
+    - path: ./intermediate/network/year=2021/geography=state/state=08/network_settings.json
+      hash: md5
+      md5: 9d2eefb8ba3b4009c8d3d4a1e5b699e1
+      size: 363
+  create_network@2021-09:
+    cmd: Rscript src/create_network.R --year 2021 --state 09
+    deps:
+    - path: ./input/elevation/geography=state/state=09/09.tif
+      hash: md5
+      md5: 14bc4846e5930c3f03c010dcaef603d5
+      size: 243140789
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=09/09.osm.pbf
+      hash: md5
+      md5: 9c7d2863fc420eed890661f08c9d99aa
+      size: 355017738
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=09/network.dat
+      hash: md5
+      md5: 25a86e9cdeec10a421432b285b8e2cb7
+      size: 1007289468
+    - path: ./intermediate/network/year=2021/geography=state/state=09/network_settings.json
+      hash: md5
+      md5: 664ad3a3b9ae2e92a4e332140589129c
+      size: 363
+  create_network@2021-10:
+    cmd: Rscript src/create_network.R --year 2021 --state 10
+    deps:
+    - path: ./input/elevation/geography=state/state=10/10.tif
+      hash: md5
+      md5: c7cca2c5fc823e939f61dd54fbc9c54d
+      size: 234846402
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=10/10.osm.pbf
+      hash: md5
+      md5: 59d1a752b2cbfc0ce8f93f258a98879f
+      size: 371049875
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=10/network.dat
+      hash: md5
+      md5: 349006f43938783aa1981679cfa9c22b
+      size: 1054100571
+    - path: ./intermediate/network/year=2021/geography=state/state=10/network_settings.json
+      hash: md5
+      md5: 487a1d56fd910483ccd838176f53d070
+      size: 363
+  create_network@2021-11:
+    cmd: Rscript src/create_network.R --year 2021 --state 11
+    deps:
+    - path: ./input/elevation/geography=state/state=11/11.tif
+      hash: md5
+      md5: d8404b0379ffbfe75c8c7640e6bd68c3
+      size: 174867590
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=11/11.osm.pbf
+      hash: md5
+      md5: 07b732d3588d4bf6cfb5d96ebd7aa0fd
+      size: 355156323
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=11/network.dat
+      hash: md5
+      md5: 3ca8810393cfbf99606d272615039552
+      size: 990225737
+    - path: ./intermediate/network/year=2021/geography=state/state=11/network_settings.json
+      hash: md5
+      md5: 9a26bc5bf72547a03a8cec11d4f10c1f
+      size: 363
+  create_network@2021-12:
+    cmd: Rscript src/create_network.R --year 2021 --state 12
+    deps:
+    - path: ./input/elevation/geography=state/state=12/12.tif
+      hash: md5
+      md5: f5cecf2eb46d22800fb80543502e6697
+      size: 494569441
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=12/12.osm.pbf
+      hash: md5
+      md5: 3513d5e723600c6561561ab2f4ccbc56
+      size: 254533499
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=12/network.dat
+      hash: md5
+      md5: fe2ab9a75591cba0bffef4997b9c6d4e
+      size: 884253905
+    - path: ./intermediate/network/year=2021/geography=state/state=12/network_settings.json
+      hash: md5
+      md5: 1fc61a2183796e5b639a1be69462ffd5
+      size: 363
+  create_network@2021-13:
+    cmd: Rscript src/create_network.R --year 2021 --state 13
+    deps:
+    - path: ./input/elevation/geography=state/state=13/13.tif
+      hash: md5
+      md5: c6163e528bc5f7d2b4284472dedf5a01
+      size: 377518059
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=13/13.osm.pbf
+      hash: md5
+      md5: d7c24015763425f61842a983767e74de
+      size: 458786306
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=13/network.dat
+      hash: md5
+      md5: 96cfc755dc1d1a6da6d06b0a429e76e8
+      size: 1375437991
+    - path: ./intermediate/network/year=2021/geography=state/state=13/network_settings.json
+      hash: md5
+      md5: aa43c5199fbc02cec93c4c568a538754
+      size: 363
+  create_network@2021-15:
+    cmd: Rscript src/create_network.R --year 2021 --state 15
+    deps:
+    - path: ./input/elevation/geography=state/state=15/15.tif
+      hash: md5
+      md5: 9a904db28e4b80bc5d9e1bfa93890182
+      size: 1434108697
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=15/15.osm.pbf
+      hash: md5
+      md5: b7bee705e39a084024d54495c057ccd8
+      size: 321261122
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=15/network.dat
+      hash: md5
+      md5: 0adc157253564d7a52bedc63342ac73a
+      size: 1113051003
+    - path: ./intermediate/network/year=2021/geography=state/state=15/network_settings.json
+      hash: md5
+      md5: facb2adccf10c72f0d0fd67bbe5e1185
+      size: 363
+  create_network@2021-16:
+    cmd: Rscript src/create_network.R --year 2021 --state 16
+    deps:
+    - path: ./input/elevation/geography=state/state=16/16.tif
+      hash: md5
+      md5: c4cf911055c20720ccdbbdf7e4dd35c1
+      size: 964492365
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=16/16.osm.pbf
+      hash: md5
+      md5: 3d785af3397f0b3fc96d76ab72ff2b1c
+      size: 203802375
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=16/network.dat
+      hash: md5
+      md5: 63be5fe00e3bd83ef8c62ca475b3d0c5
+      size: 624719369
+    - path: ./intermediate/network/year=2021/geography=state/state=16/network_settings.json
+      hash: md5
+      md5: cd733b489bdc7831b3c3463276265af3
+      size: 363
+  create_network@2021-17:
+    cmd: Rscript src/create_network.R --year 2021 --state 17
+    deps:
+    - path: ./input/elevation/geography=state/state=17/17.tif
+      hash: md5
+      md5: fae35ca422e867f96a4057f1a41f471c
+      size: 397470199
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=17/17.osm.pbf
+      hash: md5
+      md5: b9a88b1c38ba2cdeb8e59eb6caedf0b3
+      size: 531213888
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=17/network.dat
+      hash: md5
+      md5: dc6cc5d05131a6056fdc567e45f52bd1
+      size: 1826255428
+    - path: ./intermediate/network/year=2021/geography=state/state=17/network_settings.json
+      hash: md5
+      md5: 1a8a3e8f3bc553109d15e7dc226518ef
+      size: 363
+  create_network@2021-18:
+    cmd: Rscript src/create_network.R --year 2021 --state 18
+    deps:
+    - path: ./input/elevation/geography=state/state=18/18.tif
+      hash: md5
+      md5: e45891f1dd353aebb4da2f7abfcb6911
+      size: 307944830
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=18/18.osm.pbf
+      hash: md5
+      md5: 312f28f2cbd28b528c16bc10d5529af9
+      size: 515838097
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=18/network.dat
+      hash: md5
+      md5: 94c1d82c0d1e9e39710a899520d30ff5
+      size: 1724539180
+    - path: ./intermediate/network/year=2021/geography=state/state=18/network_settings.json
+      hash: md5
+      md5: c4bb48309653e8b08a5b8c70eb786d83
+      size: 363
+  create_network@2021-19:
+    cmd: Rscript src/create_network.R --year 2021 --state 19
+    deps:
+    - path: ./input/elevation/geography=state/state=19/19.tif
+      hash: md5
+      md5: 7e3f2769dc54bd0bce653cdb23cb2366
+      size: 341202162
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=19/19.osm.pbf
+      hash: md5
+      md5: 9204f1a56394313361699da6f21235d1
+      size: 341254141
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=19/network.dat
+      hash: md5
+      md5: aac0de6cf78567d7ccb6900020c4dc09
+      size: 1204935147
+    - path: ./intermediate/network/year=2021/geography=state/state=19/network_settings.json
+      hash: md5
+      md5: e495eb3e97438edab212c8e3830104a9
+      size: 363
+  create_network@2021-20:
+    cmd: Rscript src/create_network.R --year 2021 --state 20
+    deps:
+    - path: ./input/elevation/geography=state/state=20/20.tif
+      hash: md5
+      md5: 57ca6129112de73beb86307df2acc2e0
+      size: 434281215
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=20/20.osm.pbf
+      hash: md5
+      md5: b8423efcd09a380edd6751681bd8d96c
+      size: 314784083
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=20/network.dat
+      hash: md5
+      md5: 50814d98545cd505aa7be986ec0a49b2
+      size: 1086291605
+    - path: ./intermediate/network/year=2021/geography=state/state=20/network_settings.json
+      hash: md5
+      md5: c0a291b73f5ba02fa002f03c44b185c0
+      size: 363
+  create_network@2021-21:
+    cmd: Rscript src/create_network.R --year 2021 --state 21
+    deps:
+    - path: ./input/elevation/geography=state/state=21/21.tif
+      hash: md5
+      md5: 90d392191dbb5b9bec8ae722f20023bc
+      size: 357352521
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=21/21.osm.pbf
+      hash: md5
+      md5: fc3d194c3e2e467b6cc8719c346f72dd
+      size: 649307907
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=21/network.dat
+      hash: md5
+      md5: 93486d5f56d6d6907fc138e87c66e60f
+      size: 1959635999
+    - path: ./intermediate/network/year=2021/geography=state/state=21/network_settings.json
+      hash: md5
+      md5: 0d4fd0e0dc2a56e26fdc81c2b73a2655
+      size: 363
+  create_network@2021-22:
+    cmd: Rscript src/create_network.R --year 2021 --state 22
+    deps:
+    - path: ./input/elevation/geography=state/state=22/22.tif
+      hash: md5
+      md5: d0409e18eb7c18d5de60bc16fd653be7
+      size: 324734850
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=22/22.osm.pbf
+      hash: md5
+      md5: 6d71564ab3c566089fdb4a172446a985
+      size: 246135345
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=22/network.dat
+      hash: md5
+      md5: 353f2e5da9930e4cd8739ed82e7b872c
+      size: 852124907
+    - path: ./intermediate/network/year=2021/geography=state/state=22/network_settings.json
+      hash: md5
+      md5: 3fc7a3f824510b2480c6f6722b4897f1
+      size: 363
+  create_network@2021-23:
+    cmd: Rscript src/create_network.R --year 2021 --state 23
+    deps:
+    - path: ./input/elevation/geography=state/state=23/23.tif
+      hash: md5
+      md5: 079c5c7f6639aa5174c2a582cf084fbc
+      size: 461098379
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=23/23.osm.pbf
+      hash: md5
+      md5: 60e13e9171f9f2957a0a60c3e5dc27b9
+      size: 262711601
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=23/network.dat
+      hash: md5
+      md5: 4579136c37240e4d6c3254a7f64444e8
+      size: 704789641
+    - path: ./intermediate/network/year=2021/geography=state/state=23/network_settings.json
+      hash: md5
+      md5: 632657fe9a7b637f83f65ea59e2ad3c4
+      size: 363
+  create_network@2021-24:
+    cmd: Rscript src/create_network.R --year 2021 --state 24
+    deps:
+    - path: ./input/elevation/geography=state/state=24/24.tif
+      hash: md5
+      md5: 7048f5c8ed265bf96912edabd00e7a65
+      size: 323326189
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=24/24.osm.pbf
+      hash: md5
+      md5: c343f911a3daeb366b83c87213ef3abf
+      size: 544852154
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=24/network.dat
+      hash: md5
+      md5: 8d33da33c6327284948190a4bf25841b
+      size: 1593157939
+    - path: ./intermediate/network/year=2021/geography=state/state=24/network_settings.json
+      hash: md5
+      md5: fad741dfe815750abb81f4e8bff98306
+      size: 363
+  create_network@2021-25:
+    cmd: Rscript src/create_network.R --year 2021 --state 25
+    deps:
+    - path: ./input/elevation/geography=state/state=25/25.tif
+      hash: md5
+      md5: 899c3b987db4fb0864ed34ee002615e1
+      size: 291327380
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=25/25.osm.pbf
+      hash: md5
+      md5: 88e36a34dcd44449fcdf6489afa0d4fb
+      size: 342967931
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=25/network.dat
+      hash: md5
+      md5: d8aaac7c41b45a980ef8848396fc6ac7
+      size: 982741656
+    - path: ./intermediate/network/year=2021/geography=state/state=25/network_settings.json
+      hash: md5
+      md5: d74e01d6e267cf99c5386374ea053370
+      size: 363
+  create_network@2021-26:
+    cmd: Rscript src/create_network.R --year 2021 --state 26
+    deps:
+    - path: ./input/elevation/geography=state/state=26/26.tif
+      hash: md5
+      md5: 3085e063cc989c7c5b48464e077f878c
+      size: 522820031
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=26/26.osm.pbf
+      hash: md5
+      md5: 18c0cff2d66d47141437d98c2df3fe5e
+      size: 486018106
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=26/network.dat
+      hash: md5
+      md5: 42ab1a795e01c9c4b93a47b07d469a53
+      size: 1676249983
+    - path: ./intermediate/network/year=2021/geography=state/state=26/network_settings.json
+      hash: md5
+      md5: e2a04cfae2ab2ba2edb7255f36dc128f
+      size: 363
+  create_network@2021-27:
+    cmd: Rscript src/create_network.R --year 2021 --state 27
+    deps:
+    - path: ./input/elevation/geography=state/state=27/27.tif
+      hash: md5
+      md5: 5b2839344b67c36f6050539c5aac2546
+      size: 491251060
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=27/27.osm.pbf
+      hash: md5
+      md5: 0b2858237fd19f7e0ed65ea98f1263c2
+      size: 263723660
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=27/network.dat
+      hash: md5
+      md5: d7ae4ace1966aa4e3ca655e5b9bf0118
+      size: 976489219
+    - path: ./intermediate/network/year=2021/geography=state/state=27/network_settings.json
+      hash: md5
+      md5: 95432124a88b10eae85d658dc829b836
+      size: 363
+  create_network@2021-28:
+    cmd: Rscript src/create_network.R --year 2021 --state 28
+    deps:
+    - path: ./input/elevation/geography=state/state=28/28.tif
+      hash: md5
+      md5: 7f7851664de69ce341d44ac4c8ac6f96
+      size: 308702002
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=28/28.osm.pbf
+      hash: md5
+      md5: ab5ffc2794878ab01c6b02cfb9cbef1e
+      size: 268682621
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=28/network.dat
+      hash: md5
+      md5: 1ccd437c43fadc2ccfb61493fc2a2eaa
+      size: 840769863
+    - path: ./intermediate/network/year=2021/geography=state/state=28/network_settings.json
+      hash: md5
+      md5: 70e9e517e9badf697ad0baddba8e0e89
+      size: 363
+  create_network@2021-29:
+    cmd: Rscript src/create_network.R --year 2021 --state 29
+    deps:
+    - path: ./input/elevation/geography=state/state=29/29.tif
+      hash: md5
+      md5: e2d453037b85fd8c619ae4d1722451d4
+      size: 408164262
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=29/29.osm.pbf
+      hash: md5
+      md5: cf9806ea62943ba95b0fec78edeb3c15
+      size: 422306241
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=29/network.dat
+      hash: md5
+      md5: b6acdc14cac0d8cc264f09d69dbf3ac7
+      size: 1397712043
+    - path: ./intermediate/network/year=2021/geography=state/state=29/network_settings.json
+      hash: md5
+      md5: 0b7abadfc6d0a07c2d90c4e34df1603e
+      size: 363
+  create_network@2021-30:
+    cmd: Rscript src/create_network.R --year 2021 --state 30
+    deps:
+    - path: ./input/elevation/geography=state/state=30/30.tif
+      hash: md5
+      md5: 8c9471f793aa63efbb753865ab32b263
+      size: 856487663
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=30/30.osm.pbf
+      hash: md5
+      md5: 0bc89afbe3610dd69ec9427ccfb985b6
+      size: 202194721
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=30/network.dat
+      hash: md5
+      md5: 1246464d3a392879e2547ce97aeb8f90
+      size: 669066543
+    - path: ./intermediate/network/year=2021/geography=state/state=30/network_settings.json
+      hash: md5
+      md5: abc841e53f5534a0249ce3597a07f188
+      size: 363
+  create_network@2021-31:
+    cmd: Rscript src/create_network.R --year 2021 --state 31
+    deps:
+    - path: ./input/elevation/geography=state/state=31/31.tif
+      hash: md5
+      md5: 4a2f098d6b2f9db7c27ba2b1d0639378
+      size: 475769899
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=31/31.osm.pbf
+      hash: md5
+      md5: fd18865e31c366150c5bc54eb7686ca5
+      size: 240103735
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=31/network.dat
+      hash: md5
+      md5: 51f25438020ed9ebfa90baa045c2cd85
+      size: 850242527
+    - path: ./intermediate/network/year=2021/geography=state/state=31/network_settings.json
+      hash: md5
+      md5: 61264f63d70a49498ad3d978f140f40c
+      size: 363
+  create_network@2021-32:
+    cmd: Rscript src/create_network.R --year 2021 --state 32
+    deps:
+    - path: ./input/elevation/geography=state/state=32/32.tif
+      hash: md5
+      md5: 26b6ee07e860b1607b9d884be67d266d
+      size: 856106187
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=32/32.osm.pbf
+      hash: md5
+      md5: 7a0d7b27b30dc9408343e4ea13e645e5
+      size: 404569293
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=32/network.dat
+      hash: md5
+      md5: 95832bffbc7167023086b160b22d43eb
+      size: 1251601523
+    - path: ./intermediate/network/year=2021/geography=state/state=32/network_settings.json
+      hash: md5
+      md5: aa61c2f6f1f80542c48325c362bb5c3f
+      size: 363
+  create_network@2021-33:
+    cmd: Rscript src/create_network.R --year 2021 --state 33
+    deps:
+    - path: ./input/elevation/geography=state/state=33/33.tif
+      hash: md5
+      md5: 8cf6a9017e03d019f13c02bf1555e426
+      size: 313114151
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=33/33.osm.pbf
+      hash: md5
+      md5: ff05330bf30b6606f32d2b9f14f8189b
+      size: 317666215
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=33/network.dat
+      hash: md5
+      md5: b7f39407d1748520c238f711a3de85c4
+      size: 906773967
+    - path: ./intermediate/network/year=2021/geography=state/state=33/network_settings.json
+      hash: md5
+      md5: fef5a1096cb94f0cc0cce064f8849939
+      size: 363
+  create_network@2021-34:
+    cmd: Rscript src/create_network.R --year 2021 --state 34
+    deps:
+    - path: ./input/elevation/geography=state/state=34/34.tif
+      hash: md5
+      md5: 427ea71d8c34b07170b67011c736acfc
+      size: 296435259
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=34/34.osm.pbf
+      hash: md5
+      md5: f78c69b287f700d77ec0f37f3b24e52d
+      size: 473756472
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=34/network.dat
+      hash: md5
+      md5: 0b6b1864c5dbfab28ce8418a7ae38344
+      size: 1283742395
+    - path: ./intermediate/network/year=2021/geography=state/state=34/network_settings.json
+      hash: md5
+      md5: 21e742b671ac7313355c1e9c1f451c90
+      size: 363
+  create_network@2021-35:
+    cmd: Rscript src/create_network.R --year 2021 --state 35
+    deps:
+    - path: ./input/elevation/geography=state/state=35/35.tif
+      hash: md5
+      md5: 87f7e92f6bc981813896dac32cc1f128
+      size: 646698311
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=35/35.osm.pbf
+      hash: md5
+      md5: d3330a3a0e2d5eed460ee06d9b380455
+      size: 230821901
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=35/network.dat
+      hash: md5
+      md5: cf03762bea33cc78111758bb26b81f70
+      size: 812195045
+    - path: ./intermediate/network/year=2021/geography=state/state=35/network_settings.json
+      hash: md5
+      md5: b3d2e05adb996bf66096b4e595d44094
+      size: 363
+  create_network@2021-36:
+    cmd: Rscript src/create_network.R --year 2021 --state 36
+    deps:
+    - path: ./input/elevation/geography=state/state=36/36.tif
+      hash: md5
+      md5: ce4020b112aa72b1465a5c3efc290be6
+      size: 518784459
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=36/36.osm.pbf
+      hash: md5
+      md5: ca204f771c00ccac58f0a542d39bd15e
+      size: 655437006
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=36/network.dat
+      hash: md5
+      md5: 0c93fd2918fde9420e4bfab434fd7bb5
+      size: 1941614663
+    - path: ./intermediate/network/year=2021/geography=state/state=36/network_settings.json
+      hash: md5
+      md5: 8c372eb65a5605b18d1678ca588f9856
+      size: 363
+  create_network@2021-37:
+    cmd: Rscript src/create_network.R --year 2021 --state 37
+    deps:
+    - path: ./input/elevation/geography=state/state=37/37.tif
+      hash: md5
+      md5: f68c3517192f5841d38d2d457fe6c3a1
+      size: 448427525
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=37/37.osm.pbf
+      hash: md5
+      md5: 59c4aeed8607bb400b808e299b48495f
+      size: 599721613
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=37/network.dat
+      hash: md5
+      md5: c3de7eaf5031151237101e20fa3c7291
+      size: 1602937785
+    - path: ./intermediate/network/year=2021/geography=state/state=37/network_settings.json
+      hash: md5
+      md5: 7d87162c2994dae6e59e76edb2995c3d
+      size: 363
+  create_network@2021-38:
+    cmd: Rscript src/create_network.R --year 2021 --state 38
+    deps:
+    - path: ./input/elevation/geography=state/state=38/38.tif
+      hash: md5
+      md5: 5f394767b642b2229d5778f9bcec92b4
+      size: 410898528
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=38/38.osm.pbf
+      hash: md5
+      md5: f03f90cfd58cf4bd07d2e28c0168f9c3
+      size: 126098011
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=38/network.dat
+      hash: md5
+      md5: 1db77160726ff472ed866fa5266323ea
+      size: 504016786
+    - path: ./intermediate/network/year=2021/geography=state/state=38/network_settings.json
+      hash: md5
+      md5: b8a8727f1e7c51f12892134012e2fe2c
+      size: 363
+  create_network@2021-39:
+    cmd: Rscript src/create_network.R --year 2021 --state 39
+    deps:
+    - path: ./input/elevation/geography=state/state=39/39.tif
+      hash: md5
+      md5: 10e4e84a1f37714328e18ef4192cebdf
+      size: 355706735
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=39/39.osm.pbf
+      hash: md5
+      md5: c88f3b5d1854de5c42b36997c765d2bc
+      size: 653307043
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=39/network.dat
+      hash: md5
+      md5: 9fac7aa4b349dcf4958e15bb8e449fa5
+      size: 1996500446
+    - path: ./intermediate/network/year=2021/geography=state/state=39/network_settings.json
+      hash: md5
+      md5: 0543b9c896a8f8e37262a09d5d575452
+      size: 363
+  create_network@2021-40:
+    cmd: Rscript src/create_network.R --year 2021 --state 40
+    deps:
+    - path: ./input/elevation/geography=state/state=40/40.tif
+      hash: md5
+      md5: 9b3ae3f3610c6b0e04ee748f80e6f154
+      size: 451303335
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=40/40.osm.pbf
+      hash: md5
+      md5: 91a67c45577f7773d4c625a96400e908
+      size: 332812553
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=40/network.dat
+      hash: md5
+      md5: eec65ffc3090097aaebd8d2e8a87bde6
+      size: 1154448587
+    - path: ./intermediate/network/year=2021/geography=state/state=40/network_settings.json
+      hash: md5
+      md5: 884a883b9b4aa9aecf140637c70baa00
+      size: 363
+  create_network@2021-41:
+    cmd: Rscript src/create_network.R --year 2021 --state 41
+    deps:
+    - path: ./input/elevation/geography=state/state=41/41.tif
+      hash: md5
+      md5: 4a6aa6b6fae4c20e3efd5be301e07e7f
+      size: 752216024
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=41/41.osm.pbf
+      hash: md5
+      md5: 25e056d071a36922a016a211cd62d929
+      size: 284104499
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=41/network.dat
+      hash: md5
+      md5: 50c2c0cf8f22ddcf558bfc56553be21b
+      size: 822200714
+    - path: ./intermediate/network/year=2021/geography=state/state=41/network_settings.json
+      hash: md5
+      md5: 8b01b7061d983becd27b7f716b831898
+      size: 363
+  create_network@2021-42:
+    cmd: Rscript src/create_network.R --year 2021 --state 42
+    deps:
+    - path: ./input/elevation/geography=state/state=42/42.tif
+      hash: md5
+      md5: 5180cd9cd4fee9918b62f64e3460d1a3
+      size: 372468673
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=42/42.osm.pbf
+      hash: md5
+      md5: ea486163f0867b79f2514f064b31019b
+      size: 752532621
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=42/network.dat
+      hash: md5
+      md5: 7da8a05645cb3f4c8355a9737b9e15b7
+      size: 2135408115
+    - path: ./intermediate/network/year=2021/geography=state/state=42/network_settings.json
+      hash: md5
+      md5: a0931afba2c1d7c0df38ab4256e5a71e
+      size: 363
+  create_network@2021-44:
+    cmd: Rscript src/create_network.R --year 2021 --state 44
+    deps:
+    - path: ./input/elevation/geography=state/state=44/44.tif
+      hash: md5
+      md5: 193a26a2512e1295ec905627f3540dd9
+      size: 203715808
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=44/44.osm.pbf
+      hash: md5
+      md5: c0e773e8f0e45a520b9fd1182b7fcacd
+      size: 273638560
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=44/network.dat
+      hash: md5
+      md5: 5fc56770193fa1f2e7d5f8b8f3f5c669
+      size: 790790404
+    - path: ./intermediate/network/year=2021/geography=state/state=44/network_settings.json
+      hash: md5
+      md5: 134e3047abf45848d8f63392855dee05
+      size: 363
+  create_network@2021-45:
+    cmd: Rscript src/create_network.R --year 2021 --state 45
+    deps:
+    - path: ./input/elevation/geography=state/state=45/45.tif
+      hash: md5
+      md5: 178b3f3872c54cc1bbd6e5a9acd86b62
+      size: 314572800
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=45/45.osm.pbf
+      hash: md5
+      md5: 6f2fca3fdb009a81afd79468923d3ed2
+      size: 413986530
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=45/network.dat
+      hash: md5
+      md5: f920287e441cdda05ffe731263d307f4
+      size: 1195831877
+    - path: ./intermediate/network/year=2021/geography=state/state=45/network_settings.json
+      hash: md5
+      md5: f73c0b07481efb33a648e76ce35dc2d4
+      size: 363
+  create_network@2021-46:
+    cmd: Rscript src/create_network.R --year 2021 --state 46
+    deps:
+    - path: ./input/elevation/geography=state/state=46/46.tif
+      hash: md5
+      md5: 329f42a514c4e721c3a246fd3c7ea50a
+      size: 468856057
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=46/46.osm.pbf
+      hash: md5
+      md5: ef3a03f206d552d87d1790b5d1c69817
+      size: 200343907
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=46/network.dat
+      hash: md5
+      md5: 5c49907b9276b2c1c416974197cf8e04
+      size: 737581727
+    - path: ./intermediate/network/year=2021/geography=state/state=46/network_settings.json
+      hash: md5
+      md5: 9d91325259a5898ff2d2aae2ea9c6f9b
+      size: 363
+  create_network@2021-47:
+    cmd: Rscript src/create_network.R --year 2021 --state 47
+    deps:
+    - path: ./input/elevation/geography=state/state=47/47.tif
+      hash: md5
+      md5: ab2deb472f1b0e7c52c05b90d5d82ac9
+      size: 345749196
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=47/47.osm.pbf
+      hash: md5
+      md5: 5407e7adaf877f43f0de9307dbf80ff0
+      size: 610000660
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=47/network.dat
+      hash: md5
+      md5: 992fe576b9d1f0582de3b0702e1f07ee
+      size: 1825715783
+    - path: ./intermediate/network/year=2021/geography=state/state=47/network_settings.json
+      hash: md5
+      md5: c2d6847342150dd32532dc196fa03942
+      size: 363
+  create_network@2021-48:
+    cmd: Rscript src/create_network.R --year 2021 --state 48
+    deps:
+    - path: ./input/elevation/geography=state/state=48/48.tif
+      hash: md5
+      md5: 2a1d6998aa8a30c97e9bb8abc8987c96
+      size: 1121960189
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=48/48.osm.pbf
+      hash: md5
+      md5: eded1f68be947e57a6efae0f286472df
+      size: 461313628
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=48/network.dat
+      hash: md5
+      md5: d8d99e0de3c438ac65bf4ca42c8b103d
+      size: 1543916062
+    - path: ./intermediate/network/year=2021/geography=state/state=48/network_settings.json
+      hash: md5
+      md5: 3edb95a0a79ce738a5fad4f1c5f83b2e
+      size: 363
+  create_network@2021-49:
+    cmd: Rscript src/create_network.R --year 2021 --state 49
+    deps:
+    - path: ./input/elevation/geography=state/state=49/49.tif
+      hash: md5
+      md5: 27679a5ea3551381c0a0f2ede73f5e29
+      size: 685205095
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=49/49.osm.pbf
+      hash: md5
+      md5: eb27f6acdf5715f9eb49be2955716e49
+      size: 189986889
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=49/network.dat
+      hash: md5
+      md5: a6834997798cb99a3aefc65e0b0d504c
+      size: 624472498
+    - path: ./intermediate/network/year=2021/geography=state/state=49/network_settings.json
+      hash: md5
+      md5: ceabc165394f17415ccbdf06cfb165c1
+      size: 363
+  create_network@2021-50:
+    cmd: Rscript src/create_network.R --year 2021 --state 50
+    deps:
+    - path: ./input/elevation/geography=state/state=50/50.tif
+      hash: md5
+      md5: 7b8f0eff611dbec175cba908f36f38c4
+      size: 309679984
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=50/50.osm.pbf
+      hash: md5
+      md5: 35ec2c75e0dd41bcb4b10e09ae154956
+      size: 346389339
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=50/network.dat
+      hash: md5
+      md5: 3af7cd6846a044d18105667548a3de51
+      size: 991261915
+    - path: ./intermediate/network/year=2021/geography=state/state=50/network_settings.json
+      hash: md5
+      md5: 58c339fce911ef0125fe9f8380adb90a
+      size: 363
+  create_network@2021-51:
+    cmd: Rscript src/create_network.R --year 2021 --state 51
+    deps:
+    - path: ./input/elevation/geography=state/state=51/51.tif
+      hash: md5
+      md5: 1201ef398884b8303496c3177b7bffae
+      size: 435399240
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=51/51.osm.pbf
+      hash: md5
+      md5: dc808f1b361637a41af6772654b3b120
+      size: 787566615
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=51/network.dat
+      hash: md5
+      md5: 32a7b8a3bd26ce8299e010b0f1099f1b
+      size: 2201081272
+    - path: ./intermediate/network/year=2021/geography=state/state=51/network_settings.json
+      hash: md5
+      md5: 3a99ca2a621ff39cc2a15fe11d8b6e50
+      size: 363
+  create_network@2021-53:
+    cmd: Rscript src/create_network.R --year 2021 --state 53
+    deps:
+    - path: ./input/elevation/geography=state/state=53/53.tif
+      hash: md5
+      md5: 5b1cea08be1217ff7c54a46432011c88
+      size: 746477226
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=53/53.osm.pbf
+      hash: md5
+      md5: 57f5f8ed4c022e5f41bd43e45157ac20
+      size: 239149509
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=53/network.dat
+      hash: md5
+      md5: 38c2227a4f1e86489bc4a8a8d443e7f6
+      size: 718545148
+    - path: ./intermediate/network/year=2021/geography=state/state=53/network_settings.json
+      hash: md5
+      md5: 4284e5fd87bade30b0e565a86349d9a1
+      size: 363
+  create_network@2021-54:
+    cmd: Rscript src/create_network.R --year 2021 --state 54
+    deps:
+    - path: ./input/elevation/geography=state/state=54/54.tif
+      hash: md5
+      md5: cf60eb0e99d26cb8bc1feb922692e88f
+      size: 385163920
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=54/54.osm.pbf
+      hash: md5
+      md5: 3be406877c8f9000664141f684d46ea2
+      size: 756840314
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=54/network.dat
+      hash: md5
+      md5: 6b46c4a5a27adadb3991f09eca5245ca
+      size: 2148461329
+    - path: ./intermediate/network/year=2021/geography=state/state=54/network_settings.json
+      hash: md5
+      md5: 1b5a22973d210680b15ef07eb5abd7a5
+      size: 363
+  create_network@2021-55:
+    cmd: Rscript src/create_network.R --year 2021 --state 55
+    deps:
+    - path: ./input/elevation/geography=state/state=55/55.tif
+      hash: md5
+      md5: f224fa4adff1f298cdc1c18d759a2247
+      size: 376173274
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=55/55.osm.pbf
+      hash: md5
+      md5: 198722d45b9e652a5f914d3fdc5ef284
+      size: 356049327
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=55/network.dat
+      hash: md5
+      md5: 8f8977bf4435c6b7691aeaf8594bd161
+      size: 1246724923
+    - path: ./intermediate/network/year=2021/geography=state/state=55/network_settings.json
+      hash: md5
+      md5: 10d3b4607f678dbe2a6fb61f82025939
+      size: 363
+  create_network@2021-56:
+    cmd: Rscript src/create_network.R --year 2021 --state 56
+    deps:
+    - path: ./input/elevation/geography=state/state=56/56.tif
+      hash: md5
+      md5: 0146133de612ab8cb6257c004f9f437a
+      size: 664417986
+    - path: ./intermediate/osmextract/year=2021/geography=state/state=56/56.osm.pbf
+      hash: md5
+      md5: 94537d6d5578f18abcbbe18ca80f7a95
+      size: 194372032
+    outs:
+    - path: ./intermediate/network/year=2021/geography=state/state=56/network.dat
+      hash: md5
+      md5: 0d99a3b6e02167323c73f1b06abd49cc
+      size: 663123320
+    - path: ./intermediate/network/year=2021/geography=state/state=56/network_settings.json
+      hash: md5
+      md5: c712afa88ac8c0a84126cea8da3f6581
+      size: 363
