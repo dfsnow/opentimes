@@ -1,0 +1,67 @@
+---
+
+name: create-public-files
+run-name: create-public-files-${{ inputs.version }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      # Input values must match those in params.yaml
+      version:
+        required: true
+        description: Version of data
+        default: '0.0.1'
+        type: string
+
+      mode:
+        required: true
+        description: Comma-separated list of travel modes
+        default: 'car,bicycle,walk,transit'
+        type: string
+
+      year:
+        required: true
+        description: Comma-separated list of years
+        default: '2020,2021,2022,2023,2024'
+        type: string
+
+      dataset:
+        required: true
+        description: Comma-separated list of datasets
+        default: 'times,points,missing_pairs,metadata'
+        type: string
+
+env:
+  AWS_DEFAULT_REGION: us-east-1
+  # See: https://github.com/aws/aws-cli/issues/5262#issuecomment-705832151
+  AWS_EC2_METADATA_DISABLED: true
+
+jobs:
+  create-files:
+    runs-on: ubuntu-22.04
+
+    outputs:
+      chunks: ${{ steps.create-job-chunks.outputs.chunks }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Dockerized dependencies
+        uses: ./.github/actions/build-docker
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Cloudflare credentials
+        uses: ./.github/actions/setup-cloudflare-s3
+        with:
+          CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
+          CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
+
+      - name: Create public files
+        id: create-public-files
+        shell: bash
+        run: |
+          docker compose run --quiet-pull opentimes python3 ./src/create_public_files.py \
+            --version ${{ inputs.version }} --mode ${{ inputs.mode }} \
+            --year ${{ inputs.year }} --dataset ${{ inputs.dataset }}
