@@ -69,7 +69,7 @@ def create_public_files(version: str, mode: str, year: str, dataset: str) -> Non
                                 AND mode = '{m}'
                                 AND year = '{y}'
                         )
-                        TO 'r2://{params['s3']['public_bucket']}/{d}/{v}/{m}/{y}/{filename}'
+                        TO 'r2://{params['s3']['public_bucket']}/{d}/version={v}/mode={m}/year={y}/{filename}'
                         (
                             FORMAT 'parquet',
                             COMPRESSION '{params['output']['compression']['type']}',
