@@ -14,6 +14,8 @@ resource "cloudflare_r2_bucket" "opentimes-public" {
   account_id = var.cloudflare_account_id
   name       = "opentimes-public"
   location   = "ENAM"
+
+  /* Need to manually enable public bucket access via UI */
 }
 
 resource "cloudflare_r2_bucket" "opentimes-resources" {
