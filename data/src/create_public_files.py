@@ -29,25 +29,14 @@ def create_public_files(version: str, mode: str, year: str) -> None:
         "metadata": 6
     }
 
-    # Dictionary of filetypes to write and their DuckDB write options
-    filetypes = {
-        "parquet": f"""
-            FORMAT 'parquet',
-            COMPRESSION '{params['output']['compression']['type']}',
-            COMPRESSION_LEVEL {params['output']['compression']['level']}
-        """,
-        "csv.gz": """
-            FORMAT 'csv',
-            COMPRESSION 'gzip'
-        """
-    }
-
     for dataset in datasets.keys():
+        filename = f"{dataset}-{version}-{mode}-{year}.parquet"
         partitions = "/*" * datasets[dataset]
-        print("Querying dataset:", dataset)
+        print("Creating file:", filename)
+
         con.sql(
             f"""
-            CREATE TABLE {dataset} AS
+            COPY (
                 SELECT *
                 FROM read_parquet(
                     'r2://{params['s3']['data_bucket']}/{dataset}{partitions}/*.parquet',
@@ -57,19 +46,15 @@ def create_public_files(version: str, mode: str, year: str) -> None:
                 WHERE version = '{version}'
                     AND mode = '{mode}'
                     AND year = '{year}'
+            )
+            TO 'r2://{params['s3']['public_bucket']}/{dataset}/{version}/{mode}/{year}/{filename}'
+            (
+                FORMAT 'parquet',
+                COMPRESSION '{params['output']['compression']['type']}',
+                COMPRESSION_LEVEL {params['output']['compression']['level']}
+            );
             """
         )
-
-        for filetype in filetypes.keys():
-            filename = f"{dataset}-{version}-{mode}-{year}.{filetype}"
-            print("Creating public file for:", filename)
-            con.sql(
-                f"""
-                COPY {dataset}
-                TO 'r2://{params['s3']['public_bucket']}/{dataset}/{version}/{mode}/{year}/{filename}'
-                ({filetypes[filetype]});
-                """
-            )
 
     con.close()
 
