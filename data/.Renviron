@@ -3,3 +3,4 @@ RENV_CONFIG_PPM_ENABLED=TRUE
 RENV_CONFIG_CACHE_ENABLED=FALSE
 RENV_CONFIG_PPM_URL=https://packagemanager.posit.co/cran/__linux__/jammy/latest
 R_PROGRESSR_ENABLE=TRUE
+AWS_PROFILE=cloudflare
