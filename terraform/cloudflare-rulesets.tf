@@ -39,11 +39,11 @@ resource "cloudflare_ruleset" "serve_index_data_subdomain" {
       action_parameters {
         uri {
           path {
-            value = "/index.html"
+            expression = "concat(http.request.uri.path, \"index.html\")"
           }
         }
       }
-    expression = "(http.request.uri.path == \"/\" or http.request.uri.path == \"\") and not (ends_with(http.request.uri.path, \".json\") or ends_with(http.request.uri.path, \".parquet\"))"
+    expression = "(ends_with(http.request.uri.path, \"/\") or http.request.uri.path == \"\") and not (ends_with(http.request.uri.path, \".json\") or ends_with(http.request.uri.path, \".parquet\"))"
     description = "Rewrite all / to index.html in data subdomain" 
     enabled = true
   }
