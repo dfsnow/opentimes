@@ -2,7 +2,7 @@ import argparse
 from pathlib import Path
 
 import yaml
-from utils.inventory import split_file_to_str
+from utils.utils import split_file_to_str
 
 
 def split_origin(

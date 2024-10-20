@@ -2,7 +2,7 @@ import argparse
 import re
 
 import yaml
-from utils.inventory import create_duckdb_connection
+from utils.utils import create_duckdb_connection
 
 
 def create_public_files(version: str, mode: str, year: str, dataset: str) -> None:
