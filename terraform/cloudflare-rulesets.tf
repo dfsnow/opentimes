@@ -26,3 +26,25 @@ resource "cloudflare_ruleset" "cache_data_subdomain" {
     enabled     = true
   }
 }
+
+resource "cloudflare_ruleset" "serve_index_data_subdomain" {
+  zone_id     = cloudflare_zone.opentimes-org.id
+  name        = "Serve index.html to /"
+  description = "Replace / with /index.html in data subdomain"
+  kind        = "zone"
+  phase       = "http_request_transform"
+
+  rules {
+    action = "rewrite"
+      action_parameters {
+        uri {
+          path {
+            value = "/index.html"
+          }
+        }
+      }
+    expression = "(http.request.uri.path == \"/\" or http.request.uri.path == \"\") and not (ends_with(http.request.uri.path, \".json\") or ends_with(http.request.uri.path, \".parquet\"))"
+    description = "Rewrite all / to index.html in data subdomain" 
+    enabled = true
+  }
+}
