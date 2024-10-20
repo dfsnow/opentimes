@@ -38,7 +38,9 @@ data = [
   "requests==2.32.3"
 ]
 site = [
+  "boto3==1.35.35",
   "duckdb==1.1.2",
+  "jinja2==3.0.3",
   "pyyaml==6.0.2",
 ]
 test = [

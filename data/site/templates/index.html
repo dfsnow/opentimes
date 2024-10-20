@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index of {{ folder_name }}</title>
+    <title>Index of {{ folder_name if folder_name else '/' }}</title>
+    <style>
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Index of {{ folder_name if folder_name else '/' }}</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Last Modified</th>
+                <th>Size</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if folder_name %}
+        <tr>
+            <td colspan="3"><a href="../">../</a></td>
+        </tr>
+        {% endif %}
+        {% for item, subtree in contents.items() %}
+            {% if subtree is mapping %}
+            <tr>
+                <td>
+                    {% if subtree and not subtree.get('filename') %}
+                        <a href="{{ item }}/">{{ item }}/</a>
+                    {% else %}
+                        <a href="{{ item }}">{{ item }}</a>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if subtree and subtree.get('filename') %}
+                        {{ subtree.get('last_modified') }}
+                    {% elif subtree %}
+                        {{ subtree.get('max_last_modified', 'N/A') }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td>
+                    {% if subtree and subtree.get('filename') %}
+                        {{ subtree.get('size') }}
+                    {% elif subtree %}
+                        {{ subtree.get('total_size', 'N/A') }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
