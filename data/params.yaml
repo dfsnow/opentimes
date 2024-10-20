@@ -5,6 +5,7 @@
 s3:
   profile: 'cloudflare'
   data_bucket: 'opentimes-data'
+  data_url: 'https://data.opentimes.org'
   public_bucket: 'opentimes-public'
   endpoint: 'https://fcb279b22cfe4c98f903ad8f9e7ccbb2.r2.cloudflarestorage.com'
   account_id: 'fcb279b22cfe4c98f903ad8f9e7ccbb2'

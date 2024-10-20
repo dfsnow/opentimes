@@ -1,8 +1,10 @@
 import argparse
 import json
+import os
 from pathlib import Path
 
 import boto3
+import requests as r
 import yaml
 from jinja2 import Environment, FileSystemLoader
 
@@ -15,9 +17,14 @@ s3 = session.client("s3", endpoint_url=params["s3"]["endpoint"])
 env = Environment(loader=FileSystemLoader("site/templates"))
 template = env.get_template("index.html")
 
+# Load Cloudflare API credentials
+CLOUDFLARE_API_TOKEN = os.environ.get("CLOUDFLARE_API_TOKEN")
+CLOUDFLARE_ZONE_ID = os.environ.get("CLOUDFLARE_ZONE_ID")
 
-def get_s3_objects(bucket_name: str, prefix: str = ""):
+
+def get_s3_objects(bucket_name: str, prefix: str = "") -> tuple[dict, list]:
     """Retrieve a list of objects in the S3 bucket with a given prefix."""
+    print("Retrieving objects from S3 bucket...")
 
     def format_size(size):
         for unit in ["B", "KB", "MB", "GB", "TB"]:
@@ -49,8 +56,10 @@ def get_s3_objects(bucket_name: str, prefix: str = ""):
     objects = response.get("Contents", [])
     tree: dict = {}
 
+    keys = []
     for obj in objects:
         path = obj["Key"]
+        keys.append(path)
         if path.endswith("index.html"):
             continue
         parts = path.split("/")
@@ -75,11 +84,14 @@ def get_s3_objects(bucket_name: str, prefix: str = ""):
             update_directory_info(current, size, last_modified)
 
     traverse_and_format(tree)
+    print(f"Retrieved {len(keys)} objects from S3 bucket.")
 
-    return tree
+    return tree, keys
 
 
-def save_inventory_json(tree: dict, output_dir: str | Path, output_file: str):
+def save_inventory_json(
+    tree: dict, output_dir: str | Path, output_file: str
+) -> None:
     """Save the tree structure of the S3 bucket as a JSON file."""
     output_path = Path(output_dir) / output_file
 
@@ -109,6 +121,28 @@ def generate_html_files(
             generate_html_files(subtree, bucket_name, Path(folder_path) / item)
 
 
+def purge_cloudflare_cache(
+    keys: list[str], zone_id: str | None, token: str | None
+) -> None:
+    if not token or not zone_id:
+        raise ValueError("Cloudflare API token and zone ID must be provided.")
+    base_url = params["s3"]["data_url"]
+
+    url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/purge_cache"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+    }
+
+    for i in range(0, len(keys), 30):
+        chunk = [f"{base_url}/{k}" for k in keys[i : i + 30]]
+        data = {"files": chunk}
+        print(
+            f"Purging the following keys from Cloudflare cache: {', '.join(chunk)}"
+        )
+        r.post(url, headers=headers, json=data)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--bucket_name", required=True, type=str)
@@ -116,10 +150,13 @@ if __name__ == "__main__":
     parser.add_argument("--output_file", required=False, type=str)
     args = parser.parse_args()
 
-    tree = get_s3_objects(args.bucket_name)
+    tree, keys = get_s3_objects(args.bucket_name)
     save_inventory_json(
         tree,
         args.output_dir or Path.cwd() / "site",
         args.output_file or "inventory.json",
     )
+    print("Generating index.html files...")
     generate_html_files(tree, args.bucket_name)
+    purge_cloudflare_cache(keys, CLOUDFLARE_ZONE_ID, CLOUDFLARE_API_TOKEN)
+    print("Public site created successfully.")
