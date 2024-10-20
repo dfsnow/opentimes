@@ -18,8 +18,8 @@ env = Environment(loader=FileSystemLoader("site/templates"))
 template = env.get_template("index.html")
 
 # Load Cloudflare API credentials
-CLOUDFLARE_API_TOKEN = os.environ.get("CLOUDFLARE_API_TOKEN")
-CLOUDFLARE_ZONE_ID = os.environ.get("CLOUDFLARE_ZONE_ID")
+CLOUDFLARE_CACHE_API_TOKEN = os.environ.get("CLOUDFLARE_CACHE_API_TOKEN")
+CLOUDFLARE_CACHE_ZONE_ID = os.environ.get("CLOUDFLARE_CACHE_ZONE_ID")
 
 
 def get_s3_objects(bucket_name: str, prefix: str = "") -> tuple[dict, list]:
@@ -126,7 +126,7 @@ def purge_cloudflare_cache(
 ) -> None:
     if not token or not zone_id:
         raise ValueError("Cloudflare API token and zone ID must be provided.")
-    base_url = params["s3"]["data_url"]
+    base_url = params["s3"]["public_data_url"]
 
     url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/purge_cache"
     headers = {
@@ -158,5 +158,7 @@ if __name__ == "__main__":
     )
     print("Generating index.html files...")
     generate_html_files(tree, args.bucket_name)
-    purge_cloudflare_cache(keys, CLOUDFLARE_ZONE_ID, CLOUDFLARE_API_TOKEN)
+    purge_cloudflare_cache(
+        keys, CLOUDFLARE_CACHE_ZONE_ID, CLOUDFLARE_CACHE_API_TOKEN
+    )
     print("Public site created successfully.")
