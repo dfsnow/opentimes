@@ -54,26 +54,54 @@ def create_public_files(
 
     filename = f"{dataset}-{version}-{mode}-{year}-{geography}.parquet"
     partitions = "/*" * DATASET_DICT[version][dataset]["partition_levels"]
-    print("Creating file:", filename)
+    print("Fetching data:", filename)
 
+    # Pull, order, then write the data, squashing some of the existing
+    # partitions into larger, ordered ones. Three separate steps because
+    # DuckDB has memory trouble if done in one or two steps
     con.sql(
         f"""
-        COPY (
-            SELECT
-                {', '.join(DATASET_DICT[version][dataset]['public_file_columns'])},
-                regexp_extract(filename, 'part-(\\d+-\\d+)\\.parquet', 1) AS chunk_id
-            FROM read_parquet(
-                'r2://{params['s3']['data_bucket']}/{dataset}{partitions}/*.parquet',
-                hive_partitioning = true,
-                hive_types_autocast = false,
-                filename = true
-            )
-            WHERE version = '{version}'
-                AND mode = '{mode}'
-                AND year = '{year}'
-                AND geography = '{geography}'
-            ORDER BY {', '.join(DATASET_DICT[version][dataset]['public_file_order_by'])}
+        CREATE TABLE {dataset} AS
+        SELECT
+            {', '.join(DATASET_DICT[version][dataset]['public_file_columns'])},
+            regexp_extract(filename, 'part-(\\d+-\\d+)\\.parquet', 1) AS chunk_id
+        FROM read_parquet(
+            'r2://{params['s3']['data_bucket']}/{dataset}{partitions}/*.parquet',
+            hive_partitioning = true,
+            hive_types_autocast = false,
+            filename = true
         )
+        WHERE version = '{version}'
+            AND mode = '{mode}'
+            AND year = '{year}'
+            AND geography = '{geography}'
+        """
+    )
+
+    print("Sorting data:", filename)
+    con.sql(
+        f"""
+        CREATE TABLE {dataset}_sorted_1 AS
+        SELECT *
+        FROM {dataset}
+        ORDER BY state, centroid_type
+        """
+    )
+
+    print("Sorting data:", filename)
+    con.sql(
+        f"""
+        CREATE TABLE {dataset}_sorted_2 AS
+        SELECT *
+        FROM {dataset}_sorted_1
+        ORDER BY origin_id, destination_id
+        """
+    )
+
+    print("Writing data to S3:", filename)
+    con.sql(
+        f"""
+        COPY {dataset}_sorted
         TO 'r2://{params['s3']['public_bucket']}/{dataset}/version={version}/mode={mode}/year={year}/geography={geography}/{filename}'
         (
             FORMAT 'parquet',
@@ -83,6 +111,7 @@ def create_public_files(
         """
     )
 
+    print("Finished creating data:", filename)
     con.close()
 
 
