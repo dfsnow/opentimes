@@ -47,10 +47,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build Dockerized dependencies
-        uses: ./.github/actions/build-docker
+      - uses: actions/setup-python@v5
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        id: install-python-dependencies
+        shell: bash
+        run: pip install .[site]
 
       - name: Setup Cloudflare credentials
         uses: ./.github/actions/setup-cloudflare-s3
@@ -60,8 +65,9 @@ jobs:
 
       - name: Create public files
         id: create-public-files
+        working-directory: 'data'
         shell: bash
         run: |
-          docker compose run --quiet-pull opentimes python3 ./src/create_public_files.py \
+          python ./src/create_public_files.py \
             --version ${{ inputs.version }} --mode ${{ inputs.mode }} \
             --year ${{ inputs.year }} --dataset ${{ inputs.dataset }}
