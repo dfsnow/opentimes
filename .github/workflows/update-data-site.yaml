@@ -1,0 +1,47 @@
+---
+
+name: update-data-site
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: [create-public-files]
+    types:
+      - completed
+
+env:
+  AWS_DEFAULT_REGION: us-east-1
+  # See: https://github.com/aws/aws-cli/issues/5262#issuecomment-705832151
+  AWS_EC2_METADATA_DISABLED: true
+
+jobs:
+  update-site:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        id: install-python-dependencies
+        shell: bash
+        run: pip install .[site]
+
+      - name: Setup Cloudflare credentials
+        uses: ./.github/actions/setup-cloudflare-s3
+        with:
+          CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
+          CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
+
+      - name: Update data site
+        id: update-data-site
+        working-directory: 'data'
+        shell: bash
+        run: |
+          bucket=$(yq e '.s3.public_bucket') params.yaml
+          python ./src/create_public_site.py --bucket_name "$bucket"
