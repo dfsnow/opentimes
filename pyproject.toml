@@ -28,22 +28,23 @@ Repository = "https://github.com/dfsnow/opentimes"
 Documentation = "https://opentimes.org"
 
 [project.optional-dependencies]
-test = [
-  "setuptools >= 61.0",
-  "pytest >= 7.3.0",
-  "pytest-cov >= 4.1.0",
-]
 data = [
-  "duckdb==1.1.2",
   "dvc[s3]==3.55.2",
   "geopandas[all]==1.0.1",
-  "osmium==4.0.1",
   "pandas==2.2.3",
   "pyarrow==17.0.0",
   "python-dotenv==1.0.1",
   "pyyaml==6.0.2",
-  "r5py==0.1.2",
   "requests==2.32.3"
+]
+site = [
+  "duckdb==1.1.2",
+  "pyyaml==6.0.2",
+]
+test = [
+  "setuptools>=61.0",
+  "pytest>=7.3.0",
+  "pytest-cov>=4.1.0",
 ]
 
 [build-system]
