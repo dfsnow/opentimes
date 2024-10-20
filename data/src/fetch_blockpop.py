@@ -4,9 +4,6 @@ from pathlib import Path
 
 import pandas as pd
 import requests as r
-from dotenv import load_dotenv
-
-load_dotenv()
 
 BASE_URL = "https://api.census.gov/data/"
 CENSUS_API_KEY = os.getenv("CENSUS_API_KEY")
