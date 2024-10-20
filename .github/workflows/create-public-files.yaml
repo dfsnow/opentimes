@@ -7,6 +7,12 @@ on:
   workflow_dispatch:
     inputs:
       # Input values must match those in params.yaml
+      dataset:
+        required: true
+        description: Comma-separated list of datasets
+        default: 'times,points,missing_pairs,metadata'
+        type: string
+
       version:
         required: true
         description: Version of data
@@ -25,10 +31,10 @@ on:
         default: '2020,2021,2022,2023,2024'
         type: string
 
-      dataset:
+      geography:
         required: true
-        description: Comma-separated list of datasets
-        default: 'times,points,missing_pairs,metadata'
+        description: Comma-separated list of Census geographies
+        default: 'state,county,county_subdivision,tract,block_group,zcta'
         type: string
 
 env:
@@ -38,11 +44,26 @@ env:
   PYTHONUNBUFFERED: "1"
 
 jobs:
+  setup-jobs:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Parse inputs
+        shell: bash
+        run: |
+           echo "modes=$(echo '${{ inputs.mode }}' | jq -R -c 'split(",")')" >> "$GITHUB_OUTPUT"
+           echo "years=$(echo '${{ inputs.year }}' | jq -R -c 'split(",")')" >> "$GITHUB_OUTPUT"
+           echo "geographies=$(echo '${{ inputs.geography }}' | jq -R -c 'split(",")')" >> "$GITHUB_OUTPUT"
+
   create-files:
     runs-on: ubuntu-22.04
-
-    outputs:
-      chunks: ${{ steps.create-job-chunks.outputs.chunks }}
+    name: create-files-${{ inputs.version }}-${{ matrix.mode }}-${{ matrix.year }}-${{ matrix.geography }}
+    strategy:
+      # Don't fail all chunks if one fails
+      fail-fast: false
+      matrix:
+        mode: ${{ fromJSON(needs.setup-jobs.outputs.modes) }}
+        year: ${{ fromJSON(needs.setup-jobs.outputs.years) }}
+        geography: ${{ fromJSON(needs.setup-jobs.outputs.geographies) }}
 
     steps:
       - name: Checkout
@@ -69,6 +90,9 @@ jobs:
         working-directory: 'data'
         shell: bash
         run: |
+          datasets_parsed=($(echo "${{ inputs.dataset }}" | tr -d ' ' | tr ',' ' '))
+          for dataset in "${datasets_parsed[@]}"; do
           python ./src/create_public_files.py \
-            --version ${{ inputs.version }} --mode ${{ inputs.mode }} \
-            --year ${{ inputs.year }} --dataset ${{ inputs.dataset }}
+            --dataset ${{ inputs.dataset }} --version ${{ inputs.version }} \
+            --mode ${{ matrix.mode }} --year ${{ inputs.year }} \
+            --geography ${{ matrix.geography }}
