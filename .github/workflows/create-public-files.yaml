@@ -46,8 +46,15 @@ env:
 jobs:
   setup-jobs:
     runs-on: ubuntu-22.04
+
+    outputs:
+      modes: ${{ steps.parse-inputs.outputs.modes }}
+      years: ${{ steps.parse-inputs.outputs.years }}
+      geographies: ${{ steps.parse-inputs.outputs.geographies }}
+
     steps:
       - name: Parse inputs
+        id: parse-inputs
         shell: bash
         run: |
            echo "modes=$(echo '${{ inputs.mode }}' | jq -R -c 'split(",")')" >> "$GITHUB_OUTPUT"
@@ -56,7 +63,8 @@ jobs:
 
   create-files:
     runs-on: ubuntu-22.04
-    name: create-files-${{ inputs.version }}-${{ matrix.mode }}-${{ matrix.year }}-${{ matrix.geography }}
+    needs: setup-jobs
+    name: create-file-${{ inputs.version }}-${{ matrix.mode }}-${{ matrix.year }}-${{ matrix.geography }}
     strategy:
       # Don't fail all chunks if one fails
       fail-fast: false
@@ -92,7 +100,8 @@ jobs:
         run: |
           datasets_parsed=($(echo "${{ inputs.dataset }}" | tr -d ' ' | tr ',' ' '))
           for dataset in "${datasets_parsed[@]}"; do
-          python ./src/create_public_files.py \
-            --dataset ${{ inputs.dataset }} --version ${{ inputs.version }} \
-            --mode ${{ matrix.mode }} --year ${{ inputs.year }} \
-            --geography ${{ matrix.geography }}
+            python ./src/create_public_files.py \
+              --dataset "$dataset" --version ${{ inputs.version }} \
+              --mode ${{ matrix.mode }} --year ${{ matrix.year }} \
+              --geography ${{ matrix.geography }}
+          done
