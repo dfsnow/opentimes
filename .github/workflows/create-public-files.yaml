@@ -55,7 +55,7 @@ jobs:
       - name: Install Python dependencies
         id: install-python-dependencies
         shell: bash
-        run: pip install .[site]
+        run: pip install .[site] .[data]
 
       - name: Setup Cloudflare credentials
         uses: ./.github/actions/setup-cloudflare-s3

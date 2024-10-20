@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Index of {{ folder_name }}</title>
-    <title>Index of {{ folder_name if folder_name else '/' }}</title>
+    <title>Index of /{{ folder_name }}</title>
     <style>
         body {
             font-family: Helvetica, Arial, sans-serif;
@@ -36,7 +35,7 @@
     </style>
 </head>
 <body>
-    <h1>Index of {{ folder_name if folder_name else '/' }}</h1>
+    <h1>Index of /{{ folder_name }}</h1>
     <table>
         <thead>
             <tr>
