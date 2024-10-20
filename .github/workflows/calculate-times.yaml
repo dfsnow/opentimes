@@ -121,6 +121,7 @@ env:
   AWS_DEFAULT_REGION: us-east-1
   # See: https://github.com/aws/aws-cli/issues/5262#issuecomment-705832151
   AWS_EC2_METADATA_DISABLED: true
+  PYTHONUNBUFFERED: "1"
 
 jobs:
   setup-jobs:
