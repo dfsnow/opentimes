@@ -2,10 +2,6 @@
 
 name: Fetch location data
 description: Fetch/cache origin and destination point data from DVC
-inputs:
-  year:
-    description: Census year of the location data to fetch
-    required: true
 
 runs:
   using: composite
@@ -16,9 +12,9 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: |
-          ./data/intermediate/cenloc/year=${{ inputs.year }}
-          ./data/intermediate/destpoint/year=${{ inputs.year }}
-        key: location-${{ inputs.year }}-${{ hashFiles('./data/dvc.lock') }}
+          ./data/intermediate/cenloc
+          ./data/intermediate/destpoint
+        key: location-${{ hashFiles('./data/dvc.lock') }}
 
     - name: Install DVC
       if: steps.cache-restore-location-input.outputs.cache-hit != 'true'
@@ -29,9 +25,8 @@ runs:
       shell: bash
       working-directory: 'data'
       run: |
-        dvc pull --no-run-cache --glob \
-          ./intermediate/cenloc/year=${{ inputs.year }}/**/**/*.parquet \
-          ./intermediate/destpoint/year=${{ inputs.year }}/**/**/*.parquet
+        dvc pull --no-run-cache create_destpoint_by_state \
+          create_cenloc_national create_cenloc_by_state
 
     - name: Cache save location input data
       if: steps.cache-restore-location-input.outputs.cache-hit != 'true'
@@ -39,6 +34,6 @@ runs:
       uses: actions/cache/save@v4
       with:
         path: |
-          ./data/intermediate/cenloc/year=${{ inputs.year }}
-          ./data/intermediate/destpoint/year=${{ inputs.year }}
-        key: location-${{ inputs.year }}-${{ hashFiles('./data/dvc.lock') }}
+          ./data/intermediate/cenloc
+          ./data/intermediate/destpoint
+        key: location-${{ hashFiles('./data/dvc.lock') }}

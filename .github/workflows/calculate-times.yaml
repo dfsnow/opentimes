@@ -141,8 +141,6 @@ jobs:
 
       - name: Fetch locations data
         uses: ./.github/actions/fetch-locations
-        with:
-          year: ${{ inputs.year }}
 
   # Using the location data, split the origins into N jobs (max 256)
   setup-jobs:
@@ -167,8 +165,6 @@ jobs:
 
       - name: Fetch locations data
         uses: ./.github/actions/fetch-locations
-        with:
-          year: ${{ inputs.year }}
 
       - name: Fetch R5 JAR
         uses: ./.github/actions/fetch-jar
@@ -221,12 +217,13 @@ jobs:
 
       - name: Fetch locations data
         uses: ./.github/actions/fetch-locations
-        with:
-          year: ${{ inputs.year }}
 
       - name: Fetch R5 JAR
         uses: ./.github/actions/fetch-jar
 
+      # Don't fetch network data because they're very large and will churn the
+      # Actions cache. We want to wait to fetch it until jobs have actually
+      # been picked up
       - name: Fetch network data
         uses: ./.github/actions/fetch-locations
         with:
