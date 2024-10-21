@@ -32,11 +32,25 @@ def append_duckdb_info(tree: dict, version: str, db_path: Path) -> None:
         "last_modified": datetime.fromtimestamp(db_path.stat().st_mtime)
         .astimezone(timezone.utc)
         .replace(microsecond=0)
-        .isoformat(timespec="seconds")
+        .isoformat(timespec="seconds"),
     }
     if "databases" not in tree:
         tree["databases"] = {}
     tree["databases"][f"{version}.duckdb"] = duckdb_info
+
+    # Recalculate the total_size of the databases/ directory
+    total_size = sum(
+        db_path.stat().st_size
+        for db_info in tree["databases"].values()
+        if isinstance(db_info, dict) and "size" in db_info
+    )
+    tree["databases"]["total_size"] = format_size(total_size)
+
+    # Update the max_last_modified of the databases/ directory
+    if "max_last_modified" not in tree["databases"]:
+        tree["databases"]["max_last_modified"] = duckdb_info["last_modified"]
+    if duckdb_info["last_modified"] > tree["databases"]["max_last_modified"]:
+        tree["databases"]["max_last_modified"] = duckdb_info["last_modified"]
 
 
 def create_duckdb_file(
