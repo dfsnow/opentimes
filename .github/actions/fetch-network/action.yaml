@@ -1,7 +1,7 @@
 ---
 
-name: Fetch network build inputs
-description: Fetch/cache elevation and street network files
+name: Fetch network data
+description: Fetch/cache network.dat and network_settings.json files from DVC
 inputs:
   year:
     description: Census year of the network data to fetch
@@ -14,47 +14,31 @@ runs:
   using: composite
   steps:
     # Assumes actions/checkout and setup-cloudflare-s3 have already been run
-    - name: Cache restore osmextract input data
-      id: cache-restore-osmextract-input
+    - name: Cache restore network input data
+      id: cache-restore-network-input
       uses: actions/cache/restore@v4
       with:
-        path: ./data/intermediate/osmextract
-        key: osmextract-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
-
-    - name: Cache restore elevation input data
-      id: cache-restore-elevation-input
-      uses: actions/cache/restore@v4
-      with:
-        path: ./data/input/elevation
-        key: elevation-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
+        path: ./data/intermediate/network
+        key: network-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
 
     - name: Install DVC
-      if: ${{ steps.cache-restore-osmextract-input.outputs.cache-hit != 'true' ||
-              steps.cache-restore-elevation-input.outputs.cache-hit != 'true' }}
+      if: steps.cache-restore-network-input.outputs.cache-hit != 'true'
       uses: ./.github/actions/setup-dvc
 
     - name: Pull DVC objects
-      if: ${{ steps.cache-restore-osmextract-input.outputs.cache-hit != 'true' ||
-              steps.cache-restore-elevation-input.outputs.cache-hit != 'true' }}
+      if: steps.cache-restore-network-input.outputs.cache-hit != 'true'
       shell: bash
       working-directory: 'data'
       run: |
+        net_path=year=${{ inputs.year }}/geography=state/state=${{ inputs.state }}
         dvc pull --no-run-cache \
-          ./intermediate/osmextract/year=${{ inputs.year }}/geography=state/state=${{ inputs.state }}/${{ inputs.state }}.osm.pbf \
-          ./input/elevation/geography=state/state=${{ inputs.state }}/${{ inputs.state }}.tif
+          ./intermediate/network/"$net_path"/network.dat \
+          ./intermediate/network/"$net_path"/network_settings.json
 
-    - name: Cache save osmextract input data
-      if: ${{ steps.cache-restore-osmextract-input.outputs.cache-hit != 'true' }}
-      id: cache-save-osmextract-input
+    - name: Cache save network input data
+      if: steps.cache-restore-network-input.outputs.cache-hit != 'true'
+      id: cache-save-network-input
       uses: actions/cache/save@v4
       with:
-        path: ./data/intermediate/osmextract
-        key: osmextract-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
-
-    - name: Cache save elevation input data
-      if: ${{ steps.cache-restore-elevation-input.outputs.cache-hit != 'true' }}
-      id: cache-save-elevation-input
-      uses: actions/cache/save@v4
-      with:
-        path: ./data/input/elevation
-        key: elevation-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
+        path: ./data/intermediate/network
+        key: network-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
