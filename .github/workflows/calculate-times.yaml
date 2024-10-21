@@ -124,23 +124,14 @@ env:
   PYTHONUNBUFFERED: "1"
 
 jobs:
-  setup-jobs:
+  # Pre-fetch and cache location data for the year since it's used across all
+  # jobs in the same workflow/year
+  fetch-locations:
     runs-on: ubuntu-22.04
-
-    outputs:
-      chunks: ${{ steps.create-job-chunks.outputs.chunks }}
-
+    concurrency: location-${{ inputs.year }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Install DVC
-        uses: ./.github/actions/setup-dvc
-
-      - name: Build Dockerized dependencies
-        uses: ./.github/actions/build-docker
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Cloudflare credentials
         uses: ./.github/actions/setup-cloudflare-s3
@@ -148,78 +139,39 @@ jobs:
           CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
           CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
 
-      - name: Cache restore network input data
-        id: cache-restore-network-input
-        uses: actions/cache/restore@v4
+      - name: Fetch locations data
+        uses: ./.github/actions/fetch-locations
         with:
-          path: ./data/intermediate/network
-          key: network-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
+          year: ${{ inputs.year }}
 
-      - name: Cache restore location input data
-        id: cache-restore-location-input
-        uses: actions/cache/restore@v4
+  # Using the location data, split the origins into N jobs (max 256)
+  setup-jobs:
+    runs-on: ubuntu-22.04
+    needs: fetch-locations
+    outputs:
+      chunks: ${{ steps.create-job-chunks.outputs.chunks }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Cloudflare credentials
+        uses: ./.github/actions/setup-cloudflare-s3
         with:
-          path: |
-            ./data/intermediate/cenloc
-            ./data/intermediate/destpoint
-          key: location-${{ inputs.year }}-${{ inputs.geography }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
+          CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
+          CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
 
-      - name: Cache restore custom JAR
-        id: cache-restore-custom-jar
-        uses: actions/cache/restore@v4
+      - name: Build Dockerized dependencies
+        uses: ./.github/actions/build-docker
         with:
-          path: ./data/jars
-          key: jar-${{ hashFiles('./data/jars/r5-custom.jar.md5') }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Pull DVC objects
-        if: ${{ steps.cache-restore-network-input.outputs.cache-hit != 'true' ||
-                steps.cache-restore-location-input.outputs.cache-hit != 'true' }}
-        shell: bash
-        working-directory: 'data'
-        run: |
-          od_path=year=${{ inputs.year }}/geography=${{ inputs.geography }}/state=${{ inputs.state }}/${{ inputs.state }}.parquet
-          net_path=year=${{ inputs.year }}/geography=state/state=${{ inputs.state }}
-          dvc pull --no-run-cache \
-            ./intermediate/cenloc/"$od_path" \
-            ./intermediate/destpoint/"$od_path" \
-            ./intermediate/network/"$net_path"/network.dat \
-            ./intermediate/network/"$net_path"/network_settings.json
-
-      - name: Fetch custom R5 jar
-        if: ${{ steps.cache-restore-custom-jar.outputs.cache-hit != 'true' }}
-        shell: bash
-        working-directory: 'data'
-        run: |
-          aws s3 cp --quiet --endpoint-url \
-            https://${{ vars.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com \
-            s3://opentimes-resources/jars/r5-custom.jar ./jars/r5-custom.jar \
-            --profile cloudflare
-
-      - name: Cache save network input data
-        if: ${{ steps.cache-restore-network-input.outputs.cache-hit != 'true' }}
-        id: cache-save-network-input
-        uses: actions/cache/save@v4
+      - name: Fetch locations data
+        uses: ./.github/actions/fetch-locations
         with:
-          path: ./data/intermediate/network
-          key: network-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
+          year: ${{ inputs.year }}
 
-      - name: Cache save location input data
-        if: ${{ steps.cache-restore-location-input.outputs.cache-hit != 'true' }}
-        id: cache-save-location-input
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            ./data/intermediate/cenloc
-            ./data/intermediate/destpoint
-          key: location-${{ inputs.year }}-${{ inputs.geography }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
-
-      - name: Cache save custom JAR
-        if: ${{ steps.cache-restore-custom-jar.outputs.cache-hit != 'true' }}
-        id: cache-save-custom-jar
-        uses: actions/cache/save@v4
-        with:
-          path: ./data/jars
-          key: jar-${{ hashFiles('./data/jars/r5-custom.jar.md5') }}
+      - name: Fetch R5 JAR
+        uses: ./.github/actions/fetch-jar
 
       - name: Create job chunks
         id: create-job-chunks
@@ -267,28 +219,19 @@ jobs:
           CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
           CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
 
-      - name: Cache restore network input data
-        id: cache-restore-network-input-job
-        uses: actions/cache/restore@v4
+      - name: Fetch locations data
+        uses: ./.github/actions/fetch-locations
         with:
-          path: ./data/intermediate/network
-          key: network-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
+          year: ${{ inputs.year }}
 
-      - name: Cache restore location input data
-        id: cache-restore-location-input-job
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            ./data/intermediate/cenloc
-            ./data/intermediate/destpoint
-          key: location-${{ inputs.year }}-${{ inputs.geography }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
+      - name: Fetch R5 JAR
+        uses: ./.github/actions/fetch-jar
 
-      - name: Cache restore custom JAR
-        id: cache-restore-custom-jar
-        uses: actions/cache/restore@v4
+      - name: Fetch network data
+        uses: ./.github/actions/fetch-locations
         with:
-          path: ./data/jars
-          key: jar-${{ hashFiles('./data/jars/r5-custom.jar.md5') }}
+          year: ${{ inputs.year }}
+          state: ${{ inputs.state }}
 
       - name: Run job chunk
         shell: bash
@@ -299,3 +242,15 @@ jobs:
             --geography ${{ inputs.geography }} --state ${{ inputs.state }} \
             --centroid_type ${{ inputs.centroid_type }} \
             --chunk ${{ matrix.chunk }} --write-to-s3
+
+  clear-network-cache:
+    runs-on: ubuntu-22.04
+    needs: run-job
+    steps:
+      - name: Clear network cache
+        shell: bash
+        run: |
+          gh cache delete \
+            network-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

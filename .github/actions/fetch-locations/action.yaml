@@ -1,0 +1,44 @@
+---
+
+name: Fetch location data
+description: Fetch/cache origin and destination point data from DVC
+inputs:
+  year:
+    description: Census year of the location data to fetch
+    required: true
+
+runs:
+  using: composite
+  steps:
+    # Assumes actions/checkout and setup-cloudflare-s3 have already been run
+    - name: Cache restore location input data
+      id: cache-restore-location-input
+      uses: actions/cache/restore@v4
+      with:
+        path: |
+          ./data/intermediate/cenloc/year=${{ inputs.year }}
+          ./data/intermediate/destpoint/year=${{ inputs.year }}
+        key: location-${{ inputs.year }}-${{ hashFiles('./data/dvc.lock') }}
+
+    - name: Install DVC
+      if: steps.cache-restore-location-input.outputs.cache-hit != 'true'
+      uses: ./.github/actions/setup-dvc
+
+    - name: Pull DVC objects
+      if: steps.cache-restore-location-input.outputs.cache-hit != 'true'
+      shell: bash
+      working-directory: 'data'
+      run: |
+        dvc pull --no-run-cache --glob \
+          ./intermediate/cenloc/year=${{ inputs.year }}/**/**/*.parquet \
+          ./intermediate/destpoint/year=${{ inputs.year }}/**/**/*.parquet
+
+    - name: Cache save location input data
+      if: steps.cache-restore-location-input.outputs.cache-hit != 'true'
+      id: cache-save-location-input
+      uses: actions/cache/save@v4
+      with:
+        path: |
+          ./data/intermediate/cenloc/year=${{ inputs.year }}
+          ./data/intermediate/destpoint/year=${{ inputs.year }}
+        key: location-${{ inputs.year }}-${{ hashFiles('./data/dvc.lock') }}
