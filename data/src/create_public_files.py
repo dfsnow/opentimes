@@ -56,7 +56,7 @@ def create_public_files(
             f"Input geography must be one of: {', '.join(geographies)}"
         )
 
-    filename = f"{dataset}-{version}-{mode}-{year}-{geography}.parquet"
+    filename = f"{dataset}-{version}-{mode}-{year}-{geography}"
     partitions = "/*" * DATASET_DICT[version][dataset]["partition_levels"]
     print("Creating file:", filename)
 
@@ -77,11 +77,14 @@ def create_public_files(
                 AND year = '{year}'
                 AND geography = '{geography}'
         )
-        TO 'r2://{params['s3']['public_bucket']}/{dataset}/version={version}/mode={mode}/year={year}/geography={geography}/{filename}'
+        TO 'r2://{params['s3']['public_bucket']}/{dataset}/version={version}/mode={mode}/year={year}/geography={geography}'
         (
             FORMAT 'parquet',
             COMPRESSION '{params['output']['compression']['type']}',
-            COMPRESSION_LEVEL {params['output']['compression']['level']}
+            COMPRESSION_LEVEL {params['output']['compression']['level']},
+            OVERWRITE_OR_IGNORE true,
+            FILENAME_PATTERN '{filename}-',
+            FILE_SIZE_BYTES 475000000
         );
         """
     )

@@ -15,6 +15,9 @@ def create_duckdb_connection() -> duckdb.DuckDBPyConnection:
     for ext in ["parquet", "httpfs", "aws"]:
         con.install_extension(ext)
         con.load_extension(ext)
+    # Num threads is 4x available to support faster remote queries. See:
+    # https://duckdb.org/docs/guides/performance/how_to_tune_workloads.html#querying-remote-files
+    con.execute("SET threads=16;")
     con.execute(
         f"""
         CREATE SECRET (
