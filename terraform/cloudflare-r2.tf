@@ -15,7 +15,8 @@ resource "cloudflare_r2_bucket" "opentimes-public" {
   name       = "opentimes-public"
   location   = "ENAM"
 
-  /* Need to manually enable public bucket access via UI */
+  /* Need to manually enable public bucket access via UI and add CORS
+  policy for https://opentimes.org */
 }
 
 resource "cloudflare_r2_bucket" "opentimes-resources" {
