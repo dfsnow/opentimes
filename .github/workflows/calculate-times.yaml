@@ -124,28 +124,9 @@ env:
   PYTHONUNBUFFERED: "1"
 
 jobs:
-  # Pre-fetch and cache location data for the year since it's used across all
-  # jobs in the same workflow/year
-  fetch-locations:
-    runs-on: ubuntu-22.04
-    concurrency: location-${{ inputs.year }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Cloudflare credentials
-        uses: ./.github/actions/setup-cloudflare-s3
-        with:
-          CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
-          CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
-
-      - name: Fetch locations data
-        uses: ./.github/actions/fetch-locations
-
   # Using the location data, split the origins into N jobs (max 256)
   setup-jobs:
     runs-on: ubuntu-22.04
-    needs: fetch-locations
     outputs:
       chunks: ${{ steps.create-job-chunks.outputs.chunks }}
     steps:
@@ -168,6 +149,8 @@ jobs:
 
       - name: Fetch R5 JAR
         uses: ./.github/actions/fetch-jar
+        with:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Create job chunks
         id: create-job-chunks
@@ -220,12 +203,14 @@ jobs:
 
       - name: Fetch R5 JAR
         uses: ./.github/actions/fetch-jar
+        with:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
 
       # Don't fetch network data because they're very large and will churn the
       # Actions cache. We want to wait to fetch it until jobs have actually
       # been picked up
       - name: Fetch network data
-        uses: ./.github/actions/fetch-locations
+        uses: ./.github/actions/fetch-network
         with:
           year: ${{ inputs.year }}
           state: ${{ inputs.state }}

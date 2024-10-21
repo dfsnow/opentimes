@@ -2,12 +2,15 @@
 
 name: Fetch custom R5 JAR
 description: Fetch/cache custom R5 JAR file
+inputs:
+  CLOUDFLARE_ACCOUNT_ID:
+    description: A Cloudflare account ID string
+    required: true
 
 runs:
   using: composite
   steps:
-    # Assumes actions/checkout, install-dvc, and setup-cloudflare-credentials
-    # have already been run
+    # Assumes actions/checkout and setup-cloudflare-s3 have already been run
     - name: Cache restore custom JAR
       id: cache-restore-custom-jar
       uses: actions/cache/restore@v4
@@ -21,7 +24,7 @@ runs:
       working-directory: 'data'
       run: |
         aws s3 cp --quiet --endpoint-url \
-          https://${{ vars.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com \
+          https://${{ inputs.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com \
           s3://opentimes-resources/jars/r5-custom.jar ./jars/r5-custom.jar \
           --profile cloudflare
 
