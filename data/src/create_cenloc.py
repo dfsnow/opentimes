@@ -142,12 +142,14 @@ def create_cenloc(year: str, geography: str, state: str | None = None) -> None:
             state_gdf = state_gdf.drop(columns=["state"])
             state_output_dir = output_dir / f"state={state}"
             state_output_dir.mkdir(parents=True, exist_ok=True)
+            state_gdf = state_gdf.sort_values(by=["geoid"])
             state_gdf.to_parquet(
                 state_output_dir / f"{state}.parquet",
                 engine="pyarrow",
                 index=False,
             )
     else:
+        gdf = gdf.sort_values(by=["geoid"])
         gdf.to_parquet(output_file, engine="pyarrow", index=False)
 
 

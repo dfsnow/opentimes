@@ -178,7 +178,8 @@ origins_snapped <- origins %>%
   mutate(
     snap_lat = ifelse(is.na(snap_lat), lat, snap_lat),
     snap_lon = ifelse(is.na(snap_lon), lon, snap_lon)
-  )
+  ) %>%
+  arrange(id)
 destinations_snapped <- destinations %>%
   find_snap(
     r5r_core = r5r_core,
@@ -190,7 +191,8 @@ destinations_snapped <- destinations %>%
   mutate(
     snap_lat = ifelse(is.na(snap_lat), lat, snap_lat),
     snap_lon = ifelse(is.na(snap_lon), lon, snap_lon)
-  )
+  ) %>%
+  arrange(id)
 
 
 ##### CALCULATE TIMES #####
@@ -219,7 +221,8 @@ ttm <- travel_time_matrix(
     origin_id = from_id,
     destination_id = to_id,
     time_min = travel_time_p50
-  )
+  ) %>%
+  arrange(origin_id, destination_id)
 tictoc::toc(log = TRUE)
 
 # Check for missing point combinations

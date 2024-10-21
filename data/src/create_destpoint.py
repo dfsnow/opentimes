@@ -77,6 +77,7 @@ def create_destpoint(
         [c for c in cenloc.columns if c not in ["geometry", "state"]]
     ]
 
+    cenloc_final = cenloc_final.sort_values(by=["geoid"])
     cenloc_final.to_parquet(output_file, engine="pyarrow", index=False)
 
 
