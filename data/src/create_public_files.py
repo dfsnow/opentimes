@@ -7,7 +7,11 @@ from utils.utils import create_duckdb_connection
 
 
 def create_public_files(
-    dataset: str, version: str, mode: str, year: str, geography: str
+    dataset: str,
+    version: str,
+    mode: str,
+    year: str,
+    geography: str,
 ) -> None:
     """
     Janky function to pull data from the S3 output bucket and repartition it
@@ -19,7 +23,7 @@ def create_public_files(
         version: Version of the data e.g., 0.0.1.
         mode: Travel mode, one of ['walk', 'bicycle', 'car', 'transit'].
         year: Year of the data.
-        year: Census geography of the data. See params.yaml for list.
+        geography: Census geography of the data. See params.yaml for list.
 
     Returns:
         None
@@ -44,64 +48,35 @@ def create_public_files(
         )
     if year not in params["input"]["year"]:
         raise ValueError(
-            f"Input years must be one of: {', '.join(params['input']['year'])}"
+            f"Input year must be one of: {', '.join(params['input']['year'])}"
         )
     geographies = params["input"]["census"]["geography"]["all"]
     if geography not in geographies:
         raise ValueError(
-            f"Input years must be one of: {', '.join(geographies)}"
+            f"Input geography must be one of: {', '.join(geographies)}"
         )
 
     filename = f"{dataset}-{version}-{mode}-{year}-{geography}.parquet"
     partitions = "/*" * DATASET_DICT[version][dataset]["partition_levels"]
-    print("Fetching data:", filename)
+    print("Creating file:", filename)
 
-    # Pull, order, then write the data, squashing some of the existing
-    # partitions into larger, ordered ones. Three separate steps because
-    # DuckDB has memory trouble if done in one or two steps
     con.sql(
         f"""
-        CREATE TABLE {dataset} AS
-        SELECT
-            {', '.join(DATASET_DICT[version][dataset]['public_file_columns'])},
-            regexp_extract(filename, 'part-(\\d+-\\d+)\\.parquet', 1) AS chunk_id
-        FROM read_parquet(
-            'r2://{params['s3']['data_bucket']}/{dataset}{partitions}/*.parquet',
-            hive_partitioning = true,
-            hive_types_autocast = false,
-            filename = true
+        COPY (
+            SELECT
+                {', '.join(DATASET_DICT[version][dataset]['public_file_columns'])},
+                regexp_extract(filename, 'part-(\\d+-\\d+)\\.parquet', 1) AS chunk_id
+            FROM read_parquet(
+                'r2://{params['s3']['data_bucket']}/{dataset}{partitions}/*.parquet',
+                hive_partitioning = true,
+                hive_types_autocast = false,
+                filename = true
+            )
+            WHERE version = '{version}'
+                AND mode = '{mode}'
+                AND year = '{year}'
+                AND geography = '{geography}'
         )
-        WHERE version = '{version}'
-            AND mode = '{mode}'
-            AND year = '{year}'
-            AND geography = '{geography}'
-        """
-    )
-
-    print("Sorting data:", filename)
-    con.sql(
-        f"""
-        CREATE TABLE {dataset}_sorted_1 AS
-        SELECT *
-        FROM {dataset}
-        ORDER BY state, centroid_type
-        """
-    )
-
-    print("Sorting data:", filename)
-    con.sql(
-        f"""
-        CREATE TABLE {dataset}_sorted_2 AS
-        SELECT *
-        FROM {dataset}_sorted_1
-        ORDER BY origin_id, destination_id
-        """
-    )
-
-    print("Writing data to S3:", filename)
-    con.sql(
-        f"""
-        COPY {dataset}_sorted
         TO 'r2://{params['s3']['public_bucket']}/{dataset}/version={version}/mode={mode}/year={year}/geography={geography}/{filename}'
         (
             FORMAT 'parquet',
@@ -111,7 +86,6 @@ def create_public_files(
         """
     )
 
-    print("Finished creating data:", filename)
     con.close()
 
 
@@ -124,4 +98,6 @@ if __name__ == "__main__":
     parser.add_argument("--geography", required=True, type=str)
     args = parser.parse_args()
 
-    create_public_files(args.dataset, args.version, args.mode, args.year, args.geography)
+    create_public_files(
+        args.dataset, args.version, args.mode, args.year, args.geography
+    )

@@ -9,12 +9,6 @@ DATASET_DICT: dict = {
                 "destination_id",
                 "time_min",
             ],
-            "public_file_order_by": [
-                "state",
-                "centroid_type",
-                "origin_id",
-                "destination_id",
-            ],
         },
         "points": {
             "partition_levels": 7,
@@ -30,22 +24,10 @@ DATASET_DICT: dict = {
                 "distance_m",
                 "snapped",
             ],
-            "public_file_order_by": [
-                "state",
-                "centroid_type",
-                "point_type",
-                "id",
-            ],
         },
         "missing_pairs": {
             "partition_levels": 6,
             "public_file_columns": [
-                "state",
-                "centroid_type",
-                "origin_id",
-                "destination_id",
-            ],
-            "public_file_order_by": [
                 "state",
                 "centroid_type",
                 "origin_id",
@@ -95,11 +77,6 @@ DATASET_DICT: dict = {
                 "calc_chunk_n_destinations",
                 "calc_time_finished",
                 "calc_time_elapsed_sec",
-            ],
-            "public_file_order_by": [
-                "state",
-                "centroid_type",
-                "chunk_id",
             ],
         },
     }
