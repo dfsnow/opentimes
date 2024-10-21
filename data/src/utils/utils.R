@@ -129,10 +129,14 @@ setup_r5_jar <- function(path) {
 
   downloaded_r5_path <- file.path(r5r:::r5r_env$cache_dir, r5_filename)
   custom_r5_path <- here::here(path)
+  if (!dir.exists(r5r:::r5r_env$cache_dir)) {
+    dir.create(r5r:::r5r_env$cache_dir, recursive = TRUE)
+  }
   if (!file.exists(downloaded_r5_path)) {
-    message("Copying R5 JAR:")
+    message(glue::glue("Copying R5 JAR from {custom_r5_path} to {downloaded_r5_path}"))
     file.copy(from = custom_r5_path, to = downloaded_r5_path, overwrite = TRUE)
   }
+  message(glue::glue("Copied R5 JAR to {downloaded_r5_path}"))
 
   downloaded_r5_md5 <- digest::digest(
     object = downloaded_r5_path,
