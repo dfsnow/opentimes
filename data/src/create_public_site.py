@@ -1,12 +1,14 @@
-import argparse
-import json
 import os
 from pathlib import Path
+from datetime import datetime, timezone
 
 import boto3
+import duckdb
 import requests as r
 import yaml
 from jinja2 import Environment, FileSystemLoader
+from utils.datasets import DATASET_DICT
+from utils.utils import format_size
 
 # Load parameters and connect to S3/R2
 params = yaml.safe_load(open("params.yaml"))
@@ -22,15 +24,96 @@ CLOUDFLARE_CACHE_API_TOKEN = os.environ.get("CLOUDFLARE_CACHE_API_TOKEN")
 CLOUDFLARE_CACHE_ZONE_ID = os.environ.get("CLOUDFLARE_CACHE_ZONE_ID")
 
 
+def append_duckdb_info(tree: dict, version: str, db_path: Path) -> None:
+    """Append or overwrite DuckDB file location and information in the tree."""
+    duckdb_info = {
+        "filename": f"{version}.duckdb",
+        "size": format_size(db_path.stat().st_size),
+        "last_modified": datetime.fromtimestamp(db_path.stat().st_mtime)
+        .astimezone(timezone.utc)
+        .replace(microsecond=0)
+        .isoformat(timespec="seconds")
+    }
+    if "databases" not in tree:
+        tree["databases"] = {}
+    tree["databases"][f"{version}.duckdb"] = duckdb_info
+
+
+def create_duckdb_file(
+    tree: dict, datasets: list[str], bucket_name: str, base_url: str, path: str
+) -> None:
+    """Create a DuckDB database object pointing to all bucket Parquet files."""
+
+    con = duckdb.connect(database=path)
+    con.execute("SET autoinstall_known_extensions=1;")
+    con.execute("SET autoload_known_extensions=1;")
+    for dataset in datasets:
+        dataset_files = [
+            f"{base_url}/{dataset}/{p}"
+            for p in flatten_file_paths(tree, dataset, version)
+        ]
+
+        con.execute(
+            f"""
+            CREATE OR REPLACE VIEW {dataset} AS
+            SELECT *
+            FROM read_parquet(['{"', '".join(dataset_files)}'])
+            """
+        )
+
+    con.close()
+
+
+def flatten_file_paths(tree: dict, dataset: str, version: str) -> list[str]:
+    """
+    Flatten a nested dictionary to return full paths of
+    .parquet filenames for a given dataset and version.
+    """
+    items = []
+
+    def recurse(subtree: dict, parent_key: str = ""):
+        for k, v in subtree.items():
+            new_key = f"{parent_key}/{k}" if parent_key else k
+            if isinstance(v, dict):
+                if (
+                    "filename" in v
+                    and v["filename"].endswith(".parquet")
+                    and version in new_key
+                ):
+                    items.append(new_key)
+                else:
+                    recurse(v, new_key)
+
+    if dataset in tree:
+        recurse(tree[dataset])
+    return items
+
+
+def generate_html_files(
+    tree: dict,
+    bucket_name: str,
+    folder_path: str | Path = "",
+):
+    """Generate index.html files using Jinja2 for each folder."""
+    index_file_path = Path(folder_path) / "index.html"
+    html_content = template.render(folder_name=folder_path, contents=tree)
+
+    s3.put_object(
+        Bucket=bucket_name,
+        Key=str(index_file_path.as_posix()),
+        Body=html_content,
+        ContentType="text/html",
+    )
+
+    # Recursively create subfolders and their index.html
+    for item, subtree in tree.items():
+        if isinstance(subtree, dict) and "filename" not in subtree:
+            generate_html_files(subtree, bucket_name, Path(folder_path) / item)
+
+
 def get_s3_objects(bucket_name: str, prefix: str = "") -> tuple[dict, list]:
     """Retrieve a list of objects in the S3 bucket with a given prefix."""
     print("Retrieving objects from S3 bucket...")
-
-    def format_size(size):
-        for unit in ["B", "KB", "MB", "GB", "TB"]:
-            if size < 1024:
-                return f"{size:.2f} {unit}"
-            size /= 1024
 
     def update_directory_info(directory, size, last_modified):
         if "total_size" not in directory:
@@ -89,38 +172,6 @@ def get_s3_objects(bucket_name: str, prefix: str = "") -> tuple[dict, list]:
     return tree, keys
 
 
-def save_inventory_json(
-    tree: dict, output_dir: str | Path, output_file: str
-) -> None:
-    """Save the tree structure of the S3 bucket as a JSON file."""
-    output_path = Path(output_dir) / output_file
-
-    with open(output_path, "w") as f:
-        json.dump(tree, f, indent=2)
-
-
-def generate_html_files(
-    tree: dict,
-    bucket_name: str,
-    folder_path: str | Path = "",
-):
-    """Generate index.html files using Jinja2 for each folder."""
-    index_file_path = Path(folder_path) / "index.html"
-    html_content = template.render(folder_name=folder_path, contents=tree)
-
-    s3.put_object(
-        Bucket=bucket_name,
-        Key=str(index_file_path.as_posix()),
-        Body=html_content,
-        ContentType="text/html",
-    )
-
-    # Recursively create subfolders and their index.html
-    for item, subtree in tree.items():
-        if isinstance(subtree, dict) and "filename" not in subtree:
-            generate_html_files(subtree, bucket_name, Path(folder_path) / item)
-
-
 def purge_cloudflare_cache(
     keys: list[str], zone_id: str | None, token: str | None
 ) -> None:
@@ -134,30 +185,39 @@ def purge_cloudflare_cache(
         "Content-Type": "application/json",
     }
 
+    print(f"Purging {len(keys)} keys from the Cloudflare cache.")
     for i in range(0, len(keys), 30):
         chunk = [f"{base_url}/{k}" for k in keys[i : i + 30]]
         data = {"files": chunk}
-        print(
-            f"Purging the following keys from Cloudflare cache: {', '.join(chunk)}"
-        )
         r.post(url, headers=headers, json=data)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--bucket_name", required=True, type=str)
-    parser.add_argument("--output_dir", required=False, type=str)
-    parser.add_argument("--output_file", required=False, type=str)
-    args = parser.parse_args()
+    tree, keys = get_s3_objects(params["s3"]["public_bucket"])
 
-    tree, keys = get_s3_objects(args.bucket_name)
-    save_inventory_json(
-        tree,
-        args.output_dir or Path.cwd() / "site",
-        args.output_file or "inventory.json",
-    )
+    versions = list(DATASET_DICT.keys())
+    for version in versions:
+        print(f"Creating DuckDB file for version {version}...")
+        db_path = Path.cwd() / "site" / f"{version}.duckdb"
+        create_duckdb_file(
+            tree=tree,
+            datasets=list(DATASET_DICT[version].keys()),
+            bucket_name=params["s3"]["public_bucket"],
+            base_url=params["s3"]["public_data_url"],
+            path=db_path.as_posix(),
+        )
+
+        s3.upload_file(
+            Filename=db_path.as_posix(),
+            Bucket=params["s3"]["public_bucket"],
+            Key=f"databases/{version}.duckdb",
+        )
+        # Update the tree in-place with the new file
+        append_duckdb_info(tree, version, db_path)
+        print(f"DuckDB file created at {db_path}.")
+
     print("Generating index.html files...")
-    generate_html_files(tree, args.bucket_name)
+    generate_html_files(tree, params["s3"]["public_bucket"])
     purge_cloudflare_cache(
         keys, CLOUDFLARE_CACHE_ZONE_ID, CLOUDFLARE_CACHE_API_TOKEN
     )

@@ -31,6 +31,14 @@ def create_duckdb_connection() -> duckdb.DuckDBPyConnection:
     return con
 
 
+def format_size(size):
+    """Return a human-readable size string."""
+    for unit in ["B", "KB", "MB", "GB", "TB"]:
+        if size < 1024:
+            return f"{size:.2f} {unit}"
+        size /= 1024
+
+
 def split_file_to_str(file: str | Path, **kwargs) -> str:
     """
     Splits the contents of a Parquet file into index strings.
