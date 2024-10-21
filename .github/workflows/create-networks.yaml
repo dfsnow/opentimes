@@ -29,6 +29,7 @@ env:
   AWS_DEFAULT_REGION: us-east-1
   # See: https://github.com/aws/aws-cli/issues/5262#issuecomment-705832151
   AWS_EC2_METADATA_DISABLED: true
+  PYTHONUNBUFFERED: "1"
 
 jobs:
   setup-jobs:
@@ -52,30 +53,10 @@ jobs:
           CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
           CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
 
-      - name: Cache restore custom JAR
-        id: cache-restore-custom-jar
-        uses: actions/cache/restore@v4
+      - name: Fetch R5 JAR
+        uses: ./.github/actions/fetch-jar
         with:
-          path: ./data/jars
-          key: jar-${{ hashFiles('./data/jars/r5-custom.jar.md5') }}
-
-      - name: Fetch custom R5 jar
-        if: ${{ steps.cache-restore-custom-jar.outputs.cache-hit != 'true' }}
-        shell: bash
-        working-directory: 'data'
-        run: |
-          aws s3 cp --quiet --endpoint-url \
-            https://${{ vars.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com \
-            s3://opentimes-resources/jars/r5-custom.jar ./jars/r5-custom.jar \
-            --profile cloudflare
-
-      - name: Cache save custom JAR
-        if: ${{ steps.cache-restore-custom-jar.outputs.cache-hit != 'true' }}
-        id: cache-save-custom-jar
-        uses: actions/cache/save@v4
-        with:
-          path: ./data/jars
-          key: jar-${{ hashFiles('./data/jars/r5-custom.jar.md5') }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Create job chunks
         id: create-job-chunks
@@ -115,61 +96,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install DVC
-        uses: ./.github/actions/setup-dvc
-
       - name: Setup Cloudflare credentials
         uses: ./.github/actions/setup-cloudflare-s3
         with:
           CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
           CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
 
-      - name: Cache restore custom JAR
-        id: cache-restore-custom-jar
-        uses: actions/cache/restore@v4
+      - name: Fetch R5 JAR
+        uses: ./.github/actions/fetch-jar
         with:
-          path: ./data/jars
-          key: jar-${{ hashFiles('./data/jars/r5-custom.jar.md5') }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
 
-      - name: Cache restore osmextract input data
-        id: cache-restore-osmextract-input
-        uses: actions/cache/restore@v4
+      - name: Fetch network build inputs
+        uses: ./.github/actions/fetch-network-build-inputs
         with:
-          path: ./data/intermediate/osmextract
-          key: osmextract-${{ inputs.year }}-${{ matrix.state }}-${{ hashFiles('./data/dvc.lock') }}
-
-      - name: Cache restore elevation input data
-        id: cache-restore-elevation-input
-        uses: actions/cache/restore@v4
-        with:
-          path: ./data/input/elevation
-          key: elevation-${{ matrix.state }}-${{ hashFiles('./data/dvc.lock') }}
-
-      - name: Pull DVC objects
-        if: ${{ steps.cache-restore-osmextract-input.outputs.cache-hit != 'true' ||
-                steps.cache-restore-elevation-input.outputs.cache-hit != 'true' }}
-        shell: bash
-        working-directory: 'data'
-        run: |
-          dvc pull --no-run-cache \
-            ./intermediate/osmextract/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/${{ matrix.state }}.osm.pbf \
-            ./input/elevation/geography=state/state=${{ matrix.state }}/${{ matrix.state }}.tif
-
-      - name: Cache save osmextract input data
-        if: ${{ steps.cache-restore-osmextract-input.outputs.cache-hit != 'true' }}
-        id: cache-save-osmextract-input
-        uses: actions/cache/save@v4
-        with:
-          path: ./data/intermediate/osmextract
-          key: osmextract-${{ inputs.year }}-${{ matrix.state }}-${{ hashFiles('./data/dvc.lock') }}
-
-      - name: Cache save elevation input data
-        if: ${{ steps.cache-restore-elevation-input.outputs.cache-hit != 'true' }}
-        id: cache-save-elevation-input
-        uses: actions/cache/save@v4
-        with:
-          path: ./data/input/elevation
-          key: elevation-${{ matrix.state }}-${{ hashFiles('./data/dvc.lock') }}
+          year: ${{ inputs.year }}
+          state: ${{ matrix.state }}
 
       - name: Run job chunk
         shell: bash
@@ -187,4 +129,24 @@ jobs:
                ./intermediate/network/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/"$file" \
                s3://opentimes-resources/networks/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/"$file" \
               --profile cloudflare
+          done
+
+  clear-inputs-cache:
+    runs-on: ubuntu-22.04
+    needs: [setup-jobs, run-job]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Clear inputs cache
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          states_array=($(echo "${{ fromJSON(needs.setup-jobs.outputs.states) }}" | jq -r '.[]'))
+          for state in "${states_array[@]}"; do
+            gh cache delete \
+              osmextract-${{ inputs.year }}-"$state"-${{ hashFiles('./data/dvc.lock') }}
+            gh cache delete \
+              elevation-"$state"-${{ hashFiles('./data/dvc.lock') }}
           done
