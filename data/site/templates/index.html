@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Travel time data from opentimes.org">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Index of /{{ folder_name }}</title>
     <style>
         body {
@@ -25,12 +27,24 @@
         tr:hover {
             background-color: #f1f1f1;
         }
+        th:nth-child(1), td:nth-child(1) {
+            width: 50%;
+        }
+        th:nth-child(2), td:nth-child(2) {
+            width: 25%;
+        }
+        th:nth-child(3), td:nth-child(3) {
+            width: 25%;
+        }
         a {
             text-decoration: none;
-            color: #007bff;
         }
         a:hover {
             text-decoration: underline;
+        }
+        h1 {
+            word-wrap: break-word;
+            font-size: 1.5em;
         }
     </style>
 </head>
