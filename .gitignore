@@ -4,6 +4,7 @@ __pycache__/
 build/
 rosm.cache/
 venv/
+*.bak
 *.csv
 *.dat
 *.duckdb
