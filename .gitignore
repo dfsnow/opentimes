@@ -24,6 +24,5 @@ venv/
 *.zip
 plan
 .env
-.gitignore
 .DS_Store
 .Rproj.user
