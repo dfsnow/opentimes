@@ -229,14 +229,16 @@ jobs:
   clear-network-cache:
     runs-on: ubuntu-22.04
     needs: run-job
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Clear network cache
+        continue-on-error: true
         shell: bash
         run: |
           gh cache delete \
-            network-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
+            network-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }} || true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

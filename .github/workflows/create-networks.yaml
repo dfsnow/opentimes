@@ -135,11 +135,13 @@ jobs:
   clear-inputs-cache:
     runs-on: ubuntu-22.04
     needs: [setup-jobs, run-job]
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Clear inputs cache
+        continue-on-error: true
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -147,7 +149,7 @@ jobs:
           states_array=($(echo "${{ needs.setup-jobs.outputs.states }}" | jq -r '.[]'))
           for state in "${states_array[@]}"; do
             gh cache delete \
-              osmextract-${{ inputs.year }}-"$state"-${{ hashFiles('./data/dvc.lock') }}
+              osmextract-${{ inputs.year }}-"$state"-${{ hashFiles('./data/dvc.lock') }} || true
             gh cache delete \
-              elevation-"$state"-${{ hashFiles('./data/dvc.lock') }}
+              elevation-"$state"-${{ hashFiles('./data/dvc.lock') }} || true
           done
