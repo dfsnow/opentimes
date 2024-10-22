@@ -6,9 +6,6 @@ description: Installs Python and DVC with S3 support
 runs:
   using: composite
   steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-
     - name: Setup Python 3.12
       id: setup_python
       uses: actions/setup-python@v5

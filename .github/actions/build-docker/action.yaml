@@ -10,9 +10,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-
+    # Expects actions/checkout to have already run
     - name: Mask secrets in logs
       shell: bash
       run: |
