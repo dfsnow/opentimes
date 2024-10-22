@@ -144,7 +144,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          states_array=($(echo "${{ fromJSON(needs.setup-jobs.outputs.states) }}" | jq -r '.[]'))
+          states_array=($(echo "${{ needs.setup-jobs.outputs.states }}" | jq -r '.[]'))
           for state in "${states_array[@]}"; do
             gh cache delete \
               osmextract-${{ inputs.year }}-"$state"-${{ hashFiles('./data/dvc.lock') }}
