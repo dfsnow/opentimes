@@ -132,7 +132,7 @@ if (opt$write_to_s3) {
 if (!file.exists(here::here(input$network_dir, "network.dat"))) {
   stop("Network file not found. Run 'dvc repro' to create the network file.")
 }
-setup_r5_jar("./jars/r5-custom.jar")
+setup_r5_jar("jars/r5-custom.jar")
 network_settings <- read_json(here::here(
   input$network_dir,
   "network_settings.json"

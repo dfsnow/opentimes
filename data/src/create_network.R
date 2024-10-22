@@ -31,7 +31,7 @@ create_links(osmextract_dir, network_dir, pattern = ".*\\.osm.pbf")
 create_links(elevation_dir, network_dir, pattern = ".*\\.tif")
 
 # Create the network.dat file
-setup_r5_jar("./jars/r5-custom.jar")
+setup_r5_jar("jars/r5-custom.jar")
 message("Creating network.dat file:")
 r5r_core <- r5r::setup_r5(
   data_path = network_dir,
