@@ -49,7 +49,11 @@
     </style>
 </head>
 <body>
-    <h1>Index of /{{ folder_name }}</h1>
+    {% if folder_name %}
+        <h1>Index of /{{ folder_name }}/</h1>
+    {% else %}
+        <h1>Index of /</h1>
+    {% endif %}
     <table>
         <thead>
             <tr>
