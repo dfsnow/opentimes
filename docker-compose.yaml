@@ -10,7 +10,7 @@ services:
       dockerfile: data/Dockerfile
     restart: never
     environment:
-      - R_USER_CACHE_DIR
+      - R_USER_CACHE_DIR=/times/cache
     volumes:
       - $HOME/.aws/credentials:/root/.aws/credentials:ro
       - ./data/src:/times/src:ro
