@@ -144,6 +144,9 @@ r5r_core <- r5r::setup_r5(
   overwrite = FALSE
 )
 
+# Free memory after loading the network
+rJava::.jgc(R.gc = TRUE)
+
 # Select columns based on centroid type (pop. weighted or unweighted)
 od_cols <- switch(
   opt$centroid_type,
@@ -162,8 +165,8 @@ if (chunk_used) {
   origins <- origins %>% slice(chunk_indices[1]:chunk_indices[2])
 }
 message(glue::glue(
-  "Routing from {nrow(origins)} origins ",
-  "to {nrow(destinations)} destinations"
+  "Snapping {nrow(origins)} origins ",
+  "and {nrow(destinations)} destinations"
 ))
 
 # Snap lat/lon points to the street network
@@ -193,9 +196,14 @@ destinations_snapped <- destinations %>%
     snap_lon = ifelse(is.na(snap_lon), lon, snap_lon)
   ) %>%
   arrange(id)
+rJava::.jgc(R.gc = TRUE)
 
 
 ##### CALCULATE TIMES #####
+message(glue::glue(
+  "Routing from {nrow(origins)} origins ",
+  "to {nrow(destinations)} destinations"
+))
 
 # Generate the actual travel time matrix. Use the snapped lat/lon points
 tictoc::tic("Generated travel time matrix")
