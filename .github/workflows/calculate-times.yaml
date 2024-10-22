@@ -225,19 +225,29 @@ jobs:
             --centroid_type ${{ inputs.centroid_type }} \
             --chunk ${{ matrix.chunk }} --write-to-s3
 
-  clear-network-cache:
-    runs-on: ubuntu-22.04
-    needs: setup-jobs
-    if: always()
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Clear network cache
+      # Clear the cache if we're one of the last running jobs. Using this instead
+      # of a separate workflow step because the steps often come last in the job
+      # queue and then won't run when many workflows are queued at the same time
+      - name: Clear workflow cache
+        if: always()
         continue-on-error: true
         shell: bash
         run: |
-          gh cache delete \
-            network-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }} || true
+          endpoint='repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs --paginate -q'
+          total_jobs=$(gh api $endpoint '.total_count')
+          complete_jobs=$(gh api $endpoint '.jobs[] | select(.status == "completed")' | wc -l)
+          in_progress_jobs=$(gh api $endpoint '.jobs[] | select(.status == "in_progress")' | wc -l)
+
+          n_remaining=$((total_jobs - complete_jobs))
+          all_statuses=$((complete_jobs + in_progress_jobs))
+          echo "Total number of jobs: $total_jobs"
+          echo "Number of jobs complete: $total_jobs"
+          echo "Number of jobs remaining: $n_remaining"
+          echo "Number of jobs run/running: $all_statuses"
+          if [ "$n_remaining" -lt 5 ] && [ "$total_jobs" -eq "$all_statuses" ]; then
+            echo "Less than 5 jobs still running. Clearing workflow cache!"
+            gh cache delete \
+              network-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }} || true
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
