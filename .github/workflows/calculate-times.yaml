@@ -122,6 +122,7 @@ env:
   # See: https://github.com/aws/aws-cli/issues/5262#issuecomment-705832151
   AWS_EC2_METADATA_DISABLED: true
   PYTHONUNBUFFERED: "1"
+  R_USER_CACHE_DIR: ${{ github.workspace }}/cache
 
 jobs:
   # Using the location data, split the origins into N jobs (max 256)
