@@ -227,7 +227,7 @@ jobs:
 
   clear-network-cache:
     runs-on: ubuntu-22.04
-    needs: run-job
+    needs: setup-jobs
     if: always()
     steps:
       - name: Checkout
