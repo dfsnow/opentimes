@@ -23,6 +23,7 @@ venv/
 *.tiff
 *.wal
 *.zip
+*temp*
 plan
 .env
 .DS_Store
