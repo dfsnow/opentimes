@@ -103,18 +103,6 @@ stages:
       - ./intermediate/osmclip/year=${item.year}/geography=state/state=${item.state}/${item.state}.geojson:
           persist: true
 
-  fetch_elevation:
-    deps:
-      - ./intermediate/osmclip/year=${item.year}/geography=state/state=${item.state}/${item.state}.geojson
-    matrix:
-      year: ['2020']
-      state: ${input.state}
-    cmd: "Rscript ./src/fetch_elevation.R
-      --year ${item.year} --state ${item.state}"
-    outs:
-      - ./input/elevation/geography=state/state=${item.state}/${item.state}.tif:
-          persist: true
-
   create_destpoint_by_state:
     deps:
       - ./intermediate/cenloc/year=${item.year}/geography=${item.geography}/state=${item.state}/${item.state}.parquet
@@ -156,17 +144,43 @@ stages:
       - ./intermediate/osmextract/year=${item.year}/geography=state/state=${item.state}/${item.state}.osm.pbf:
           persist: true
 
-  create_network:
+  create_valhalla_tiles:
     deps:
-      - ./intermediate/osmextract/year=${item.year}/geography=state/state=${item.state}/${item.state}.osm.pbf
-      - ./input/elevation/geography=state/state=${item.state}/${item.state}.tif
+      - ./valhalla.json
+      - ./input/osm/year=${item.year}/us-${item.year}.osm.pbf
+      - ./intermediate/osmclip/year=${item.year}/geography=state/state=${item.state}/${item.state}.geojson
     matrix:
       year: ${input.year}
       state: ${input.state}
-    cmd: "Rscript src/create_network.R
-      --year ${item.year} --state ${item.state}"
+    # Here we're using compose to run containerized osmium and valhalla to prep tiles.
+    # This horrible bash will output a nice tarball of routing tiles, elevation, etc
+    # to the target DVC dir
+    cmd: '
+      BUILD_DIR=build &&
+      find "$BUILD_DIR" -type f ! -name "tiles.tar" -delete &&
+      OSM_FILE=input/osm/year=${item.year}/us-${item.year}.osm.pbf &&
+      JSON_FILE=intermediate/osmclip/year=${item.year}/geography=state/state=${item.state}/${item.state}.geojson &&
+      cp "$OSM_FILE" "$BUILD_DIR" &&
+      cp "$JSON_FILE" "$BUILD_DIR" &&
+      OUT_DIR=intermediate/valhalla_tiles/year=${item.year}/geography=state/state=${item.state} &&
+      mkdir -p $OUT_DIR &&
+      docker compose run --rm --entrypoint=osmium valhalla-run extract
+        --strategy complete_ways
+        -p ${item.state}.geojson us-${item.year}.osm.pbf --overwrite
+        -o tmp.osm.pbf &&
+      docker compose run --rm --entrypoint=osmium valhalla-run
+        tags-filter tmp.osm.pbf
+        w/highway w/public_transport=platform
+        w/railway=platform w/park_ride r/type=restriction --overwrite
+        -o tmp_clipped.osm.pbf &&
+      rm -f "$BUILD_DIR"/us-${item.year}.osm.pbf "$BUILD_DIR"/${item.state} "$BUILD_DIR"/tmp.osm.pbf &&
+      docker compose run --rm valhalla-build &&
+      rm -f "$BUILD_DIR"/tmp_clipped.osm.pbf &&
+      tar -cf "$BUILD_DIR"/tiles.tar "$BUILD_DIR"/* &&
+      zstd --rm -o "$BUILD_DIR"/tiles.tar.zst "$BUILD_DIR"/tiles.tar &&
+      mv "$BUILD_DIR"/tiles.tar.zst "$OUT_DIR" &&
+      find "$BUILD_DIR" -type f ! -name "tiles.tar" -delete
+      '
     outs:
-      - ./intermediate/network/year=${item.year}/geography=state/state=${item.state}/network.dat:
-          persist: true
-      - ./intermediate/network/year=${item.year}/geography=state/state=${item.state}/network_settings.json:
+      - ./intermediate/valhalla_tiles/year=${item.year}/geography=state/state=${item.state}/tiles.tar.zst:
           persist: true

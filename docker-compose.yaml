@@ -21,6 +21,8 @@ services:
       - build_tar=True
       - force_rebuild=True
       - update_existing_config=True
+      - use_default_speeds_config=True
+      - traffic_name=
 
   valhalla-run:
     image: ghcr.io/gis-ops/docker-valhalla/valhalla:latest
@@ -36,5 +38,5 @@ services:
     environment:
       - use_tiles_ignore_pbf=True
       - update_existing_config=False
+      - force_rebuild=False
       - tileset_name=tiles
-    entrypoint: "bash"
