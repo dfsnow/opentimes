@@ -1,23 +1,47 @@
 ---
 
 services:
-  opentimes:
-    image: ghcr.io/dfsnow/opentimes:latest
-    container_name: opentimes
-    hostname: opentimes
+  # https://github.com/nilsnolde/docker-valhalla/blob/master/docker-compose.yml
+  valhalla-build:
+    image: ghcr.io/gis-ops/docker-valhalla/valhalla:latest
+    container_name: valhalla-build
+    user: "${USER_ID}:${GROUP_ID}"
     build:
       context: .
       dockerfile: data/Dockerfile
-    restart: never
-    environment:
-      - R_USER_CACHE_DIR=/times/cache
+      args:
+        - VALHALLA_UID=${USER_ID}
+        - VALHALLA_GID=${GROUP_ID}
     volumes:
-      - $HOME/.aws/credentials:/root/.aws/credentials:ro
-      - ./data/src:/times/src:ro
-      - ./data/input:/times/input:rw
-      - ./data/intermediate:/times/intermediate:rw
-      - ./data/output:/times/output:rw
-      - ./data/jars:/times/jars:ro
-      - ./data/params.yaml:/times/params.yaml:ro
-      # So git2r in Docker can read git info and add it to output metadata
-      - ./.git:/times/.git:ro
+      - ./data/build/:/custom_files
+    environment:
+      - server_threads=32
+      - serve_tiles=False
+      - tileset_name=tiles
+      - build_elevation=True
+      - build_admins=True
+      - build_time_zones=True
+      - build_transit=False
+      - build_tar=True
+      - force_rebuild=True
+      - update_existing_config=True
+      - traffic_name=""
+
+  valhalla-run:
+    image: ghcr.io/gis-ops/docker-valhalla/valhalla:latest
+    container_name: valhalla-build
+    user: "${USER_ID}:${GROUP_ID}"
+    build:
+      context: .
+      dockerfile: data/Dockerfile
+      args:
+        - VALHALLA_UID=${USER_ID}
+        - VALHALLA_GID=${GROUP_ID}
+    ports:
+      - 8002:8002
+    volumes:
+      - ./data/build/:/custom_files
+    environment:
+      - server_threads=32
+      - serve_tiles=True
+      - tileset_name=tiles
