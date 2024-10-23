@@ -5,13 +5,10 @@ services:
   valhalla-build:
     image: ghcr.io/gis-ops/docker-valhalla/valhalla:latest
     container_name: valhalla-build
-    user: "${USER_ID}:${GROUP_ID}"
+    user: 59999:59999
     build:
       context: .
       dockerfile: data/Dockerfile
-      args:
-        - VALHALLA_UID=${USER_ID}
-        - VALHALLA_GID=${GROUP_ID}
     volumes:
       - ./data/build/:/custom_files
     environment:
@@ -30,13 +27,10 @@ services:
   valhalla-run:
     image: ghcr.io/gis-ops/docker-valhalla/valhalla:latest
     container_name: valhalla-build
-    user: "${USER_ID}:${GROUP_ID}"
+    user: 59999:59999
     build:
       context: .
       dockerfile: data/Dockerfile
-      args:
-        - VALHALLA_UID=${USER_ID}
-        - VALHALLA_GID=${GROUP_ID}
     ports:
       - 8002:8002
     volumes:
@@ -45,3 +39,4 @@ services:
       - server_threads=32
       - serve_tiles=True
       - tileset_name=tiles
+    entrypoint: "bash"

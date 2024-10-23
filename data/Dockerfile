@@ -14,3 +14,4 @@ RUN apt-get update && \
 # Install Python dependencies for opentimes work inside docker
 COPY ./pyproject.toml .
 RUN pip install --no-cache-dir --break-system-packages .[data]
+USER valhalla
