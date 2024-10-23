@@ -12,7 +12,6 @@ services:
     volumes:
       - ./data/build/:/custom_files
     environment:
-      - server_threads=32
       - serve_tiles=False
       - tileset_name=tiles
       - build_elevation=True
@@ -22,7 +21,6 @@ services:
       - build_tar=True
       - force_rebuild=True
       - update_existing_config=True
-      - traffic_name=""
 
   valhalla-run:
     image: ghcr.io/gis-ops/docker-valhalla/valhalla:latest
@@ -36,7 +34,7 @@ services:
     volumes:
       - ./data/build/:/custom_files
     environment:
-      - server_threads=32
-      - serve_tiles=True
+      - use_tiles_ignore_pbf=True
+      - update_existing_config=False
       - tileset_name=tiles
     entrypoint: "bash"
