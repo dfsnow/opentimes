@@ -37,12 +37,12 @@ services:
     volumes:
       - ./data/build/:/custom_files:rw
       - ./data/valhalla.json:/custom_files/valhalla.json:rw
+      - ./data/output:/data/output:rw
       # Read only volumes to serve data to the container
       - $HOME/.aws/credentials:/home/valhalla/.aws/credentials:ro
       - ./data/src:/data/src:ro
       - ./data/input:/data/input:ro
       - ./data/intermediate:/data/intermediate:ro
-      - ./data/output:/data/output:ro
       - ./data/params.yaml:/data/params.yaml:ro
     environment:
       - use_tiles_ignore_pbf=True
