@@ -20,7 +20,7 @@ services:
       - build_transit=False
       - build_tar=True
       - force_rebuild=True
-      - update_existing_config=True
+      - update_existing_config=False
       - use_default_speeds_config=True
       - traffic_name=
 
@@ -34,7 +34,15 @@ services:
     ports:
       - 8002:8002
     volumes:
-      - ./data/build/:/custom_files
+      - ./data/build/:/custom_files:rw
+      # Read only volumes to serve data to the container
+      - $HOME/.aws/credentials:/home/valhalla/.aws/credentials:ro
+      - ./data/src:/custom_files/src:ro
+      - ./data/input:/custom_files/input:ro
+      - ./data/intermediate:/custom_files/intermediate:ro
+      - ./data/output:/custom_files/output:ro
+      - ./data/params.yaml:/custom_files/params.yaml:ro
+      - ./data/valhalla.json:/custom_files/valhalla.json:ro
     environment:
       - use_tiles_ignore_pbf=True
       - update_existing_config=False

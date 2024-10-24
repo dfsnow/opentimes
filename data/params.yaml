@@ -10,15 +10,6 @@ s3:
   endpoint: 'https://fcb279b22cfe4c98f903ad8f9e7ccbb2.r2.cloudflarestorage.com'
   account_id: 'fcb279b22cfe4c98f903ad8f9e7ccbb2'
 
-# Parameters used to control the chunking of work on GitHub Actions
-actions:
-  # The max number of jobs to create for a workflow. GitHub allows up to 256
-  n_chunks: 256
-
-  # The minimum number of origins to include in a job. Higher = fewer jobs
-  # that take longer. Lower = more jobs that finish quicker
-  min_chunk_size: 5
-
 times:
   # Travel times output version. Follows SemVer (kind of):
   # 1. MAJOR version increments for incompatible API changes
@@ -26,31 +17,17 @@ times:
   # 3. PATCH version increments for backwards-compatible data updates
   version: '0.0.1'
 
-  # Travel modes in R5. TRANSIT automatically includes all public transit modes
+  # Valhalla costing models to calculate times for, see:
+  # https://valhalla.github.io/valhalla/api/turn-by-turn/api-reference/#costing-models
   mode:
-    - car
+    - auto
     - bicycle
-    - transit
-    - walk
+    - pedestrian
+    #- multimodal
 
-  # Parameters corresponding directly to those of travel_time_matrix() in r5r.
-  # See: https://ipeagit.github.io/r5r/reference/travel_time_matrix.html
-  r5:
-    max_trip_duration: 6000  # 100 hours
-    walk_speed: 4.5  # kph
-    bike_speed: 15.0  # kph
-    max_lts: 3  # Level of travel stress, see docs
-    max_rides: 3
-    time_window: 10
-    percentiles: [50]
-    draws_per_minute: [5]
-
-  # Maximum distance to search for roads to snap origins/destinations to
-  snap_radius: 500000  # meters
-
-  # Whether to use verbose output when generating times. False will enable
-  # the built-in r5r progress bar instead
-  verbose: False
+  # Maximum size of chunk of origins AND destinations to process in a single call to
+  # Valhalla. This is necessary because larger matrices will cause it to choke
+  max_chunk_size: 1000
 
 input:
   # Distance in meters to buffer each state boundary by when clipping the
@@ -62,12 +39,6 @@ input:
   # destination points to route to. Larger buffer = more points = longer
   # overall compute time
   destination_buffer_m: 300000
-
-  # Level of elevation zoom for .tif elevation data. See Tilezen GitHub:
-  # https://github.com/tilezen/joerd/blob/master/docs/data-sources.md
-  # NOTE: Zoom levels over 12 result in MASSIVE files given the scale of the
-  # state-level clips. Recommend using 12 or less
-  elevation_zoom: 10
 
   # Years for which to collect input data. Each year will grab the
   # corresponding TIGER/Line Census files, the Jan 1 Geofabrik North America
