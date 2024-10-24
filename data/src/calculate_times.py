@@ -1,11 +1,12 @@
 import argparse
 import json
 from pathlib import Path
+from multiprocessing import Pool
 
 import boto3
 import pandas as pd
 import time
-import valhalla
+import valhalla  # pyright: ignore [reportMissingImports]
 import yaml
 from utils.utils import format_time
 
@@ -26,7 +27,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.mode not in params["times"]["mode"]:
-        raise ValueError("Invalid mode, must be one of: ", params["times"]["mode"])
+        raise ValueError(
+            "Invalid mode, must be one of: ", params["times"]["mode"]
+        )
     if args.centroid_type not in ["weighted", "unweighted"]:
         raise ValueError(
             "Invalid centroid_type, must be one of: ['weighted', 'unweighted']"
@@ -35,7 +38,7 @@ if __name__ == "__main__":
     print(
         f"Starting routing for version: {params['times']['version']},"
         f"mode: {args.mode}, year: {args.year}, geography: {args.geography},",
-        f"state: {args.state}, centroid type: {args.centroid_type}"
+        f"state: {args.state}, centroid type: {args.centroid_type}",
     )
 
     ##### FILE PATHS #####
@@ -43,22 +46,26 @@ if __name__ == "__main__":
     # Setup file paths for inputs (pre-made network file and OD points)
     input = {}
     input["main"] = {
-        "path": Path((
-            f"year={args.year}/geography={args.geography}/"
-            f"state={args.state}/{args.state}.parquet"
-        ))
+        "path": Path(
+            (
+                f"year={args.year}/geography={args.geography}/"
+                f"state={args.state}/{args.state}.parquet"
+            )
+        )
     }
     input["dirs"] = {
-        "valhalla_tiles": Path((
-            f"intermediate/valhalla_tiles/year={args.year}/"
-            f"geography=state/state={args.state}"
-        ))
+        "valhalla_tiles": Path(
+            (
+                f"intermediate/valhalla_tiles/year={args.year}/"
+                f"geography=state/state={args.state}"
+            )
+        )
     }
     input["files"] = {
         "origins_file": Path(f"intermediate/cenloc/{input['main']['path']}"),
         "destinations_file": Path(
             f"intermediate/destpoint/{input['main']['path']}"
-        )
+        ),
     }
 
     # Setup file paths for outputs. S3 paths if enabled
@@ -69,32 +76,50 @@ if __name__ == "__main__":
 
     output = {}
     output["main"] = {
-        "path": Path((
-            f"version={params['times']['version']}/mode={args.mode}/"
-            f"year={args.year}/geography={args.geography}/state={args.state}/"
-            f"centroid_type={args.centroid_type}"
-        )),
+        "path": Path(
+            (
+                f"version={params['times']['version']}/mode={args.mode}/"
+                f"year={args.year}/geography={args.geography}/state={args.state}/"
+                f"centroid_type={args.centroid_type}"
+            )
+        ),
         "file": Path("part-0.parquet"),
-        "prefix": Path(output_prefix)
+        "prefix": Path(output_prefix),
     }
     output["dirs"] = {
         "times": Path("times", output["main"]["path"]),
         "origins": Path("points", output["main"]["path"], "point_type=origin"),
-        "destinations": Path("points", output["main"]["path"], "point_type=destination"),
+        "destinations": Path(
+            "points", output["main"]["path"], "point_type=destination"
+        ),
         "missing_pairs": Path("missing_pairs", output["main"]["path"]),
         "metadata": Path("metadata", output["main"]["path"]),
     }
     output["files"] = {
-        "times_file": Path(output["main"]["prefix"], output["dirs"]["times"], output["main"]["file"]),
-        "origins_file": Path(output["main"]["prefix"], output["dirs"]["origins"], output["main"]["file"]),
+        "times_file": Path(
+            output["main"]["prefix"],
+            output["dirs"]["times"],
+            output["main"]["file"],
+        ),
+        "origins_file": Path(
+            output["main"]["prefix"],
+            output["dirs"]["origins"],
+            output["main"]["file"],
+        ),
         "destinations_file": Path(
-            output["main"]["prefix"], output["dirs"]["destinations"], output["main"]["file"]
+            output["main"]["prefix"],
+            output["dirs"]["destinations"],
+            output["main"]["file"],
         ),
         "missing_pairs_file": Path(
-            output["main"]["prefix"], output["dirs"]["missing_pairs"], output["main"]["file"]
+            output["main"]["prefix"],
+            output["dirs"]["missing_pairs"],
+            output["main"]["file"],
         ),
         "metadata_file": Path(
-            output["main"]["prefix"], output["dirs"]["metadata"], output["main"]["file"]
+            output["main"]["prefix"],
+            output["dirs"]["metadata"],
+            output["main"]["file"],
         ),
     }
 
@@ -102,24 +127,28 @@ if __name__ == "__main__":
     for dir_path in output["dirs"].values():
         dir_path.mkdir(parents=True, exist_ok=True)
 
-
     ##### DATA PREP #####
 
     # Load origins and destinations
     od_cols = {
         "weighted": {"geoid": "id", "x_4326_wt": "lon", "y_4326_wt": "lat"},
-        "unweighted": {"geoid": "id", "x_4326": "lon", "y_4326": "lat"}
+        "unweighted": {"geoid": "id", "x_4326": "lon", "y_4326": "lat"},
     }[args.centroid_type]
 
-    origins = pd.read_parquet(input["files"]["origins_file"])\
-        .loc[:, od_cols.keys()].rename(columns=od_cols)
-    destinations = pd.read_parquet(input["files"]["destinations_file"])\
-        .loc[:, od_cols.keys()].rename(columns=od_cols)
+    origins = (
+        pd.read_parquet(input["files"]["origins_file"])
+        .loc[:, od_cols.keys()]
+        .rename(columns=od_cols)
+    )
+    destinations = (
+        pd.read_parquet(input["files"]["destinations_file"])
+        .loc[:, od_cols.keys()]
+        .rename(columns=od_cols)
+    )
     n_origins = len(origins)
     n_destinations = len(destinations)
 
     print(f"Found {len(origins)} origins and {len(destinations)} destinations")
-
 
     ##### CALCULATE TIMES #####
 
@@ -136,22 +165,39 @@ if __name__ == "__main__":
             d_idx = min(d + params["times"]["max_chunk_size"], n_destinations)
             print(
                 "Calculating times for origins",
-                f"{o}-{o_idx} and destinations {d}-{d_idx}"
+                f"{o}-{o_idx} and destinations {d}-{d_idx}",
             )
 
-            origins_list = origins.iloc[o:o_idx]\
-                .apply(lambda row: {"lat": row["lat"], "lon": row["lon"]}, axis=1).tolist()
-            destinations_list = destinations.iloc[d:d_idx]\
-                .apply(lambda row: {"lat": row["lat"], "lon": row["lon"]}, axis=1).tolist()
-            request_json = json.dumps({
-                "sources": origins_list,
-                "targets": destinations_list,
-                "costing": args.mode
-            })
+            origins_list = (
+                origins.iloc[o:o_idx]
+                .apply(
+                    lambda row: {"lat": row["lat"], "lon": row["lon"]}, axis=1
+                )
+                .tolist()
+            )
+            destinations_list = (
+                destinations.iloc[d:d_idx]
+                .apply(
+                    lambda row: {"lat": row["lat"], "lon": row["lon"]}, axis=1
+                )
+                .tolist()
+            )
+            request_json = json.dumps(
+                {
+                    "sources": origins_list,
+                    "targets": destinations_list,
+                    "costing": args.mode,
+                    "verbose": False
+                }
+            )
             out = actor.matrix(request_json)
+
+            data = json.loads(out)
+            with open('output.json', 'w') as json_file:
+                json.dump(data, json_file, indent=2)
+
             elapsed_time = time.time() - start_time
             print(f"Iteration time: {format_time(elapsed_time)}")
-            print(out)
 
     breakpoint()
 

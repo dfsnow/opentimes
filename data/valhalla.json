@@ -97,7 +97,7 @@
   },
   "mjolnir": {
     "admin": "/custom_files/admin_data/admins.sqlite",
-    "concurrency": 8,
+    "concurrency": "8",
     "data_processing": {
       "allow_alt_name": false,
       "apply_country_overrides": true,
@@ -139,7 +139,8 @@
     "transit_feeds_dir": "/gtfs_feeds",
     "transit_pbf_limit": 200000,
     "use_lru_mem_cache": false,
-    "use_simple_mem_cache": false
+    "use_simple_mem_cache": false,
+    "default_speeds_config": "/custom_files/default_speeds.json"
   },
   "odin": {
     "logging": {
@@ -166,19 +167,19 @@
       "max_distance": 50000000.0,
       "max_locations": 50,
       "max_matrix_distance": 50000000.0,
-      "max_matrix_location_pairs": 1000000 
+      "max_matrix_location_pairs": 1000000
     },
     "bikeshare": {
       "max_distance": 50000000.0,
       "max_locations": 50,
       "max_matrix_distance": 50000000.0,
-      "max_matrix_location_pairs": 1000000  
+      "max_matrix_location_pairs": 1000000
     },
     "bus": {
       "max_distance": 50000000.0,
       "max_locations": 50,
       "max_matrix_distance": 50000000.0,
-      "max_matrix_location_pairs": 1000000  
+      "max_matrix_location_pairs": 1000000
     },
     "centroid": {
       "max_distance": 50000000.0,
@@ -203,13 +204,13 @@
       "max_distance": 500000.0,
       "max_locations": 50,
       "max_matrix_distance": 200000.0,
-      "max_matrix_location_pairs": 1000000  
+      "max_matrix_location_pairs": 1000000
     },
     "motorcycle": {
       "max_distance": 50000000.0,
       "max_locations": 50,
       "max_matrix_distance": 50000000.0,
-      "max_matrix_location_pairs": 1000000  
+      "max_matrix_location_pairs": 1000000
     },
     "multimodal": {
       "max_distance": 50000000.0,
@@ -221,7 +222,7 @@
       "max_distance": 50000000.0,
       "max_locations": 50,
       "max_matrix_distance": 50000000.0,
-      "max_matrix_location_pairs": 1000000 ,
+      "max_matrix_location_pairs": 1000000,
       "max_transit_walking_distance": 10000,
       "min_transit_walking_distance": 1
     },
@@ -236,7 +237,7 @@
       "max_distance": 50000000.0,
       "max_locations": 20,
       "max_matrix_distance": 50000000.0,
-      "max_matrix_location_pairs": 1000000  
+      "max_matrix_location_pairs": 1000000
     },
     "trace": {
       "max_alternates": 3,
@@ -250,13 +251,13 @@
       "max_distance": 50000000.0,
       "max_locations": 50,
       "max_matrix_distance": 50000000.0,
-      "max_matrix_location_pairs": 1000000  
+      "max_matrix_location_pairs": 1000000
     },
     "truck": {
       "max_distance": 50000000.0,
       "max_locations": 20,
       "max_matrix_distance": 50000000.0,
-      "max_matrix_location_pairs": 1000000  
+      "max_matrix_location_pairs": 1000000
     }
   },
   "statsd": {

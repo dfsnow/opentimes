@@ -27,7 +27,7 @@ times:
 
   # Maximum size of chunk of origins AND destinations to process in a single call to
   # Valhalla. This is necessary because larger matrices will cause it to choke
-  max_chunk_size: 1000
+  max_chunk_size: 500
 
 input:
   # Distance in meters to buffer each state boundary by when clipping the

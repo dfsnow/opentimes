@@ -10,7 +10,8 @@ services:
       context: .
       dockerfile: data/Dockerfile
     volumes:
-      - ./data/build/:/custom_files
+      - ./data/build/:/custom_files:rw
+      - ./data/valhalla.json:/custom_files/valhalla.json:rw
     environment:
       - serve_tiles=False
       - tileset_name=tiles
@@ -48,3 +49,4 @@ services:
       - update_existing_config=False
       - force_rebuild=False
       - tileset_name=tiles
+      - traffic_name=

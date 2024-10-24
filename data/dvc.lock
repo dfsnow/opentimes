@@ -72122,8 +72122,8 @@ stages:
       md5: 55a32ed702be65c70ecb896c0eac56d2
       size: 363
   create_valhalla_tiles@2024-01:
-    cmd: ' BUILD_DIR=build && find "$BUILD_DIR" -type f ! -name "tiles.tar" -delete
-      && OSM_FILE=input/osm/year=2024/us-2024.osm.pbf && JSON_FILE=intermediate/osmclip/year=2024/geography=state/state=01/01.geojson
+    cmd: ' BUILD_DIR=build && rm -rf ./"$BUILD_DIR"/* && OSM_FILE=input/osm/year=2024/us-2024.osm.pbf
+      && JSON_FILE=intermediate/osmclip/year=2024/geography=state/state=01/01.geojson
       && cp "$OSM_FILE" "$BUILD_DIR" && cp "$JSON_FILE" "$BUILD_DIR" && OUT_DIR=intermediate/valhalla_tiles/year=2024/geography=state/state=01
       && mkdir -p $OUT_DIR && docker compose run --rm --entrypoint=osmium valhalla-run
       extract --strategy complete_ways -p 01.geojson us-2024.osm.pbf --overwrite -o
@@ -72131,10 +72131,9 @@ stages:
       tmp.osm.pbf w/highway w/public_transport=platform w/railway=platform w/park_ride
       r/type=restriction --overwrite -o tmp_clipped.osm.pbf && rm -f "$BUILD_DIR"/us-2024.osm.pbf
       "$BUILD_DIR"/01 "$BUILD_DIR"/tmp.osm.pbf && docker compose run --rm valhalla-build
-      && rm -f "$BUILD_DIR"/tmp_clipped.osm.pbf && tar -cf "$BUILD_DIR"/tiles.tar
-      "$BUILD_DIR"/* && zstd --rm -o "$BUILD_DIR"/tiles.tar.zst "$BUILD_DIR"/tiles.tar
-      && mv "$BUILD_DIR"/tiles.tar.zst "$OUT_DIR" && find "$BUILD_DIR" -type f ! -name
-      "tiles.tar" -delete '
+      && rm -f "$BUILD_DIR"/tmp_clipped.osm.pbf && tar -cf "$BUILD_DIR"/valhalla_tiles.tar
+      "$BUILD_DIR"/* && zstd --rm -o "$BUILD_DIR"/valhalla_tiles.tar.zst "$BUILD_DIR"/valhalla_tiles.tar
+      && mv "$BUILD_DIR"/valhalla_tiles.tar.zst "$OUT_DIR" && rm -rf ./"$BUILD_DIR"/* '
     deps:
     - path: ./input/osm/year=2024/us-2024.osm.pbf
       hash: md5
@@ -72146,10 +72145,11 @@ stages:
       size: 20905
     - path: ./valhalla.json
       hash: md5
-      md5: 317de35400066af0f3d0a0b9592ed41d
-      size: 7590
+      md5: 1e636762e67dcd1deb9cd4438b16c87b
+      size: 7642
     outs:
-    - path: ./intermediate/valhalla_tiles/year=2024/geography=state/state=01/tiles.tar.zst
+    - path: 
+        ./intermediate/valhalla_tiles/year=2024/geography=state/state=01/valhalla_tiles.tar.zst
       hash: md5
-      md5: dec2de6d37f312ae7b937e3530a53709
-      size: 1599666043
+      md5: aa406eac5f439e714764d842638a0681
+      size: 2425378353

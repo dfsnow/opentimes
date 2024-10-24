@@ -157,7 +157,7 @@ stages:
     # to the target DVC dir
     cmd: '
       BUILD_DIR=build &&
-      find "$BUILD_DIR" -type f ! -name "tiles.tar" -delete &&
+      rm -rf ./"$BUILD_DIR"/* &&
       OSM_FILE=input/osm/year=${item.year}/us-${item.year}.osm.pbf &&
       JSON_FILE=intermediate/osmclip/year=${item.year}/geography=state/state=${item.state}/${item.state}.geojson &&
       cp "$OSM_FILE" "$BUILD_DIR" &&
@@ -173,14 +173,11 @@ stages:
         w/highway w/public_transport=platform
         w/railway=platform w/park_ride r/type=restriction --overwrite
         -o tmp_clipped.osm.pbf &&
-      rm -f "$BUILD_DIR"/us-${item.year}.osm.pbf "$BUILD_DIR"/${item.state} "$BUILD_DIR"/tmp.osm.pbf &&
       docker compose run --rm valhalla-build &&
-      rm -f "$BUILD_DIR"/tmp_clipped.osm.pbf &&
-      tar -cf "$BUILD_DIR"/tiles.tar "$BUILD_DIR"/* &&
       zstd --rm -o "$BUILD_DIR"/tiles.tar.zst "$BUILD_DIR"/tiles.tar &&
       mv "$BUILD_DIR"/tiles.tar.zst "$OUT_DIR" &&
       rm -rf ./"$BUILD_DIR"/*
       '
     outs:
-      - ./intermediate/valhalla_tiles/year=${item.year}/geography=state/state=${item.state}/tiles.tar.zst:
+      - ./intermediate/valhalla_tiles/year=${item.year}/geography=state/state=${item.state}/valhalla_tiles.tar.zst:
           persist: true
