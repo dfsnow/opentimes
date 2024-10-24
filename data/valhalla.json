@@ -33,7 +33,7 @@
       "heading_tolerance": 60,
       "minimum_reachability": 50,
       "node_snap_tolerance": 5,
-      "radius": 0,
+      "radius": 35000,
       "search_cutoff": 3500000,
       "street_side_max_distance": 1000,
       "street_side_tolerance": 5
