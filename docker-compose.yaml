@@ -23,7 +23,6 @@ services:
       - force_rebuild=True
       - update_existing_config=False
       - use_default_speeds_config=True
-      - traffic_name=
 
   valhalla-run:
     image: ghcr.io/gis-ops/docker-valhalla/valhalla:latest
@@ -36,17 +35,16 @@ services:
       - 8002:8002
     volumes:
       - ./data/build/:/custom_files:rw
+      - ./data/valhalla.json:/custom_files/valhalla.json:ro
       # Read only volumes to serve data to the container
       - $HOME/.aws/credentials:/home/valhalla/.aws/credentials:ro
-      - ./data/src:/custom_files/src:ro
-      - ./data/input:/custom_files/input:ro
-      - ./data/intermediate:/custom_files/intermediate:ro
-      - ./data/output:/custom_files/output:ro
-      - ./data/params.yaml:/custom_files/params.yaml:ro
-      - ./data/valhalla.json:/custom_files/valhalla.json:ro
+      - ./data/src:/data/src:ro
+      - ./data/input:/data/input:ro
+      - ./data/intermediate:/data/intermediate:ro
+      - ./data/output:/data/output:ro
+      - ./data/params.yaml:/data/params.yaml:ro
     environment:
       - use_tiles_ignore_pbf=True
       - update_existing_config=False
       - force_rebuild=False
       - tileset_name=tiles
-      - traffic_name=
