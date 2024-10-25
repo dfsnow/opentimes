@@ -115,6 +115,7 @@ jobs:
 
       - name: Run job chunk
         shell: bash
+        working-directory: 'data'
         run: |
           dvc repro -s create_valhalla_tiles@${{ inputs.year }}-${{ matrix.state }}
 
