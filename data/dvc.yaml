@@ -166,8 +166,7 @@ stages:
         elevation_data admin_data timezone_data tiles.tar
         traffic.tar default_speeds.json file_hashes.txt duplicateways.txt &&
       zstd --rm -o "$BUILD_DIR"/valhalla_tiles.tar.zst "$BUILD_DIR"/valhalla_tiles.tar &&
-      mv "$BUILD_DIR"/valhalla_tiles.tar.zst "$OUT_DIR" &&
-      rm -rf ./"$BUILD_DIR"/*
+      mv "$BUILD_DIR"/valhalla_tiles.tar.zst "$OUT_DIR"
       '
     outs:
       - ./intermediate/valhalla_tiles/year=${item.year}/geography=state/state=${item.state}/valhalla_tiles.tar.zst:
