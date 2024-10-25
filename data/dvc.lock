@@ -72121,3 +72121,26 @@ stages:
       hash: md5
       md5: 55a32ed702be65c70ecb896c0eac56d2
       size: 363
+  create_valhalla_tiles@2020-01:
+    cmd: ' BUILD_DIR=build && OUT_DIR=intermediate/valhalla_tiles/year=2020/geography=state/state=01
+      && rm -rf ./"$BUILD_DIR"/* && mkdir -p $OUT_DIR && ln ./intermediate/osmextract/year=2020/geography=state/state=01/01.osm.pbf
+      ./"$BUILD_DIR"/01.osm.pbf && docker compose run --rm valhalla-build && tar -cf
+      "$BUILD_DIR"/valhalla_tiles.tar -C "$BUILD_DIR" elevation_data admin_data timezone_data
+      tiles.tar traffic.tar default_speeds.json file_hashes.txt duplicateways.txt
+      && zstd --rm -o "$BUILD_DIR"/valhalla_tiles.tar.zst "$BUILD_DIR"/valhalla_tiles.tar
+      && mv "$BUILD_DIR"/valhalla_tiles.tar.zst "$OUT_DIR" '
+    deps:
+    - path: ./intermediate/osmextract/year=2020/geography=state/state=01/01.osm.pbf
+      hash: md5
+      md5: d975d7d275f8fc184a100168c58814d1
+      size: 316408001
+    - path: ./valhalla.json
+      hash: md5
+      md5: 35a73e90d9521f3add2c5f6d27e1f193
+      size: 7642
+    outs:
+    - path: 
+        ./intermediate/valhalla_tiles/year=2020/geography=state/state=01/valhalla_tiles.tar.zst
+      hash: md5
+      md5: 0d0134671cc4b8cd3c25eb7c16e53902
+      size: 1358974822
