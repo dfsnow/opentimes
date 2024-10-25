@@ -3,7 +3,7 @@
 services:
   # https://github.com/nilsnolde/docker-valhalla/blob/master/docker-compose.yml
   valhalla-build:
-    image: ghcr.io/gis-ops/docker-valhalla/valhalla:latest
+    image: opentimes:latest
     container_name: valhalla-build
     user: 59999:59999
     build:
@@ -26,7 +26,7 @@ services:
       - traffic_name=traffic
 
   valhalla-run:
-    image: ghcr.io/gis-ops/docker-valhalla/valhalla:latest
+    image: opentimes:latest
     container_name: valhalla-build
     user: 59999:59999
     build:

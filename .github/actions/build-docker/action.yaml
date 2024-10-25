@@ -24,7 +24,7 @@ runs:
       with:
         file: ./data/Dockerfile
         context: .
-        tags: ghcr.io/${{ github.repository }}:latest
+        tags: opentimes:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
         provenance: false
@@ -35,5 +35,5 @@ runs:
       with:
         name: opentimes-docker-${{ hashFiles('./data/Dockerfile') }}
         path: /tmp/opentimes.tar
-        retention-days: 1
+        retention-days: 3
         overwrite: true
