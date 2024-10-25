@@ -1,23 +1,26 @@
 import argparse
 import json
+import os
+import re
 import time
+import uuid
 from pathlib import Path
 
-import boto3
 import pandas as pd
 import valhalla
 import yaml
-from utils.utils import format_time
+from utils.utils import format_time, get_md5_hash
 
 # Path within the valhalla-run Docker container that input/output directories
 # are mounted to
 DOCKER_PATH = Path("/data")
 
-# Load parameters from file and instantiate S3 connection
+# Load params, env vars, and JSON used for config
 params = yaml.safe_load(open(DOCKER_PATH / "params.yaml"))
-max_chunk_size = params["times"]["max_chunk_size"]
-session = boto3.Session(profile_name=params["s3"]["profile"])
-s3 = session.client("s3", endpoint_url=params["s3"]["endpoint"])
+max_split_size = params["times"]["max_split_size"]
+os.environ["AWS_PROFILE"] = params["s3"]["profile"]
+with open(DOCKER_PATH / "valhalla.json", "r") as f:
+    valhalla_data = json.load(f)
 
 
 def calculate_times(
@@ -26,7 +29,7 @@ def calculate_times(
     d_start_idx: int,
     origins: pd.DataFrame,
     destinations: pd.DataFrame,
-    max_chunk_size: int,
+    max_split_size: int,
     mode: str,
 ) -> pd.DataFrame:
     """Calculates travel times and distances between origins and destinations.
@@ -37,15 +40,15 @@ def calculate_times(
         d_start_idx: Starting index for the destinations DataFrame.
         origins: DataFrame containing origin points with 'lat' and 'lon' columns.
         destinations: DataFrame containing destination points with 'lat' and 'lon' columns.
-        max_chunk_size: Maximum number of points to process in one chunk.
+        max_split_size: Maximum number of points to process in one iteration.
         mode: Travel mode for the Valhalla API (e.g., 'auto', 'bicycle').
 
     Returns:
         DataFrame containing origin IDs, destination IDs, travel durations, and distances.
     """
     start_time = time.time()
-    o_end_idx = min(o_start_idx + max_chunk_size, len(origins))
-    d_end_idx = min(d_start_idx + max_chunk_size, len(destinations))
+    o_end_idx = min(o_start_idx + max_split_size, len(origins))
+    d_end_idx = min(d_start_idx + max_split_size, len(destinations))
     job_string = (
         f"Starting origins {o_start_idx}-{o_end_idx} and "
         f"destinations {d_start_idx}-{d_end_idx}"
@@ -104,15 +107,26 @@ def calculate_times(
     return df
 
 
+def create_write_path(key: str, out_type: str, output_dict: dict) -> str:
+    """Tiny helper to create Parquet output write paths."""
+    return (
+        "s3://" + output_dict[out_type][key].as_posix()
+        if out_type == "s3"
+        else output_dict[out_type][key].as_posix()
+    )
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", required=True, type=str)
     parser.add_argument("--year", required=True, type=str)
     parser.add_argument("--geography", required=True, type=str)
     parser.add_argument("--state", required=True, type=str)
-    parser.add_argument("--centroid_type", required=True, type=str)
+    parser.add_argument("--centroid-type", required=True, type=str)
+    parser.add_argument("--chunk", required=False, type=str)
     parser.add_argument("--write-to-s3", action="store_true", default=False)
     args = parser.parse_args()
+    script_start_time = time.time()
 
     if args.mode not in params["times"]["mode"]:
         raise ValueError(
@@ -122,11 +136,26 @@ if __name__ == "__main__":
         raise ValueError(
             "Invalid centroid_type, must be one of: ['weighted', 'unweighted']"
         )
+    if args.chunk:
+        if not re.match(r"^\d+-\d+$", args.chunk):
+            raise ValueError(
+                "Invalid chunk argument. Must be two numbers separated by a dash (e.g., '1-2')."
+            )
 
+    # Split and check chunk value
+    chunk_start_idx, chunk_end_idx = map(int, args.chunk.split("-"))
+    chunk_size = chunk_end_idx - chunk_start_idx
+    if max_split_size > chunk_size:
+        raise ValueError(
+            f"Chunk size ({chunk_size}) exceeds max_split_size ({max_split_size})"
+        )
+
+    chunk_msg = f", chunk: {args.chunk}" if args.chunk else ""
     print(
         f"Starting routing for version: {params['times']['version']},"
         f"mode: {args.mode}, year: {args.year}, geography: {args.geography},",
-        f"state: {args.state}, centroid type: {args.centroid_type}",
+        f"state: {args.state}, centroid type: {args.centroid_type}"
+        + chunk_msg,
     )
 
     ##### FILE PATHS #####
@@ -142,11 +171,16 @@ if __name__ == "__main__":
     input["dirs"] = {
         "valhalla_tiles": Path(
             DOCKER_PATH,
-            f"intermediate/valhalla_tiles/year={args.year}/"
+            f"intermediate/valhalla_tiles/year={args.year}/",
             f"geography=state/state={args.state}",
         )
     }
     input["files"] = {
+        "valhalla_tiles_file": Path(
+            DOCKER_PATH,
+            f"intermediate/valhalla_tiles/year={args.year}",
+            f"geography=state/state={args.state}/valhalla_tiles.tar.zst",
+        ),
         "origins_file": Path(
             DOCKER_PATH, f"intermediate/cenloc/{input['main']['path']}"
         ),
@@ -155,23 +189,21 @@ if __name__ == "__main__":
         ),
     }
 
-    # Setup file paths for outputs. S3 paths if enabled
-    if args.write_to_s3:
-        output_prefix = params["s3"]["data_bucket"]
-    else:
-        output_prefix = DOCKER_PATH / "output"
-
+    # Setup file paths for all outputs both locally and on the remote
     output = {}
+    output["prefix"] = {
+        "local": Path(DOCKER_PATH / "output"),
+        "s3": Path(params["s3"]["data_bucket"]),
+    }
     output["main"] = {
         "path": Path(
-            (
-                f"version={params['times']['version']}/mode={args.mode}/"
-                f"year={args.year}/geography={args.geography}/state={args.state}/"
-                f"centroid_type={args.centroid_type}"
-            )
+            f"version={params['times']['version']}/mode={args.mode}/",
+            f"year={args.year}/geography={args.geography}/state={args.state}/",
+            f"centroid_type={args.centroid_type}",
         ),
-        "file": Path("part-0.parquet"),
-        "prefix": Path(output_prefix),
+        "file": Path(
+            f"part-{args.chunk}.parquet" if args.chunk else "part-0.parquet"
+        ),
     }
     output["dirs"] = {
         "times": Path("times", output["main"]["path"]),
@@ -182,38 +214,39 @@ if __name__ == "__main__":
         "missing_pairs": Path("missing_pairs", output["main"]["path"]),
         "metadata": Path("metadata", output["main"]["path"]),
     }
-    output["files"] = {
-        "times_file": Path(
-            output["main"]["prefix"],
-            output["dirs"]["times"],
-            output["main"]["file"],
-        ),
-        "origins_file": Path(
-            output["main"]["prefix"],
-            output["dirs"]["origins"],
-            output["main"]["file"],
-        ),
-        "destinations_file": Path(
-            output["main"]["prefix"],
-            output["dirs"]["destinations"],
-            output["main"]["file"],
-        ),
-        "missing_pairs_file": Path(
-            output["main"]["prefix"],
-            output["dirs"]["missing_pairs"],
-            output["main"]["file"],
-        ),
-        "metadata_file": Path(
-            output["main"]["prefix"],
-            output["dirs"]["metadata"],
-            output["main"]["file"],
-        ),
-    }
+    for loc in ["local", "s3"]:
+        output[loc] = {
+            "times_file": Path(
+                output["prefix"][loc],
+                output["dirs"]["times"],
+                output["main"]["file"],
+            ),
+            "origins_file": Path(
+                output["prefix"][loc],
+                output["dirs"]["origins"],
+                output["main"]["file"],
+            ),
+            "destinations_file": Path(
+                output["prefix"][loc],
+                output["dirs"]["destinations"],
+                output["main"]["file"],
+            ),
+            "missing_pairs_file": Path(
+                output["prefix"][loc],
+                output["dirs"]["missing_pairs"],
+                output["main"]["file"],
+            ),
+            "metadata_file": Path(
+                output["prefix"][loc],
+                output["dirs"]["metadata"],
+                output["main"]["file"],
+            ),
+        }
 
     # Make sure outputs have somewhere to write to
-    if not args.write_to_s3:
-        for path in output["files"].values():
-            path.mkdir(parents=True, exist_ok=True)
+    for path in output["dirs"].values():
+        path = output["prefix"]["local"] / path
+        path.mkdir(parents=True, exist_ok=True)
 
     ##### DATA PREP #####
 
@@ -227,14 +260,23 @@ if __name__ == "__main__":
         pd.read_parquet(input["files"]["origins_file"])
         .loc[:, od_cols.keys()]
         .rename(columns=od_cols)
+        .sort_values(by="id")
     )
+    n_origins = len(origins)
+
+    # Subset the origins if a chunk is used
+    if args.chunk:
+        origins = origins.iloc[chunk_start_idx:chunk_end_idx]
+
     destinations = (
         pd.read_parquet(input["files"]["destinations_file"])
         .loc[:, od_cols.keys()]
         .rename(columns=od_cols)
+        .sort_values(by="id")
     )
-    n_origins = len(origins)
     n_destinations = len(destinations)
+    n_origins_chunk = len(origins)
+    n_destinations_chunk = len(destinations)
 
     print(
         f"Routing from {len(origins)} origins",
@@ -248,22 +290,163 @@ if __name__ == "__main__":
 
     # Calculate times for each chunk and append to a list
     results = []
-    for o in range(0, n_origins, max_chunk_size):
-        for d in range(0, n_destinations, max_chunk_size):
+    for o in range(0, n_origins_chunk, max_split_size):
+        for d in range(0, n_destinations_chunk, max_split_size):
             times = calculate_times(
                 actor=actor,
                 o_start_idx=o,
                 d_start_idx=d,
                 origins=origins,
                 destinations=destinations,
-                max_chunk_size=max_chunk_size,
+                max_split_size=max_split_size,
                 mode=args.mode,
             )
             results.append(times)
-    breakpoint()
 
-    # TODO: extract missing points to separate DF
-    # TODO: Save times to output
-    # TODO: Save missing_points to output
-    # TODO: Save points to output
-    # TODO: Create and save metadata to output
+    print(
+        "Finished calculating times in",
+        f"{format_time(time.time() - script_start_time)}",
+    )
+
+    # Concatenate all results into a single DataFrame
+    results_df = pd.concat(results, ignore_index=True)
+    del results
+
+    # Extract missing pairs to a separate dataframe
+    missing_pairs_df = results_df[results_df["duration_sec"].isnull()]
+    missing_pairs_df = (
+        pd.DataFrame(missing_pairs_df)
+        .drop(columns=["duration_sec", "distance_km"])
+        .sort_values(by=["origin_id", "destination_id"])
+    )
+
+    # Drop missing pairs and sort for more efficient compression
+    results_df = results_df.dropna(subset=["duration_sec"]).sort_values(
+        by=["origin_id", "destination_id"]
+    )
+
+    ##### SAVE OUTPUTS #####
+
+    out_types = ["local", "s3"] if args.write_to_s3 else ["local"]
+    compression_type = params["output"]["compression"]["type"]
+    compression_level = params["output"]["compression"]["level"]
+    storage_options = {
+        "s3": {
+            "client_kwargs": {
+                "endpoint_url": params["s3"]["endpoint"],
+            }
+        },
+        "local": {},
+    }
+    print(
+        f"Calculated times between {len(results_df)} pairs.",
+        f"Times missing between {len(missing_pairs_df)} pairs.",
+        f"Saving outputs to: {', '.join(out_types)}",
+    )
+
+    # Loop through files and write to both local and remote paths
+    for out_type in out_types:
+        results_df.to_parquet(
+            create_write_path("times_file", out_type, output),
+            engine="pyarrow",
+            compression=compression_type,
+            compression_level=compression_level,
+            index=False,
+            storage_options=storage_options[out_type],
+        )
+        origins.to_parquet(
+            create_write_path("origins_file", out_type, output),
+            engine="pyarrow",
+            compression=compression_type,
+            compression_level=compression_level,
+            index=False,
+            storage_options=storage_options[out_type],
+        )
+        destinations.to_parquet(
+            create_write_path("destinations_file", out_type, output),
+            engine="pyarrow",
+            compression=compression_type,
+            compression_level=compression_level,
+            index=False,
+            storage_options=storage_options[out_type],
+        )
+        missing_pairs_df.to_parquet(
+            create_write_path("missing_pairs_file", out_type, output),
+            engine="pyarrow",
+            compression=compression_type,
+            compression_level=compression_level,
+            index=False,
+            storage_options=storage_options[out_type],
+        )
+
+    ##### SAVE METADATA #####
+
+    run_id = str(uuid.uuid4().hex[:8])
+    git_commit_sha = os.getenv("GIT_COMMIT_SHA")
+    git_commit_sha_short = git_commit_sha[:8] if git_commit_sha else None
+    input_file_hashes = {
+        f: get_md5_hash(input["files"][f]) for f in input["files"].keys()
+    }
+    output_file_hashes = {
+        f: get_md5_hash(output["local"][f])
+        for f in output["local"].keys()
+        if f != "metadata_file"
+    }
+
+    # Create a metadata dataframe of all settings and data used for creating inputs
+    # and generating times
+    metadata = pd.DataFrame(
+        {
+            "run_id": run_id,
+            "calc_datetime_finished": pd.Timestamp.now(tz="UTC"),
+            "calc_time_elapsed_sec": time.time() - script_start_time,
+            "calc_chunk_id": args.chunk,
+            "calc_chunk_n_origins": n_origins_chunk,
+            "calc_chunk_n_destinations": n_destinations_chunk,
+            "calc_n_origins": n_origins,
+            "calc_n_destinations": n_destinations,
+            "git_commit_sha_short": git_commit_sha_short,
+            "git_commit_sha_long": git_commit_sha,
+            "param_network_buffer_m": params["input"]["network_buffer_m"],
+            "param_destination_buffer_m": params["input"][
+                "destination_buffer_m"
+            ],
+            "file_input_valhalla_tiles_md5": input_file_hashes[
+                "valhalla_tiles_file"
+            ],
+            "file_input_origins_md5": input_file_hashes["origins_file"],
+            "file_input_destinations_md5": input_file_hashes[
+                "destinations_file"
+            ],
+            "file_output_times_md5": output_file_hashes["times_file"],
+            "file_output_origins_md5": output_file_hashes["origins_file"],
+            "file_output_destinations_md5": output_file_hashes[
+                "destinations_file"
+            ],
+            "file_output_missing_pairs_md5": output_file_hashes[
+                "missing_pairs_file"
+            ],
+            "valhalla_config_data": json.dumps(
+                valhalla_data, separators=(",", ":")
+            ),
+        },
+        index=[0],
+    )
+
+    for out_type in out_types:
+        metadata.to_parquet(
+            create_write_path("metadata_file", out_type, output),
+            engine="pyarrow",
+            compression=compression_type,
+            compression_level=compression_level,
+            index=False,
+            storage_options=storage_options[out_type],
+        )
+
+    print(
+        f"Finished routing for version: {params['times']['version']},"
+        f"mode: {args.mode}, year: {args.year}, geography: {args.geography},",
+        f"state: {args.state}, centroid type: {args.centroid_type}"
+        + chunk_msg,
+        f"in {format_time(time.time() - script_start_time)}",
+    )

@@ -1,3 +1,4 @@
+import hashlib
 import math
 import os
 
@@ -42,6 +43,15 @@ def format_time(seconds):
     hours, remainder = divmod(seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
     return f"{int(hours)}H {int(minutes)}M {int(seconds)}s"
+
+
+def get_md5_hash(file_path):
+    """Return the MD5 hash of a file."""
+    hash_md5 = hashlib.md5()
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
 
 
 def split_range(

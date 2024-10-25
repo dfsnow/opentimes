@@ -37,6 +37,7 @@ services:
     volumes:
       - ./data/build/:/custom_files:rw
       - ./data/valhalla.json:/custom_files/valhalla.json:rw
+      - ./data/valhalla.json:/data/valhalla.json:rw
       - ./data/output:/data/output:rw
       # Read only volumes to serve data to the container
       - $HOME/.aws/credentials:/home/valhalla/.aws/credentials:ro
@@ -45,6 +46,7 @@ services:
       - ./data/intermediate:/data/intermediate:ro
       - ./data/params.yaml:/data/params.yaml:ro
     environment:
+      - GIT_COMMIT_SHA
       - use_tiles_ignore_pbf=True
       - update_existing_config=False
       - force_rebuild=False
