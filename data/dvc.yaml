@@ -146,7 +146,6 @@ stages:
 
   create_valhalla_tiles:
     deps:
-      - ./valhalla.json
       - ./intermediate/osmextract/year=${item.year}/geography=state/state=${item.state}/${item.state}.osm.pbf
     matrix:
       year: ${input.year}
