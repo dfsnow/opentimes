@@ -1,8 +1,10 @@
 import hashlib
 import math
 import os
+from pathlib import Path
 
 import duckdb
+import pandas as pd
 import yaml
 
 
@@ -52,6 +54,32 @@ def get_md5_hash(file_path):
         for chunk in iter(lambda: f.read(4096), b""):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
+
+
+def split_file_to_str(file: str | Path, **kwargs) -> str:
+    """
+    Splits the contents of a Parquet file into index strings.
+
+    Args:
+        file: The path to the Parquet file.
+        **kwargs: Additional keyword arguments passed to the
+            split_range function.
+
+    Returns:
+        A string representation of the chunked ranges in
+            the format '["start-end", ...]'.
+    """
+    origins_df = pd.read_parquet(file)
+
+    chunk_idx = split_range(len(origins_df), **kwargs)
+    zfill_size = len(str(chunk_idx[-1][1]))
+    chunk_str = [
+        f"{str(start).zfill(zfill_size)}-{str(end).zfill(zfill_size)}"
+        for start, end in chunk_idx
+    ]
+    chunk_out = '["' + '", "'.join(chunk_str) + '"]'
+
+    return chunk_out
 
 
 def split_range(
