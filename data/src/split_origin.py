@@ -55,6 +55,6 @@ if __name__ == "__main__":
         args.year,
         args.geography,
         args.state,
-        args.n_chunks,
-        args.min_chunk_size,
+        int(args.n_chunks),
+        int(args.min_chunk_size),
     )

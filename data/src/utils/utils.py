@@ -105,7 +105,7 @@ def split_range(
             end = ((i + 1) * chunk_size) - 1
             chunk_ranges.append((start, end))
     else:
-        n_chunks_small = max(1, n // min_chunk_size)
+        n_chunks_small = max(1, math.ceil(n / min_chunk_size))
         for i in range(n_chunks_small):
             start = i * min_chunk_size
             end = ((i + 1) * min_chunk_size) - 1
