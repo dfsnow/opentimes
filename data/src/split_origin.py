@@ -4,6 +4,9 @@ from pathlib import Path
 import yaml
 from utils.utils import split_file_to_str
 
+DOCKER_PATH = Path("/data")
+params = yaml.safe_load(open(DOCKER_PATH / "params.yaml"))
+
 
 def split_origin(
     year: str,
@@ -30,8 +33,6 @@ def split_origin(
 
 
 if __name__ == "__main__":
-    params = yaml.safe_load(open("params.yaml"))["actions"]
-
     parser = argparse.ArgumentParser()
     parser.add_argument("--year", required=True, type=str)
     parser.add_argument("--geography", required=True, type=str)
@@ -40,13 +41,13 @@ if __name__ == "__main__":
         "--n_chunks",
         required=False,
         type=str,
-        default=params["n_chunks"],
+        default=params["actions"]["n_chunks"],
     )
     parser.add_argument(
         "--min_chunk_size",
         required=False,
         type=str,
-        default=params["min_chunk_size"],
+        default=params["actions"]["min_chunk_size"],
     )
     args = parser.parse_args()
 
