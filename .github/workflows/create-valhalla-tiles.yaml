@@ -113,6 +113,11 @@ jobs:
             ./input/osm/year=${{ inputs.year }}/us-${{ inputs.year }}.osm.pbf \
             ./intermediate/osmclip/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/${{ matrix.state }}.geojson
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+
       - name: Run job chunk
         shell: bash
         working-directory: 'data'
