@@ -16,6 +16,13 @@ runs:
       run: |
         echo "::add-mask::${{ inputs.GITHUB_TOKEN }}"
 
+    - name: Fetch GitHub user and group ID
+      shell: bash
+      id: fetch-ids
+      run: |
+        echo "VALHALLA_UID=$(id -u)" >> $GITHUB_ENV
+        echo "VALHALLA_GID=$(id -g)" >> $GITHUB_ENV
+
     - name: Setup Docker Buildx
       uses: docker/setup-buildx-action@v3
 
@@ -29,6 +36,9 @@ runs:
         cache-to: type=gha,mode=max
         provenance: false
         outputs: type=docker,dest=/tmp/opentimes.tar
+        build-args: |
+          VALHALLA_UID=${{ env.VALHALLA_UID }}
+          VALHALLA_GID=${{ env.VALHALLA_GID }}
 
     - name: Upload image artifact
       uses: actions/upload-artifact@v4

@@ -138,6 +138,13 @@ jobs:
           CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
           CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
 
+      - name: Fetch GitHub user and group ID
+        shell: bash
+        id: fetch-ids
+        run: |
+          echo "USER_ID=$(id -u)" >> $GITHUB_ENV
+          echo "GROUP_ID=$(id -g)" >> $GITHUB_ENV
+
       - name: Build Dockerized dependencies
         uses: ./.github/actions/build-docker
         with:
@@ -155,6 +162,8 @@ jobs:
         id: create-job-chunks
         shell: bash
         run: |
+          export USER_ID=${{ env.USER_ID }}
+          export GROUP_ID=${{ env.GROUP_ID }}
           chunks=$(docker compose run --rm --quiet-pull \
             --entrypoint=python valhalla-run /data/src/split_origin.py \
             --year ${{ inputs.year }} --geography ${{ inputs.geography }} \
@@ -210,6 +219,13 @@ jobs:
           year: ${{ inputs.year }}
           state: ${{ inputs.state }}
 
+      - name: Fetch GitHub user and group ID
+        shell: bash
+        id: fetch-ids
+        run: |
+          echo "USER_ID=$(id -u)" >> $GITHUB_ENV
+          echo "GROUP_ID=$(id -g)" >> $GITHUB_ENV
+
       - name: Fetch Docker image
         uses: actions/download-artifact@v4
         with:
@@ -225,6 +241,8 @@ jobs:
         shell: bash
         working-directory: 'data'
         run: |
+          export USER_ID=${{ env.USER_ID }}
+          export GROUP_ID=${{ env.GROUP_ID }}
           docker compose run --rm --quiet-pull --entrypoint=python \
             valhalla-run /data/src/calculate_times.py \
             --mode ${{ inputs.mode }} --year ${{ inputs.year }} \

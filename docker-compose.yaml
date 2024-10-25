@@ -5,7 +5,7 @@ services:
   valhalla-build:
     image: opentimes:latest
     container_name: valhalla-build
-    user: 59999:59999
+    user: ${USER_ID}:${GROUP_ID}
     build:
       context: .
       dockerfile: data/Dockerfile
@@ -28,7 +28,7 @@ services:
   valhalla-run:
     image: opentimes:latest
     container_name: valhalla-build
-    user: 59999:59999
+    user: ${USER_ID}:${GROUP_ID}
     build:
       context: .
       dockerfile: data/Dockerfile

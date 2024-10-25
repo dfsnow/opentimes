@@ -147,7 +147,7 @@ if __name__ == "__main__":
     max_split_size = min(params["times"]["max_split_size"], chunk_size)
     chunk_msg = f", chunk: {args.chunk}" if args.chunk else ""
     print(
-        f"Starting routing for version: {params['times']['version']},"
+        f"Starting routing for version: {params['times']['version']},",
         f"mode: {args.mode}, year: {args.year}, geography: {args.geography},",
         f"state: {args.state}, centroid type: {args.centroid_type}"
         + chunk_msg,
