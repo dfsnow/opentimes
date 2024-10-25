@@ -1,6 +1,6 @@
 import os
-from pathlib import Path
 from datetime import datetime, timezone
+from pathlib import Path
 
 import boto3
 import duckdb
