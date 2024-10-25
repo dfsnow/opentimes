@@ -45,7 +45,7 @@ env:
 
 jobs:
   setup-jobs:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     outputs:
       modes: ${{ steps.parse-inputs.outputs.modes }}
@@ -62,7 +62,7 @@ jobs:
            echo "geographies=$(echo '${{ inputs.geography }}' | jq -R -c 'split(",")')" >> "$GITHUB_OUTPUT"
 
   create-files:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: setup-jobs
     name: create-file-${{ inputs.version }}-${{ matrix.mode }}-${{ matrix.year }}-${{ matrix.geography }}
     strategy:

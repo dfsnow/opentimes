@@ -126,7 +126,7 @@ env:
 jobs:
   # Using the location data, split the origins into N jobs (max 256)
   setup-jobs:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     outputs:
       chunks: ${{ steps.create-job-chunks.outputs.chunks }}
     steps:
@@ -180,7 +180,7 @@ jobs:
           fi
 
   run-job:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: setup-jobs
     strategy:
       # Don't fail all chunks if one fails
