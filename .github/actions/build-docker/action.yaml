@@ -33,7 +33,7 @@ runs:
     - name: Upload image artifact
       uses: actions/upload-artifact@v4
       with:
-        name: opentimes-docker-${{ hashFiles('./data/Dockerfile') }}
+        name: opentimes-docker-${{ hashFiles('./data/Dockerfile', './pyproject.toml') }}
         path: /tmp/opentimes.tar
         retention-days: 3
         overwrite: true

@@ -97,7 +97,7 @@ jobs:
       - name: Fetch Docker image
         uses: actions/download-artifact@v4
         with:
-          name: opentimes-docker-${{ hashFiles('./data/Dockerfile') }}
+          name: opentimes-docker-${{ hashFiles('./data/Dockerfile', './pyproject.toml') }}
           path: /tmp
 
       - name: Load Docker image
