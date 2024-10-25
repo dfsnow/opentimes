@@ -16,6 +16,7 @@ services:
       - ./data/build/:/custom_files:rw
       - ./data/valhalla.json:/custom_files/valhalla.json:rw
     environment:
+      - PYTHONUNBUFFERED="1"
       - serve_tiles=False
       - tileset_name=tiles
       - build_elevation=True
@@ -53,6 +54,7 @@ services:
       - ./data/params.yaml:/data/params.yaml:ro
     environment:
       - GIT_COMMIT_SHA
+      - PYTHONUNBUFFERED="1"
       - use_tiles_ignore_pbf=True
       - update_existing_config=False
       - force_rebuild=False
