@@ -22,7 +22,7 @@ on:
       mode:
         required: true
         description: Comma-separated list of travel modes
-        default: 'car,bicycle,walk,transit'
+        default: 'auto,bicycle,pedestrian'
         type: string
 
       year:
