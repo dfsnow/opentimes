@@ -143,6 +143,7 @@ if __name__ == "__main__":
 
     # Split and check chunk value
     chunk_start_idx, chunk_end_idx = map(int, args.chunk.split("-"))
+    chunk_end_idx = chunk_end_idx + 1
     chunk_size = chunk_end_idx - chunk_start_idx
     max_split_size = min(params["times"]["max_split_size"], chunk_size)
     chunk_msg = f", chunk: {args.chunk}" if args.chunk else ""
