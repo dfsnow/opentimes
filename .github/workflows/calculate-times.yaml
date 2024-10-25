@@ -241,7 +241,7 @@ jobs:
         shell: bash
         working-directory: 'data'
         run: |
-          tile_path=year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}
+          tile_path="year=${{ inputs.year }}/geography=state/state=${{ inputs.state }}"
           ln ./intermediate/valhalla_tiles/"$tile_path"/valhalla_tiles.tar.zst ./build/
           tar -xf ./build/valhalla_tiles.tar.zst -C ./build
           rm -f ./build/valhalla_tiles.tar.zst
