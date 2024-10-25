@@ -24,7 +24,7 @@ venv/
 *.tiff
 *.wal
 *.zip
-*.zstd
+*.zst
 *temp*
 plan
 .env
