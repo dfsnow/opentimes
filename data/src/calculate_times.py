@@ -17,7 +17,6 @@ DOCKER_PATH = Path("/data")
 
 # Load params, env vars, and JSON used for config
 params = yaml.safe_load(open(DOCKER_PATH / "params.yaml"))
-max_split_size = params["times"]["max_split_size"]
 os.environ["AWS_PROFILE"] = params["s3"]["profile"]
 with open(DOCKER_PATH / "valhalla.json", "r") as f:
     valhalla_data = json.load(f)
@@ -145,11 +144,7 @@ if __name__ == "__main__":
     # Split and check chunk value
     chunk_start_idx, chunk_end_idx = map(int, args.chunk.split("-"))
     chunk_size = chunk_end_idx - chunk_start_idx
-    if max_split_size > chunk_size:
-        raise ValueError(
-            f"Chunk size ({chunk_size}) exceeds max_split_size ({max_split_size})"
-        )
-
+    max_split_size = min(params["times"]["max_split_size"], chunk_size)
     chunk_msg = f", chunk: {args.chunk}" if args.chunk else ""
     print(
         f"Starting routing for version: {params['times']['version']},"
