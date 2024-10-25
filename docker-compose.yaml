@@ -9,6 +9,9 @@ services:
     build:
       context: .
       dockerfile: data/Dockerfile
+      args:
+        - USER_ID=59999
+        - GROUP_ID=59999
     volumes:
       - ./data/build/:/custom_files:rw
       - ./data/valhalla.json:/custom_files/valhalla.json:rw
@@ -32,6 +35,9 @@ services:
     build:
       context: .
       dockerfile: data/Dockerfile
+      args:
+        - USER_ID=59999
+        - GROUP_ID=59999
     ports:
       - 8002:8002
     volumes:

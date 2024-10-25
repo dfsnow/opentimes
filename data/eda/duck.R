@@ -20,7 +20,7 @@ ttm <- dbGetQuery(
   WHERE version = '0.0.1'
   AND mode = 'car'
   AND year = '2024'
-  AND origin_id = '02020000101' 
+  AND origin_id = '02020000101'
   "
 )
 

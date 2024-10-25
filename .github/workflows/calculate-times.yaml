@@ -237,6 +237,15 @@ jobs:
           docker load --input /tmp/opentimes.tar
           docker image ls -a
 
+      - name: Extract tiles
+        shell: bash
+        working-directory: 'data'
+        run: |
+          tile_path=year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}
+          ln ./intermediate/valhalla_tiles/"$tile_path"/valhalla_tiles.tar.zst ./build/
+          tar -xf ./build/valhalla_tiles.tar.zst -C ./build
+          rm -f ./build/valhalla_tiles.tar.zst
+
       - name: Run job chunk
         shell: bash
         working-directory: 'data'

@@ -13,6 +13,17 @@ RUN apt-get update && \
     python3-pip=24.0+dfsg-1ubuntu1 && \
     rm -rf /var/lib/apt/lists/*
 
+# Create a new valhalla user with correct ids
+# https://jtreminio.com/blog/running-docker-containers-as-current-host-user
+ARG USER_ID=59999
+ARG GROUP_ID=59999
+RUN userdel -f valhalla && \
+    if getent group valhalla; then groupdel valhalla; fi && \
+    if getent group ${GROUP_ID}; then groupdel $(getent group ${GROUP_ID} | cut -d: -f1); fi && \
+    groupadd -g ${GROUP_ID} valhalla && \
+    useradd -l -u ${USER_ID} -g valhalla valhalla && \
+    install -d -m 0755 -o valhalla -g valhalla /home/valhalla
+
 # Install Python dependencies for opentimes work inside docker
 COPY ./pyproject.toml .
 RUN pip install --no-cache-dir --break-system-packages .[data]
