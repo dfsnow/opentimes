@@ -53,7 +53,7 @@ services:
       - ./data/intermediate:/data/intermediate:ro
       - ./data/params.yaml:/data/params.yaml:ro
     environment:
-      - GIT_COMMIT_SHA
+      - GITHUB_SHA
       - PYTHONUNBUFFERED="1"
       - use_tiles_ignore_pbf=True
       - update_existing_config=False

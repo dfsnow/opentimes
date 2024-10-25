@@ -378,8 +378,8 @@ if __name__ == "__main__":
     ##### SAVE METADATA #####
 
     run_id = str(uuid.uuid4().hex[:8])
-    git_commit_sha = os.getenv("GIT_COMMIT_SHA")
-    git_commit_sha_short = git_commit_sha[:8] if git_commit_sha else None
+    git_commit_sha = str(os.getenv("GITHUB_SHA"))
+    git_commit_sha_short = str(git_commit_sha[:8] if git_commit_sha else None)
     input_file_hashes = {
         f: get_md5_hash(input["files"][f]) for f in input["files"].keys()
     }
