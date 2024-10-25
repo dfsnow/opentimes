@@ -94,14 +94,6 @@ jobs:
       - name: Install DVC
         uses: ./.github/actions/setup-dvc
 
-      - name: Pull DVC objects
-        shell: bash
-        working-directory: 'data'
-        run: |
-          dvc pull --no-run-cache \
-            ./input/osm/year=${{ inputs.year }}/us-${{ inputs.year }}.osm.pbf \
-            ./intermediate/osmclip/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/${{ matrix.state }}.geojson
-
       - name: Fetch Docker image
         uses: actions/download-artifact@v4
         with:
@@ -112,6 +104,14 @@ jobs:
         run: |
           docker load --input /tmp/opentimes.tar
           docker image ls -a
+
+      - name: Pull DVC objects
+        shell: bash
+        working-directory: 'data'
+        run: |
+          dvc pull --no-run-cache \
+            ./input/osm/year=${{ inputs.year }}/us-${{ inputs.year }}.osm.pbf \
+            ./intermediate/osmclip/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/${{ matrix.state }}.geojson
 
       - name: Run job chunk
         shell: bash
