@@ -16,7 +16,7 @@ def split_origin(
     min_chunk_size: int = 5,
 ) -> None:
     origins_file = (
-        Path.cwd()
+        DOCKER_PATH
         / "intermediate"
         / "cenloc"
         / f"year={year}"
