@@ -1,9 +1,7 @@
 import argparse
 import json
-import os
 import time
 from pathlib import Path
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import boto3
 import pandas as pd
@@ -238,20 +236,21 @@ if __name__ == "__main__":
     n_origins = len(origins)
     n_destinations = len(destinations)
 
-    print(f"Found {len(origins)} origins and {len(destinations)} destinations")
+    print(
+        f"Routing from {len(origins)} origins",
+        f"to {len(destinations)} destinations",
+    )
 
     ##### CALCULATE TIMES #####
 
     # Initialize the Valhalla actor bindings
     actor = valhalla.Actor((Path.cwd() / "valhalla.json").as_posix())
-    num_cores = os.cpu_count() or 1
-    num_cores = max(1, num_cores - 1)
-    print("Starting ThreadPoolExecutor with", num_cores, "cores")
 
-    with ThreadPoolExecutor(num_cores) as executor:
-        futures = [
-            executor.submit(
-                calculate_times,
+    # Calculate times for each chunk and append to a list
+    results = []
+    for o in range(0, n_origins, max_chunk_size):
+        for d in range(0, n_destinations, max_chunk_size):
+            times = calculate_times(
                 actor=actor,
                 o_start_idx=o,
                 d_start_idx=d,
@@ -260,13 +259,11 @@ if __name__ == "__main__":
                 max_chunk_size=max_chunk_size,
                 mode=args.mode,
             )
-            for o in range(0, n_origins, max_chunk_size)
-            for d in range(0, n_destinations, max_chunk_size)
-        ]
+            results.append(times)
+    breakpoint()
 
-        results = []
-        for future in as_completed(futures):
-            results.append(future.result())
-
-
-    # df.to_parquet('s3://your-bucket-name/path/to/file.parquet', storage_options={'client': boto3.client('s3')})
+    # TODO: extract missing points to separate DF
+    # TODO: Save times to output
+    # TODO: Save missing_points to output
+    # TODO: Save points to output
+    # TODO: Create and save metadata to output
