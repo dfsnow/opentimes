@@ -13,10 +13,9 @@ on:
         default: 'car'
         type: choice
         options:
-          - car
+          - auto
           - bicycle
-          - transit
-          - walk
+          - pedestrian
 
       year:
         required: true
@@ -147,16 +146,12 @@ jobs:
       - name: Fetch locations data
         uses: ./.github/actions/fetch-locations
 
-      - name: Fetch R5 JAR
-        uses: ./.github/actions/fetch-jar
-        with:
-          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-
       - name: Create job chunks
         id: create-job-chunks
         shell: bash
         run: |
-          chunks=$(docker compose run --quiet-pull opentimes python3 ./src/split_origin.py \
+          chunks=$(docker compose run --rm --quiet-pull \
+            --entrypoint=python valhalla-run /data/src/split_origin.py \
             --year ${{ inputs.year }} --geography ${{ inputs.geography }} \
             --state ${{ inputs.state }})
           echo "chunks=$chunks" >> $GITHUB_OUTPUT
@@ -201,28 +196,35 @@ jobs:
       - name: Fetch locations data
         uses: ./.github/actions/fetch-locations
 
-      - name: Fetch R5 JAR
-        uses: ./.github/actions/fetch-jar
-        with:
-          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-
-      # Don't fetch network data because they're very large and will churn the
-      # Actions cache. We want to wait to fetch it until jobs have actually
-      # been picked up
-      - name: Fetch network data
-        uses: ./.github/actions/fetch-network
+      # Don't fetch tile data in setup-jobs because they're very large and
+      # will churn the Actions cache. We want to wait to fetch it until jobs
+      # have actually been picked up
+      - name: Fetch Valhalla tile data
+        uses: ./.github/actions/fetch-valhalla-tiles
         with:
           year: ${{ inputs.year }}
           state: ${{ inputs.state }}
+
+      - name: Fetch Docker image
+        uses: actions/download-artifact@v4
+        with:
+          name: opentimes-docker-${{ hashFiles('./data/Dockerfile', './pyproject.toml') }}
+          path: /tmp
+
+      - name: Load Docker image
+        run: |
+          docker load --input /tmp/opentimes.tar
+          docker image ls -a
 
       - name: Run job chunk
         shell: bash
         working-directory: 'data'
         run: |
-          docker compose run --quiet-pull opentimes Rscript ./src/calculate_times.R \
+          docker compose run --rm --quiet-pull --entrypoint=python \
+            valhalla-run /data/src/calculate_times.py \
             --mode ${{ inputs.mode }} --year ${{ inputs.year }} \
             --geography ${{ inputs.geography }} --state ${{ inputs.state }} \
-            --centroid_type ${{ inputs.centroid_type }} \
+            --centroid-type ${{ inputs.centroid_type }} \
             --chunk ${{ matrix.chunk }} --write-to-s3
 
       # Clear the cache if we're one of the last running jobs. Using this instead
@@ -244,10 +246,10 @@ jobs:
           echo "Number of jobs complete: $total_jobs"
           echo "Number of jobs remaining: $n_remaining"
           echo "Number of jobs run/running: $all_statuses"
-          if [ "$n_remaining" -lt 5 ] && [ "$total_jobs" -eq "$all_statuses" ]; then
+          if [ "$n_remaining" -lt 2 ] && [ "$total_jobs" -eq "$all_statuses" ]; then
             echo "Less than 5 jobs still running. Clearing workflow cache!"
             gh cache delete \
-              network-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }} || true
+              valhalla-tiles-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }} || true
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
