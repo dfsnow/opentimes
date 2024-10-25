@@ -1,7 +1,7 @@
 ---
 
-name: create-networks
-run-name: create-networks-${{ inputs.year }}
+name: create-valhalla-tiles
+run-name: create-valhalla-tiles-${{ inputs.year }}
 
 on:
   workflow_dispatch:
@@ -33,7 +33,7 @@ env:
 
 jobs:
   setup-jobs:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     outputs:
       states: ${{ steps.create-job-chunks.outputs.states }}
@@ -46,17 +46,6 @@ jobs:
         uses: ./.github/actions/build-docker
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Setup Cloudflare credentials
-        uses: ./.github/actions/setup-cloudflare-s3
-        with:
-          CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
-          CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
-
-      - name: Fetch R5 JAR
-        uses: ./.github/actions/fetch-jar
-        with:
-          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Create job chunks
         id: create-job-chunks
@@ -84,7 +73,7 @@ jobs:
           fi
 
   run-job:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: setup-jobs
     strategy:
       # Don't fail all chunks if one fails
@@ -102,53 +91,39 @@ jobs:
           CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
           CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
 
-      - name: Fetch R5 JAR
-        uses: ./.github/actions/fetch-jar
-        with:
-          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Install DVC
+        uses: ./.github/actions/setup-dvc
 
-      - name: Fetch network build inputs
-        uses: ./.github/actions/fetch-network-build-inputs
+      - name: Pull DVC objects
+        shell: bash
+        working-directory: 'data'
+        run: |
+          dvc pull --no-run-cache \
+            ./input/osm/year=${{ inputs.year }}/us-${{ inputs.year }}.osm.pbf \
+            ./intermediate/osmclip/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/${{ matrix.state }}.geojson
+
+      - name: Fetch Docker image
+        uses: actions/download-artifact@v4
         with:
-          year: ${{ inputs.year }}
-          state: ${{ matrix.state }}
+          name: opentimes-docker-${{ hashFiles('./data/Dockerfile') }}
+          path: /tmp
+
+      - name: Load Docker image
+        run: |
+          docker load --input /tmp/opentimes.tar
+          docker image ls -a
 
       - name: Run job chunk
         shell: bash
         run: |
-          docker compose run --quiet-pull opentimes Rscript ./src/create_network.R \
-            --year ${{ inputs.year }} --state ${{ matrix.state }}
+          dvc repro -s create_valhalla_tiles@${{ inputs.year }}-${{ matrix.state }}
 
-      - name: Write network files to S3
+      - name: Write tile files to S3
         shell: bash
         working-directory: 'data'
         run: |
-          for file in 'network.dat' 'network_settings.json'; do
-            aws s3 cp --quiet --endpoint-url \
-              https://${{ vars.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com \
-               ./intermediate/network/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/"$file" \
-               s3://opentimes-resources/networks/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/"$file" \
-              --profile cloudflare
-          done
-
-  clear-inputs-cache:
-    runs-on: ubuntu-22.04
-    needs: [setup-jobs, run-job]
-    if: always()
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Clear inputs cache
-        continue-on-error: true
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          states_array=($(echo "${{ needs.setup-jobs.outputs.states }}" | jq -r '.[]'))
-          for state in "${states_array[@]}"; do
-            gh cache delete \
-              osmextract-${{ inputs.year }}-"$state"-${{ hashFiles('./data/dvc.lock') }} || true
-            gh cache delete \
-              elevation-"$state"-${{ hashFiles('./data/dvc.lock') }} || true
-          done
+          aws s3 cp --quiet --endpoint-url \
+            https://${{ vars.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com \
+             ./intermediate/valhalla_tiles/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/valhalla_tiles.tar.zst \
+             s3://opentimes-resources/valhalla_tiles/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/valhalla_tiles.tar.zst \
+            --profile cloudflare
