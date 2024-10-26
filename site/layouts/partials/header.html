@@ -1,6 +1,8 @@
 <header class="navbar">
     <nav class="navbar-content">
-        <h1 class="navbar-title">{{ .Site.Title }}</h1>
+        <h1 class="navbar-title">
+            <a href="/" class="link-nowrap-nodec" title="Link to home">{{ .Site.Title }}</a>
+        </h1>
         <ul class="navbar-internal-links">
             <li>
                 <a href="/about" class="link-nowrap-nodec" title="Link to about page">About</a>

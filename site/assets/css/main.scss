@@ -126,7 +126,8 @@ ol {
 
 .content {
   margin: auto;
-  padding: 1em 1.25em 1.25em;
+  height: 100vh;
+  width: 100%;
 
   code {
     font-size: 1.5rem;
@@ -160,6 +161,7 @@ ol {
   >article {
     max-width: var(--full-width);
     margin: auto;
+    padding: 1em 1.25em 1.25em;
   }
 }
 
