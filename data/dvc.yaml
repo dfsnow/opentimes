@@ -152,7 +152,8 @@ stages:
       state: ${input.state}
     # Here we're using compose to run containerized valhalla to prep tiles.
     # This horrible bash will output a nice tarball of routing tiles, elevation,
-    # etc. to the target DVC directory
+    # etc. to the target DVC directory. The obscene conditional is because
+    # sometimes the elevation_data dir may not exist i.e. for Alaska
     cmd: '
       BUILD_DIR=build &&
       OUT_DIR=intermediate/valhalla_tiles/year=${item.year}/geography=state/state=${item.state} &&
@@ -161,10 +162,9 @@ stages:
       ln ./intermediate/osmextract/year=${item.year}/geography=state/state=${item.state}/${item.state}.osm.pbf
         ./"$BUILD_DIR"/${item.state}.osm.pbf &&
       docker compose run --rm valhalla-build &&
-      tar -cf "$BUILD_DIR"/valhalla_tiles.tar -C "$BUILD_DIR"
-        elevation_data admin_data timezone_data tiles.tar
-        traffic.tar default_speeds.json file_hashes.txt duplicateways.txt &&
-      zstd --rm -o "$BUILD_DIR"/valhalla_tiles.tar.zst "$BUILD_DIR"/valhalla_tiles.tar &&
+      tar --zstd --ignore-failed-read -cf "$BUILD_DIR"/valhalla_tiles.tar.zst -C "$BUILD_DIR"
+        elevation_data admin_data timezone_data tiles.tar traffic.tar default_speeds.json
+        file_hashes.txt duplicateways.txt &&
       mv "$BUILD_DIR"/valhalla_tiles.tar.zst "$OUT_DIR"
       '
     outs:
