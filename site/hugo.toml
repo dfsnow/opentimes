@@ -1,0 +1,11 @@
+baseURL = "https://opentimes.org/"
+languageCode = "en-us"
+title = "opentimes.org"
+disableKinds = ["taxonomy", "term"]
+enableInlineShortcodes = true
+pygmentsCodeFences = true
+pygmentsUseClasses = true
+
+[params]
+  description = "Free multi-modal travel times between U.S. Census geographies"
+  author = "Dan Snow"
