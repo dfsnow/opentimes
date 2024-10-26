@@ -115,6 +115,9 @@ jobs:
       - name: Run job chunk
         shell: bash
         working-directory: 'data'
+        env:
+          # Disable elevation for Alaska (which requires 22GB of tiles)
+          BUILD_ELEVATION: ${{ matrix.state == '02' && 'False' || 'True' }}
         run: |
           dvc repro -s create_valhalla_tiles@${{ inputs.year }}-${{ matrix.state }}
 
