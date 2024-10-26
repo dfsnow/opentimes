@@ -26,9 +26,12 @@ def calculate_times(
     actor,
     o_start_idx: int,
     d_start_idx: int,
+    o_end_idx: int,
+    d_end_idx: int,
     origins: pd.DataFrame,
     destinations: pd.DataFrame,
-    max_split_size: int,
+    max_split_size_origins: int,
+    max_split_size_destinations: int,
     mode: str,
 ) -> pd.DataFrame:
     """Calculates travel times and distances between origins and destinations.
@@ -46,11 +49,9 @@ def calculate_times(
         DataFrame containing origin IDs, destination IDs, travel durations, and distances.
     """
     start_time = time.time()
-    o_end_idx = min(o_start_idx + max_split_size, len(origins))
-    d_end_idx = min(d_start_idx + max_split_size, len(destinations))
     job_string = (
-        f"Starting origins {o_start_idx}-{o_end_idx} and "
-        f"destinations {d_start_idx}-{d_end_idx}"
+        f"Routing origin indices {o_start_idx}-{o_end_idx - 1} to "
+        f"destination indices {d_start_idx}-{d_end_idx - 1}"
     )
     print(job_string)
 
@@ -106,6 +107,73 @@ def calculate_times(
     return df
 
 
+def calculate_times_with_backoff(
+    actor,
+    origins,
+    destinations,
+    max_split_size_origins,
+    max_split_size_destinations,
+    mode,
+):
+    results = []
+    n_origins_chunk = len(origins)
+    n_destinations_chunk = len(destinations)
+
+    def binary_search_times(o_start_idx, d_start_idx, o_end_idx, d_end_idx):
+        if o_start_idx + 1 >= o_end_idx and d_start_idx + 1 >= d_end_idx:
+            df = pd.merge(
+                pd.DataFrame(
+                    origins[o_start_idx:o_end_idx], columns=["origin_id"]
+                ),
+                pd.DataFrame(
+                    destinations[d_start_idx:d_end_idx],
+                    columns=["destination_id"],
+                ),
+                how="cross",
+            )
+            df["distance_km"] = pd.Series([], dtype=float)
+            df["duration_sec"] = pd.Series([], dtype=float)
+
+            return [df]
+        try:
+            times = calculate_times(
+                actor=actor,
+                o_start_idx=o_start_idx,
+                d_start_idx=d_start_idx,
+                o_end_idx=o_end_idx,
+                d_end_idx=d_end_idx,
+                origins=origins,
+                destinations=destinations,
+                max_split_size_origins=max_split_size_origins,
+                max_split_size_destinations=max_split_size_destinations,
+                mode=mode,
+            )
+            return [times]
+        except Exception as e:
+            print(f"Error: {e}, backing off and retrying...")
+            mid_o = (o_start_idx + o_end_idx) // 2
+            mid_d = (d_start_idx + d_end_idx) // 2
+            return (
+                binary_search_times(o_start_idx, d_start_idx, mid_o, mid_d)
+                + binary_search_times(mid_o, d_start_idx, o_end_idx, mid_d)
+                + binary_search_times(o_start_idx, mid_d, mid_o, d_end_idx)
+                + binary_search_times(mid_o, mid_d, o_end_idx, d_end_idx)
+            )
+
+    for o in range(0, n_origins_chunk, max_split_size_origins):
+        for d in range(0, n_destinations_chunk, max_split_size_destinations):
+            results.extend(
+                binary_search_times(
+                    o,
+                    d,
+                    min(o + max_split_size_origins, n_origins_chunk),
+                    min(d + max_split_size_destinations, n_destinations_chunk),
+                )
+            )
+
+    return results
+
+
 def create_write_path(key: str, out_type: str, output_dict: dict) -> str:
     """Tiny helper to create Parquet output write paths."""
     return (
@@ -145,7 +213,6 @@ if __name__ == "__main__":
     chunk_start_idx, chunk_end_idx = map(int, args.chunk.split("-"))
     chunk_end_idx = chunk_end_idx + 1
     chunk_size = chunk_end_idx - chunk_start_idx
-    max_split_size = min(params["times"]["max_split_size"], chunk_size)
     chunk_msg = f", chunk: {args.chunk}" if args.chunk else ""
     print(
         f"Starting routing for version: {params['times']['version']},",
@@ -281,23 +348,23 @@ if __name__ == "__main__":
 
     ##### CALCULATE TIMES #####
 
+    max_split_size_origins = min(params["times"]["max_split_size"], chunk_size)
+    max_split_size_destinations = min(
+        params["times"]["max_split_size"], n_destinations
+    )
+
     # Initialize the Valhalla actor bindings
     actor = valhalla.Actor((Path.cwd() / "valhalla.json").as_posix())
 
     # Calculate times for each chunk and append to a list
-    results = []
-    for o in range(0, n_origins_chunk, max_split_size):
-        for d in range(0, n_destinations_chunk, max_split_size):
-            times = calculate_times(
-                actor=actor,
-                o_start_idx=o,
-                d_start_idx=d,
-                origins=origins,
-                destinations=destinations,
-                max_split_size=max_split_size,
-                mode=args.mode,
-            )
-            results.append(times)
+    results = calculate_times_with_backoff(
+        actor=actor,
+        origins=origins,
+        destinations=destinations,
+        max_split_size_origins=max_split_size_origins,
+        max_split_size_destinations=max_split_size_destinations,
+        mode=args.mode,
+    )
 
     print(
         "Finished calculating times in",
@@ -334,6 +401,10 @@ if __name__ == "__main__":
         },
         "local": {},
     }
+    print(
+        f"Routed from {len(origins)} origins",
+        f"to {len(destinations)} destinations",
+    )
     print(
         f"Calculated times between {len(results_df)} pairs.",
         f"Times missing between {len(missing_pairs_df)} pairs.",
@@ -440,7 +511,7 @@ if __name__ == "__main__":
         )
 
     print(
-        f"Finished routing for version: {params['times']['version']},"
+        f"Finished routing for version: {params['times']['version']},",
         f"mode: {args.mode}, year: {args.year}, geography: {args.geography},",
         f"state: {args.state}, centroid type: {args.centroid_type}"
         + chunk_msg,
