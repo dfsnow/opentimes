@@ -1,6 +1,6 @@
 baseURL = "https://opentimes.org/"
 languageCode = "en-us"
-title = "opentimes.org"
+title = "Opentimes"
 disableKinds = ["taxonomy", "term"]
 enableInlineShortcodes = true
 pygmentsCodeFences = true
