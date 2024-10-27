@@ -3,6 +3,7 @@ DATASET_DICT: dict = {
         "times": {
             "partition_levels": 6,
             "public_file_columns": [
+                "state",
                 "centroid_type",
                 "origin_id",
                 "destination_id",
@@ -13,6 +14,7 @@ DATASET_DICT: dict = {
         "points": {
             "partition_levels": 7,
             "public_file_columns": [
+                "state",
                 "centroid_type",
                 "point_type",
                 "id",
@@ -23,6 +25,7 @@ DATASET_DICT: dict = {
         "missing_pairs": {
             "partition_levels": 6,
             "public_file_columns": [
+                "state",
                 "centroid_type",
                 "origin_id",
                 "destination_id",
@@ -31,6 +34,7 @@ DATASET_DICT: dict = {
         "metadata": {
             "partition_levels": 6,
             "public_file_columns": [
+                "state",
                 "centroid_type",
                 "run_id",
                 "calc_datetime_finished",

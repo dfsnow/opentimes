@@ -126,7 +126,7 @@ map.on("load", async () => {
 
       const result = await db.query(`
         SELECT destination_id, duration_sec
-        FROM opentimes.primary.times
+        FROM opentimes.times
         WHERE version = '0.0.1'
             AND mode = 'auto'
             AND year = '2024'
