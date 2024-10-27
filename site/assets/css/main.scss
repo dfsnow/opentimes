@@ -126,8 +126,8 @@ ol {
 
 .content {
   margin: auto;
-  height: 100vh;
   width: 100%;
+  height: calc(100vh - 3.5em - 1px);
 
   code {
     font-size: 1.5rem;
@@ -186,9 +186,7 @@ ol {
 }
 
 .navbar {
-  top: 0;
-  z-index: 998;
-  position: sticky;
+  height: 3.5em;
   background-color: var(--bg-color);
   border-bottom: 1.5px solid var(--gray-accent-1);
 }
@@ -287,6 +285,11 @@ blockquote p,
   width: 8rem;
 }
 
+#map {
+  height: 100%;
+  width: 100%;
+}
+
 /* support for Edge */
 @supports (-ms-ime-align: auto) {
   .navbar-content>.navbar-internal-links {
@@ -302,11 +305,11 @@ blockquote p,
   }
 
   .content {
-    padding-top: 1.25em;
+    height: calc(100vh - 5.8em - 1px);
   }
 
   .navbar {
-    position: static;
+    height: 5.8em;
   }
 
   .navbar-content {
