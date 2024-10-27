@@ -5,8 +5,10 @@
 
 {{ define "scripts" }}
 {{ $maplibrejs := resources.Get "vendor/maplibre-gl-4.7.0.min.js" | fingerprint }}
+{{ $pmtilesjs := resources.Get "vendor/pmtiles-3.2.0.min.js" | fingerprint }}
 {{ $map := resources.Get "js/map.js" | minify | fingerprint }}
 <script defer src="{{ $maplibrejs.RelPermalink }}"></script>
+<script defer src="{{ $pmtilesjs.RelPermalink }}"></script>
 <script defer src="{{ $map.RelPermalink }}"></script>
 {{ end }}
 
