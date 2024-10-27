@@ -29,6 +29,7 @@ def create_public_files(
         None
     """
     params = yaml.safe_load(open("params.yaml"))
+    states = params["input"]["state"]
     con = create_duckdb_connection()
 
     # Check that the input strings are valid
@@ -56,38 +57,40 @@ def create_public_files(
             f"Input geography must be one of: {', '.join(geographies)}"
         )
 
-    filename = f"{dataset}-{version}-{mode}-{year}-{geography}"
-    partitions = "/*" * DATASET_DICT[version][dataset]["partition_levels"]
-    print("Creating file:", filename)
+    for state in states:
+        filename = f"{dataset}-{version}-{mode}-{year}-{geography}-{state}"
+        partitions = "/*" * DATASET_DICT[version][dataset]["partition_levels"]
+        print("Creating file:", filename)
 
-    con.sql(
-        f"""
-        COPY (
-            SELECT
-                {', '.join(DATASET_DICT[version][dataset]['public_file_columns'])},
-                regexp_extract(filename, 'part-(\\d+-\\d+)\\.parquet', 1) AS chunk_id
-            FROM read_parquet(
-                'r2://{params['s3']['data_bucket']}/{dataset}{partitions}/*.parquet',
-                hive_partitioning = true,
-                hive_types_autocast = false,
-                filename = true
+        con.sql(
+            f"""
+            COPY (
+                SELECT
+                    {', '.join(DATASET_DICT[version][dataset]['public_file_columns'])},
+                    regexp_extract(filename, 'part-(\\d+-\\d+)\\.parquet', 1) AS chunk_id
+                FROM read_parquet(
+                    'r2://{params['s3']['data_bucket']}/{dataset}{partitions}/*.parquet',
+                    hive_partitioning = true,
+                    hive_types_autocast = false,
+                    filename = true
+                )
+                WHERE version = '{version}'
+                    AND mode = '{mode}'
+                    AND year = '{year}'
+                    AND geography = '{geography}'
+                    AND state = '{state}'
             )
-            WHERE version = '{version}'
-                AND mode = '{mode}'
-                AND year = '{year}'
-                AND geography = '{geography}'
+            TO 'r2://{params['s3']['public_bucket']}/{dataset}/version={version}/mode={mode}/year={year}/geography={geography}/state={state}'
+            (
+                FORMAT 'parquet',
+                COMPRESSION '{params['output']['compression']['type']}',
+                COMPRESSION_LEVEL {params['output']['compression']['level']},
+                OVERWRITE_OR_IGNORE true,
+                FILENAME_PATTERN '{filename}-',
+                FILE_SIZE_BYTES 475000000
+            );
+            """
         )
-        TO 'r2://{params['s3']['public_bucket']}/{dataset}/version={version}/mode={mode}/year={year}/geography={geography}'
-        (
-            FORMAT 'parquet',
-            COMPRESSION '{params['output']['compression']['type']}',
-            COMPRESSION_LEVEL {params['output']['compression']['level']},
-            OVERWRITE_OR_IGNORE true,
-            FILENAME_PATTERN '{filename}-',
-            FILE_SIZE_BYTES 475000000
-        );
-        """
-    )
 
     con.close()
 

@@ -54,31 +54,70 @@ def append_duckdb_info(tree: dict, version: str, db_path: Path) -> None:
 
 
 def create_duckdb_file(
-    tree: dict, datasets: list[str], bucket_name: str, base_url: str, path: str
+    tree: dict,
+    version: str,
+    datasets: list[str],
+    modes: list[str],
+    years: list[str],
+    geographies: list[str],
+    bucket_name: str,
+    base_url: str,
+    path: str,
 ) -> None:
     """Create a DuckDB database object pointing to all bucket Parquet files."""
 
-    con = duckdb.connect(database=path)
+    con = duckdb.connect()
     con.execute("SET autoinstall_known_extensions=1;")
     con.execute("SET autoload_known_extensions=1;")
+    con.execute(f"ATTACH '{path}' AS opentimes;")
+    con.execute("CREATE SCHEMA IF NOT EXISTS opentimes.primary;")
+    con.execute("CREATE SCHEMA IF NOT EXISTS opentimes.internal;")
     for dataset in datasets:
-        dataset_files = [
-            f"{base_url}/{dataset}/{p}"
-            for p in flatten_file_paths(tree, dataset, version)
-        ]
+        views = []
+        for mode in modes:
+            for year in years:
+                for geography in geographies:
+                    dataset_files = [
+                        f"{base_url}/{dataset}/{p}"
+                        for p in flatten_file_paths(
+                            tree, dataset, version, mode, year, geography
+                        )
+                    ]
+                    if len(dataset_files) == 0:
+                        continue
 
-        con.execute(
-            f"""
-            CREATE OR REPLACE VIEW {dataset} AS
-            SELECT *
-            FROM read_parquet(['{"', '".join(dataset_files)}'])
-            """
-        )
+                    con.execute(
+                        f"""
+                        CREATE OR REPLACE VIEW opentimes.internal.{dataset}_{mode}_{year}_{geography} AS
+                        SELECT *
+                        FROM read_parquet(['{"', '".join(dataset_files)}'])
+                        """
+                    )
+
+                    views.append(f"{dataset}_{mode}_{year}_{geography}")
+
+        if views:
+            view_queries = [
+                f"SELECT * FROM opentimes.internal.{view}" for view in views
+            ]
+            con.execute(
+                f"""
+                CREATE OR REPLACE VIEW opentimes.primary.{dataset} AS
+                {' UNION ALL'.join(view_queries)}
+                """
+            )
 
     con.close()
 
 
-def flatten_file_paths(tree: dict, dataset: str, version: str) -> list[str]:
+def flatten_file_paths(
+    tree: dict,
+    dataset: str,
+    version: str,
+    mode: str,
+    year: str,
+    geography: str,
+) -> list[str]:
     """
     Flatten a nested dictionary to return full paths of
     .parquet filenames for a given dataset and version.
@@ -89,18 +128,27 @@ def flatten_file_paths(tree: dict, dataset: str, version: str) -> list[str]:
         for k, v in subtree.items():
             new_key = f"{parent_key}/{k}" if parent_key else k
             if isinstance(v, dict):
-                if (
-                    "filename" in v
-                    and v["filename"].endswith(".parquet")
-                    and version in new_key
-                ):
+                if "filename" in v and v["filename"].endswith(".parquet"):
                     items.append(new_key)
                 else:
                     recurse(v, new_key)
 
-    if dataset in tree:
-        recurse(tree[dataset])
-    return items
+    version_str = f"version={version}"
+    mode_str = f"mode={mode}"
+    year_str = f"year={year}"
+    geography_str = f"geography={geography}"
+    if (
+        dataset in tree
+        and version_str in tree[dataset]
+        and mode_str in tree[dataset][version_str]
+        and year_str in tree[dataset][version_str][mode_str]
+        and geography_str in tree[dataset][version_str][mode_str][year_str]
+    ):
+        recurse(tree[dataset][version_str][mode_str][year_str][geography_str])
+    return [
+        f"{version_str}/{mode_str}/{year_str}/{geography_str}/{item}"
+        for item in items
+    ]
 
 
 def generate_html_files(
@@ -216,6 +264,10 @@ if __name__ == "__main__":
         create_duckdb_file(
             tree=tree,
             datasets=list(DATASET_DICT[version].keys()),
+            version=version,
+            modes=params["times"]["mode"],
+            years=params["input"]["year"],
+            geographies=params["input"]["census"]["geography"]["all"],
             bucket_name=params["s3"]["public_bucket"],
             base_url=params["s3"]["public_data_url"],
             path=db_path.as_posix(),

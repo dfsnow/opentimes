@@ -126,7 +126,7 @@ map.on("load", async () => {
 
       const result = await db.query(`
         SELECT destination_id, duration_sec
-        FROM opentimes.times
+        FROM opentimes.primary.times
         WHERE version = '0.0.1'
             AND mode = 'auto'
             AND year = '2024'
@@ -135,6 +135,7 @@ map.on("load", async () => {
             AND state = '${state}'
             AND origin_id = '${id}'
       `);
+      console.log("Query finished");
 
       const colorScale = (duration) => {
         if (duration < 900) return "color_1"; // 15 minutes
