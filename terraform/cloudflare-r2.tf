@@ -15,8 +15,27 @@ resource "cloudflare_r2_bucket" "opentimes-public" {
   name       = "opentimes-public"
   location   = "ENAM"
 
-  /* Need to manually enable public bucket access via UI and add CORS
-  policy for https://opentimes.org */
+  /* Need to manually enable public bucket access via UI and add the CORS
+  policy below 
+
+  [
+    {
+      "AllowedOrigins": [
+        "https://shell.duckdb.org",
+        "https://opentimes.org"
+      ],
+      "AllowedMethods": [
+        "GET",
+        "HEAD"
+      ],
+      "AllowedHeaders": [
+        "Content-Range"
+      ],
+      "ExposeHeaders": [
+        "Content-Range"
+      ]
+    }
+  ]*/
 }
 
 resource "cloudflare_r2_bucket" "opentimes-resources" {
