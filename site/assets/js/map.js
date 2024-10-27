@@ -7,6 +7,7 @@ const map = new maplibregl.Map({
   zoom: 10,
   pitchWithRotate: false,
   container: "map",
+  maxZoom: 12
 })
 
 map.on("load", async () => {
@@ -16,4 +17,15 @@ map.on("load", async () => {
   });
   map.addControl(new maplibregl.NavigationControl());
   map.addControl(new maplibregl.ScaleControl({ unit: "metric" }));
+  map.addLayer({
+    "id": "tracts",
+    "type": "line",
+    "source": "protomap",
+    "source-layer": "tracts",
+    filter: ["==", ["geometry-type"], "Polygon"],
+    "paint": {
+      "line-opacity": 0.2,
+      "line-color": "#000",
+    },
+  });
 })
