@@ -1,4 +1,6 @@
 import os
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -6,6 +8,7 @@ import boto3
 import duckdb
 import requests as r
 import yaml
+from botocore.exceptions import ClientError
 from jinja2 import Environment, FileSystemLoader
 from utils.datasets import DATASET_DICT
 from utils.utils import format_size
@@ -65,6 +68,9 @@ def create_duckdb_file(
     path: str,
 ) -> None:
     """Create a DuckDB database object pointing to all bucket Parquet files."""
+
+    if Path(path).exists():
+        Path(path).unlink()
 
     con = duckdb.connect()
     con.execute("SET autoinstall_known_extensions=1;")
@@ -144,13 +150,25 @@ def generate_html_files(
     index_file_path = Path(folder_path) / "index.html"
     html_content = template.render(folder_name=folder_path, contents=tree)
 
-    s3.put_object(
-        Bucket=bucket_name,
-        Key=str(index_file_path.as_posix()),
-        Body=html_content,
-        ContentType="text/html",
-    )
+    retries = 3
+    for attempt in range(retries):
+        try:
+            s3.put_object(
+                Bucket=bucket_name,
+                Key=str(index_file_path.as_posix()),
+                Body=html_content,
+                ContentType="text/html",
+            )
+            break  # Exit the loop if successful
+        except ClientError as e:
+            if attempt < retries - 1:
+                print(f"Attempt {attempt + 1} failed, retrying...")
+                time.sleep(2**attempt)
+            else:
+                print(f"Failed after {retries} attempts")
+                raise e
 
+    print("Rendered index.html for", folder_path)
     # Recursively create subfolders and their index.html
     for item, subtree in tree.items():
         if isinstance(subtree, dict) and "filename" not in subtree:
@@ -191,7 +209,9 @@ def get_s3_objects(bucket_name: str, prefix: str = "") -> tuple[dict, list]:
     while True:
         if continuation_token:
             response = s3.list_objects_v2(
-                Bucket=bucket_name, Prefix=prefix, ContinuationToken=continuation_token
+                Bucket=bucket_name,
+                Prefix=prefix,
+                ContinuationToken=continuation_token,
             )
         else:
             response = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
@@ -211,7 +231,9 @@ def get_s3_objects(bucket_name: str, prefix: str = "") -> tuple[dict, list]:
                 current = current[part]
 
             size = obj["Size"]
-            last_modified = obj["LastModified"].replace(microsecond=0).isoformat()
+            last_modified = (
+                obj["LastModified"].replace(microsecond=0).isoformat()
+            )
             current[parts[-1]] = {
                 "filename": parts[-1],
                 "size": format_size(size),
@@ -246,11 +268,19 @@ def purge_cloudflare_cache(
         "Content-Type": "application/json",
     }
 
+    if len(keys) > 10000:
+        print(f"Purging the entire cache due to too many keys ({len(keys)}).")
+        r.post(url, headers=headers, json={"purge_everything": True})
+
     print(f"Purging {len(keys)} keys from the Cloudflare cache.")
+    calls_per_minute = 960  # Cloudflare limits to 1000 calls per minute
+    call_interval = 60 / calls_per_minute
+
     for i in range(0, len(keys), 30):
         chunk = [f"{base_url}/{k}" for k in keys[i : i + 30]]
         data = {"files": chunk}
         r.post(url, headers=headers, json=data)
+        time.sleep(call_interval)
 
 
 if __name__ == "__main__":
@@ -281,8 +311,22 @@ if __name__ == "__main__":
         append_duckdb_info(tree, version, db_path)
         print(f"DuckDB file created at {db_path}.")
 
-    print("Generating index.html files...")
-    generate_html_files(tree, params["s3"]["public_bucket"])
+    # Recursively create subfolders and their index.html
+    print("Generating HTML index files...")
+    with ThreadPoolExecutor() as executor:
+        futures = [
+            executor.submit(
+                generate_html_files,
+                subtree,
+                params["s3"]["data_bucket"],
+                Path(item),
+            )
+            for item, subtree in tree.items()
+            if isinstance(subtree, dict) and "filename" not in subtree
+        ]
+        for future in as_completed(futures):
+            future.result()  # Ensure any exceptions are raised
+
     purge_cloudflare_cache(
         keys, CLOUDFLARE_CACHE_ZONE_ID, CLOUDFLARE_CACHE_API_TOKEN
     )
