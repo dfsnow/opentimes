@@ -61,7 +61,7 @@ map.on("load", async () => {
         ["==", ["feature-state", "tract_color"], "color_8"], "#3E4A89",
         ["==", ["feature-state", "tract_color"], "color_9"], "#482878",
         ["==", ["feature-state", "tract_color"], "color_10"], "#440154",
-        "#ffffff" // Default color if no match found
+        "rgba(255, 255, 255, 0.0)"
       ]
     },
   });
@@ -137,16 +137,17 @@ map.on("load", async () => {
       `);
 
       const colorScale = (duration) => {
-        if (duration < 1800) return "color_1";
-        if (duration < 3600) return "color_2";
-        if (duration < 5400) return "color_3";
-        if (duration < 7200) return "color_4";
-        if (duration < 9000) return "color_5";
-        if (duration < 10800) return "color_6";
-        if (duration < 12600) return "color_7";
-        if (duration < 14400) return "color_8";
-        if (duration < 16200) return "color_9";
-        return "color_10";
+        if (duration < 900) return "color_1"; // 15 minutes
+        if (duration < 1800) return "color_2"; // 30 minutes
+        if (duration < 2700) return "color_3"; // 45 minutes
+        if (duration < 3600) return "color_4"; // 1 hour
+        if (duration < 5400) return "color_5"; // 1.5 hours
+        if (duration < 7200) return "color_6"; // 2 hours
+        if (duration < 10800) return "color_7"; // 3 hours
+        if (duration < 14400) return "color_8"; // 4 hours
+        if (duration < 21600) return "color_9"; // 6 hours
+        if (duration < 28800) return "color_10"; // 8 hours
+        return "none";
       };
 
       // Clear previous feature states
