@@ -24,9 +24,3 @@ resource "cloudflare_r2_bucket" "opentimes-resources" {
   name       = "opentimes-resources"
   location   = "ENAM"
 }
-
-resource "cloudflare_r2_bucket" "opentimes-site" {
-  account_id = var.cloudflare_account_id
-  name       = "opentimes-site"
-  location   = "ENAM"
-}
