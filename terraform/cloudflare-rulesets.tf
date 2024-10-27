@@ -43,7 +43,7 @@ resource "cloudflare_ruleset" "serve_index_data_subdomain" {
           }
         }
       }
-    expression = "(ends_with(http.request.uri.path, \"/\") or http.request.uri.path == \"\") and not (ends_with(http.request.uri.path, \".json\") or ends_with(http.request.uri.path, \".parquet\"))"
+    expression = "starts_with(http.host, \"data\") and (ends_with(http.request.uri.path, \"/\") or http.request.uri.path == \"\") and not (ends_with(http.request.uri.path, \".json\") or ends_with(http.request.uri.path, \".parquet\"))"
     description = "Rewrite all / to index.html in data subdomain" 
     enabled = true
   }

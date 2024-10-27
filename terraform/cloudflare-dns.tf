@@ -14,4 +14,4 @@ resource "cloudflare_zone_settings_override" "opentimes-org" {
 }
 
 /* Need to manually add an R2 CNAME record via the UI since those aren't 
-   managed by terraform */
+   managed by terraform. Likewise with the Cloudflare Pages CNAME record */
