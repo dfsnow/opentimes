@@ -135,7 +135,6 @@ map.on("load", async () => {
             AND state = '${state}'
             AND origin_id = '${id}'
       `);
-      console.log("Query finished");
 
       const colorScale = (duration) => {
         if (duration < 900) return "color_1"; // 15 minutes

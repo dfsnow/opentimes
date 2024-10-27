@@ -71,41 +71,25 @@ def create_duckdb_file(
     con.execute("SET autoload_known_extensions=1;")
     con.execute(f"ATTACH '{path}' AS opentimes;")
     con.execute("CREATE SCHEMA IF NOT EXISTS opentimes.primary;")
-    con.execute("CREATE SCHEMA IF NOT EXISTS opentimes.internal;")
     for dataset in datasets:
-        views = []
+        dataset_files = []
         for mode in modes:
             for year in years:
                 for geography in geographies:
-                    dataset_files = [
+                    dataset_files += [
                         f"{base_url}/{dataset}/{p}"
                         for p in flatten_file_paths(
                             tree, dataset, version, mode, year, geography
                         )
                     ]
-                    if len(dataset_files) == 0:
-                        continue
 
-                    con.execute(
-                        f"""
-                        CREATE OR REPLACE VIEW opentimes.internal.{dataset}_{mode}_{year}_{geography} AS
-                        SELECT *
-                        FROM read_parquet(['{"', '".join(dataset_files)}'])
-                        """
-                    )
-
-                    views.append(f"{dataset}_{mode}_{year}_{geography}")
-
-        if views:
-            view_queries = [
-                f"SELECT * FROM opentimes.internal.{view}" for view in views
-            ]
-            con.execute(
-                f"""
-                CREATE OR REPLACE VIEW opentimes.primary.{dataset} AS
-                {' UNION ALL'.join(view_queries)}
-                """
-            )
+        con.execute(
+            f"""
+            CREATE OR REPLACE VIEW opentimes.primary.{dataset} AS
+            SELECT *
+            FROM read_parquet(['{"', '".join(dataset_files)}'])
+            """
+        )
 
     con.close()
 
@@ -197,36 +181,51 @@ def get_s3_objects(bucket_name: str, prefix: str = "") -> tuple[dict, list]:
                 if "filename" not in value:
                     format_directory_info(value)
 
+    tree: dict = {}
+    keys = []
+    continuation_token = None
+
     response = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
     objects = response.get("Contents", [])
-    tree: dict = {}
 
-    keys = []
-    for obj in objects:
-        path = obj["Key"]
-        keys.append(path)
-        if path.endswith("index.html"):
-            continue
-        parts = path.split("/")
-        current = tree
+    while True:
+        if continuation_token:
+            response = s3.list_objects_v2(
+                Bucket=bucket_name, Prefix=prefix, ContinuationToken=continuation_token
+            )
+        else:
+            response = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
 
-        for part in parts[:-1]:
-            if part not in current:
-                current[part] = {}
-            current = current[part]
+        objects = response.get("Contents", [])
+        for obj in objects:
+            path = obj["Key"]
+            keys.append(path)
+            if path.endswith("index.html"):
+                continue
+            parts = path.split("/")
+            current = tree
 
-        size = obj["Size"]
-        last_modified = obj["LastModified"].replace(microsecond=0).isoformat()
-        current[parts[-1]] = {
-            "filename": parts[-1],
-            "size": format_size(size),
-            "last_modified": last_modified,
-        }
+            for part in parts[:-1]:
+                if part not in current:
+                    current[part] = {}
+                current = current[part]
 
-        current = tree
-        for part in parts[:-1]:
-            current = current[part]
-            update_directory_info(current, size, last_modified)
+            size = obj["Size"]
+            last_modified = obj["LastModified"].replace(microsecond=0).isoformat()
+            current[parts[-1]] = {
+                "filename": parts[-1],
+                "size": format_size(size),
+                "last_modified": last_modified,
+            }
+
+            current = tree
+            for part in parts[:-1]:
+                current = current[part]
+                update_directory_info(current, size, last_modified)
+
+        continuation_token = response.get("NextContinuationToken")
+        if not continuation_token:
+            break
 
     traverse_and_format(tree)
     print(f"Retrieved {len(keys)} objects from S3 bucket.")
