@@ -20,8 +20,9 @@ resource "cloudflare_ruleset" "cache_data_subdomain" {
       }
       respect_strong_etags = false
       origin_error_page_passthru = false
+      cache = true
     }
-    expression  = "(http.request.full_uri wildcard \"https://data.opentimes.org/*\" and http.request.uri.path.extension in {\"parquet\" \"json\" \"html\"})"
+    expression  = "(http.request.full_uri wildcard \"https://data.opentimes.org/*\")"
     description = "Cache data files for data subdomain"
     enabled     = true
   }
