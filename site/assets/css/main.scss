@@ -28,7 +28,6 @@
 html {
   font-size: 62.5%;
   height: 100%;
-  height: -webkit-fill-available;
   scroll-padding-top: 7em;
   -webkit-text-size-adjust: 100%;
 }
@@ -44,9 +43,6 @@ body {
   overflow: hidden scroll;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  min-height: 100vh;
-  /* mobile viewport bug fix */
-  min-height: -webkit-fill-available;
 }
 
 a {
@@ -141,9 +137,11 @@ ol {
 }
 
 .content {
+  position: relative;
   margin: auto;
   width: 100%;
   height: calc(100vh - 3.5em - 2px);
+  height: calc(100svh - 3.5em - 2px); // Correct size on mobile Safari
 
   code {
     font-size: 1.5rem;
@@ -385,6 +383,9 @@ blockquote p,
   cursor: pointer;
   min-width: 30px;
   min-height: 30px;
+  padding: 0;
+  vertical-align: middle;
+  line-height: 1;
 }
 
 #map-color-scale.collapsed {
@@ -420,7 +421,8 @@ blockquote p,
   }
 
   .content {
-    height: calc(100vh - 5.8em - 2px);
+    height: calc(100vh - 5.8em);
+    height: calc(100svh - 5.8em); // Correct size on mobile Safari
   }
 
   .navbar {
