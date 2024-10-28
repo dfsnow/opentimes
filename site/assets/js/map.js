@@ -50,6 +50,11 @@ async function instantiateMap() {
     doubleClickZoom: false,
     container: "map",
     maxZoom: 12,
+    minZoom: 2,
+    maxBounds: [
+      [-180.0, 6.0],
+      [-50.7, 75.1],
+    ],
   });
 
   return new Promise((resolve) => {
@@ -75,19 +80,18 @@ function addMapLayers(map) {
     "source-layer": "tracts",
     filter: ["==", ["geometry-type"], "Polygon"],
     paint: {
-      "fill-opacity": 0.5,
       "fill-color": [
         "case",
-        ["==", ["feature-state", "tract_color"], "color_1"], "#FDE725",
-        ["==", ["feature-state", "tract_color"], "color_2"], "#B4DE2C",
-        ["==", ["feature-state", "tract_color"], "color_3"], "#6DCD59",
-        ["==", ["feature-state", "tract_color"], "color_4"], "#35B779",
-        ["==", ["feature-state", "tract_color"], "color_5"], "#1F9E89",
-        ["==", ["feature-state", "tract_color"], "color_6"], "#26828E",
-        ["==", ["feature-state", "tract_color"], "color_7"], "#31688E",
-        ["==", ["feature-state", "tract_color"], "color_8"], "#3E4A89",
-        ["==", ["feature-state", "tract_color"], "color_9"], "#482878",
-        ["==", ["feature-state", "tract_color"], "color_10"], "#440154",
+        ["==", ["feature-state", "tract_color"], "color_1"], "rgba(253, 231, 37, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_2"], "rgba(180, 222, 44, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_3"], "rgba(109, 205, 89, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_4"], "rgba(53, 183, 121, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_5"], "rgba(31, 158, 137, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_6"], "rgba(38, 130, 142, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_7"], "rgba(49, 104, 142, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_8"], "rgba(62, 74, 137, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_9"], "rgba(72, 40, 120, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_10"], "rgba(68, 1, 84, 0.5)",
         "rgba(255, 255, 255, 0.0)"
       ],
     },
@@ -110,8 +114,54 @@ function addMapLayers(map) {
 function createTractIdDisplay() {
   const display = document.createElement("div");
   display.id = "map-info";
+  display.style.display = "none"; // Initially hidden
   document.body.append(display);
   return display;
+}
+
+function addColorScale(map) {
+  const scaleContainer = document.createElement("div");
+  scaleContainer.id = "map-color-scale";
+
+  const toggleButton = document.createElement("button");
+  toggleButton.innerHTML = "&#x2212;"; // Unicode for minus sign
+  toggleButton.id = "map-color-scale-toggle";
+  toggleButton.onclick = () => {
+    const isCollapsed = scaleContainer.classList.toggle("collapsed");
+    toggleButton.innerHTML = isCollapsed ? "&#x2b;" : "&#x2212;"; // Unicode for plus and minus signs
+  };
+
+  scaleContainer.appendChild(toggleButton);
+  const legendTitle = document.createElement("div");
+  legendTitle.innerHTML = "<h3>Travel time<br>(driving)</h3>";
+  scaleContainer.appendChild(toggleButton);
+  scaleContainer.appendChild(legendTitle);
+
+  const colors = [
+    { color: "var(--color-less-15-min)", label: "< 15 min" },
+    { color: "var(--color-15-30-min)", label: "15-30 min" },
+    { color: "var(--color-30-45-min)", label: "30-45 min" },
+    { color: "var(--color-45-60-min)", label: "45-60 min" },
+    { color: "var(--color-60-90-min)", label: "60-90 min" },
+    { color: "var(--color-90-120-min)", label: "90-120 min" },
+    { color: "var(--color-2-3-hrs)", label: "2-3 hrs" },
+    { color: "var(--color-3-4-hrs)", label: "3-4 hrs" },
+    { color: "var(--color-4-6-hrs)", label: "4-6 hrs" },
+    { color: "var(--color-more-6-hrs)", label: "> 6 hrs" },
+  ];
+
+  colors.forEach(({ color, label }) => {
+    const item = document.createElement("div");
+    const colorBox = document.createElement("div");
+    const text = document.createElement("span");
+    text.textContent = label;
+    colorBox.style.backgroundColor = color;
+    item.appendChild(colorBox);
+    item.appendChild(text);
+    scaleContainer.appendChild(item);
+  });
+
+  map.getContainer().appendChild(scaleContainer);
 }
 
 // Color scale based on duration
@@ -141,15 +191,18 @@ const colorScale = (duration) => {
   spinner.hide();
 
   const tractIdDisplay = createTractIdDisplay();
+  addColorScale(map);
 
   map.on("mousemove", (e) => {
     const features = map.queryRenderedFeatures(e.point, { layers: ["tracts_fill"] });
     const feature = features[0];
     if (feature) {
       map.getCanvas().style.cursor = "pointer";
+      tractIdDisplay.style.display = "block";
       tractIdDisplay.textContent = `Tract ID: ${feature.properties.id}`;
     } else {
       map.getCanvas().style.cursor = "";
+      tractIdDisplay.style.display = "none";
       tractIdDisplay.textContent = "";
     }
   });

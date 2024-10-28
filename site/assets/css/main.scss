@@ -11,6 +11,18 @@
   --link-color: #2979bc;
   --visited-link-color: #8f5baa;
   --full-width: 720px;
+
+  // Map color scale vars (viridis)
+  --color-less-15-min: rgba(253, 231, 37, 0.5);
+  --color-15-30-min: rgba(180, 222, 44, 0.5);
+  --color-30-45-min: rgba(109, 205, 89, 0.5);
+  --color-45-60-min: rgba(53, 183, 121, 0.5);
+  --color-60-90-min: rgba(31, 158, 137, 0.5);
+  --color-90-120-min: rgba(38, 130, 142, 0.5);
+  --color-2-3-hrs: rgba(49, 104, 142, 0.5);
+  --color-3-4-hrs: rgba(62, 74, 137, 0.5);
+  --color-4-6-hrs: rgba(72, 40, 120, 0.5);
+  --color-more-6-hrs: rgba(68, 1, 84, 0.5);
 }
 
 html {
@@ -296,7 +308,7 @@ blockquote p,
   bottom: 10px;
   left: 10px;
   background-color: rgba(255, 255, 255, 0.75);
-  padding: 5px;
+  padding: 10px;
   border-radius: 5px;
   font-family: Arial, sans-serif;
   font-size: 1.2em;
@@ -307,7 +319,7 @@ blockquote p,
   position: absolute;
   top: 50%;
   left: 50%;
-  border: 16px solid #f3f3f3;
+  border: 16px solid #cccccc;
   border-top: 16px solid #3498db;
   border-radius: 50%;
   width: 6em;
@@ -324,6 +336,52 @@ blockquote p,
   height: 100%;
   background-color: rgba(255, 255, 255, 0.5);
   z-index: 1000;
+}
+
+#map-color-scale {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #ffffff;
+  padding: 10px;
+  border-radius: 5px;
+  min-width: 8px;
+  min-height: 10px;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+
+  &:last-child {
+    margin-bottom: 0px;
+  }
+}
+
+#map-color-scale div {
+  display: flex;
+  align-items: center;
+  margin-bottom: 3px;
+}
+
+#map-color-scale div div {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+#map-color-scale div h3 {
+  margin-top: 0;
+}
+
+#map-color-scale-toggle {
+  position: absolute;
+  top: 0;
+  right: 2px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+#map-color-scale.collapsed div:not(:first-child) {
+  display: none;
 }
 
 @keyframes spinner {
