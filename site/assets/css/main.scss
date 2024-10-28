@@ -127,7 +127,8 @@ ol {
 .content {
   margin: auto;
   width: 100%;
-  height: calc(100vh - 3.5em - 1px);
+  height: calc(100vh - 3.5em - 2px);
+  position: relative;
 
   code {
     font-size: 1.5rem;
@@ -305,7 +306,7 @@ blockquote p,
   }
 
   .content {
-    height: calc(100vh - 5.8em - 1px);
+    height: calc(100vh - 5.8em - 2px);
   }
 
   .navbar {
