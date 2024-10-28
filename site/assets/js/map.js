@@ -52,8 +52,8 @@ async function instantiateMap() {
     maxZoom: 12,
     minZoom: 2,
     maxBounds: [
-      [-180.0, 6.0],
-      [-50.7, 75.1],
+      [-175.0, -9.0],
+      [-20.0, 72.1],
     ],
   });
 
@@ -121,20 +121,18 @@ function createTractIdDisplay() {
 
 function addColorScale(map) {
   const scaleContainer = document.createElement("div");
-  scaleContainer.id = "map-color-scale";
-
   const toggleButton = document.createElement("button");
-  toggleButton.innerHTML = "&#x2212;"; // Unicode for minus sign
+  scaleContainer.id = "map-color-scale";
   toggleButton.id = "map-color-scale-toggle";
+
+  toggleButton.innerHTML = "&#x2212;"; // Unicode for minus sign
   toggleButton.onclick = () => {
     const isCollapsed = scaleContainer.classList.toggle("collapsed");
     toggleButton.innerHTML = isCollapsed ? "&#x2b;" : "&#x2212;"; // Unicode for plus and minus signs
   };
 
-  scaleContainer.appendChild(toggleButton);
   const legendTitle = document.createElement("div");
   legendTitle.innerHTML = "<h3>Travel time<br>(driving)</h3>";
-  scaleContainer.appendChild(toggleButton);
   scaleContainer.appendChild(legendTitle);
 
   const colors = [
@@ -161,6 +159,7 @@ function addColorScale(map) {
     scaleContainer.appendChild(item);
   });
 
+  scaleContainer.appendChild(toggleButton);
   map.getContainer().appendChild(scaleContainer);
 }
 

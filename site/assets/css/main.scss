@@ -28,6 +28,7 @@
 html {
   font-size: 62.5%;
   height: 100%;
+  height: -webkit-fill-available;
   scroll-padding-top: 7em;
   -webkit-text-size-adjust: 100%;
 }
@@ -43,6 +44,9 @@ body {
   overflow: hidden scroll;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  /* mobile viewport bug fix */
+  min-height: -webkit-fill-available;
 }
 
 a {
@@ -140,7 +144,6 @@ ol {
   margin: auto;
   width: 100%;
   height: calc(100vh - 3.5em - 2px);
-  position: relative;
 
   code {
     font-size: 1.5rem;
@@ -345,19 +348,19 @@ blockquote p,
   background-color: #ffffff;
   padding: 10px;
   border-radius: 5px;
-  min-width: 8px;
-  min-height: 10px;
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+  min-width: 30px;
+  min-height: 30px;
+}
+
+#map-color-scale div {
+  position: relative;
+  display: flex;
+  margin-bottom: 3px;
 
   &:last-child {
     margin-bottom: 0px;
   }
-}
-
-#map-color-scale div {
-  display: flex;
-  align-items: center;
-  margin-bottom: 3px;
 }
 
 #map-color-scale div div {
@@ -368,20 +371,28 @@ blockquote p,
 
 #map-color-scale div h3 {
   margin-top: 0;
+  margin-bottom: 0.6em;
 }
 
 #map-color-scale-toggle {
   position: absolute;
   top: 0;
-  right: 2px;
+  right: 0;
   background: none;
   border: none;
   font-size: 20px;
+  color: var(--text-color);
   cursor: pointer;
+  min-width: 30px;
+  min-height: 30px;
 }
 
-#map-color-scale.collapsed div:not(:first-child) {
-  display: none;
+#map-color-scale.collapsed {
+  padding: 0;
+
+  >div:not(:last-child) {
+    display: none;
+  }
 }
 
 @keyframes spinner {
