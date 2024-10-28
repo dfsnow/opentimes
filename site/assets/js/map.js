@@ -6,34 +6,14 @@ maplibregl.addProtocol("pmtiles", protocol.tile);
 class Spinner {
   constructor() {
     this.spinner = document.createElement("div");
-    this.spinner.style.cssText = `
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      border: 16px solid #f3f3f3;
-      border-top: 16px solid #3498db;
-      border-radius: 50%;
-      width: 6em;
-      height: 6em;
-      animation: spin 1s linear infinite;
-      z-index: 1001;
-    `;
+    this.spinner.id = "map-spinner";
+
     this.overlay = document.createElement("div");
-    this.overlay.style.cssText = `
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(255, 255, 255, 0.5);
-      z-index: 1000;
-    `;
+    this.overlay.id = "map-overlay";
   }
 
   show() {
     const contentDiv = document.querySelector(".content");
-    contentDiv.style.position = "relative";
     contentDiv.appendChild(this.overlay);
     contentDiv.appendChild(this.spinner);
   }
@@ -44,16 +24,6 @@ class Spinner {
     contentDiv.removeChild(this.overlay);
   }
 }
-
-// Spinner animation
-document.head.append(Object.assign(document.createElement("style"), {
-  textContent: `
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  `
-}));
 
 // Initialize and return DuckDB instance
 async function instantiateDB() {
@@ -139,13 +109,7 @@ function addMapLayers(map) {
 // Create display for current tract
 function createTractIdDisplay() {
   const display = document.createElement("div");
-  display.style.cssText = `
-    position: absolute; bottom: 10px; left: 10px;
-    background-color: rgba(255, 255, 255, 0.75);
-    padding: 5px; border-radius: 5px;
-    font-family: Arial, sans-serif; font-size: 1.2em;
-    pointer-events: none;
-  `;
+  display.id = "map-info";
   document.body.append(display);
   return display;
 }
