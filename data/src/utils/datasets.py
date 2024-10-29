@@ -3,30 +3,38 @@ DATASET_DICT: dict = {
         "times": {
             "partition_levels": 6,
             "public_file_columns": [
-                "state",
                 "centroid_type",
                 "origin_id",
                 "destination_id",
                 "duration_sec",
                 "distance_km",
             ],
+            "order_by_columns": [
+                "origin_id",
+                "destination_id",
+            ],
         },
         "points": {
             "partition_levels": 7,
             "public_file_columns": [
-                "state",
                 "centroid_type",
                 "point_type",
                 "id",
                 "lat",
                 "lon",
             ],
+            "order_by_columns": [
+                "id",
+            ],
         },
         "missing_pairs": {
             "partition_levels": 6,
             "public_file_columns": [
-                "state",
                 "centroid_type",
+                "origin_id",
+                "destination_id",
+            ],
+            "order_by_columns": [
                 "origin_id",
                 "destination_id",
             ],
@@ -34,7 +42,6 @@ DATASET_DICT: dict = {
         "metadata": {
             "partition_levels": 6,
             "public_file_columns": [
-                "state",
                 "centroid_type",
                 "run_id",
                 "calc_datetime_finished",
@@ -56,6 +63,9 @@ DATASET_DICT: dict = {
                 "file_output_destinations_md5",
                 "file_output_missing_pairs_md5",
                 "valhalla_config_data",
+            ],
+            "order_by_columns": [
+                "calc_chunk_id",
             ],
         },
     }
