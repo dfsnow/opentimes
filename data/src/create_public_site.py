@@ -75,7 +75,6 @@ def create_duckdb_file(
     con.execute("SET autoload_known_extensions=1;")
     con.execute(f"ATTACH '{path}' AS opentimes;")
     con.execute("CREATE SCHEMA IF NOT EXISTS opentimes.public;")
-    con.execute("CREATE SCHEMA IF NOT EXISTS opentimes.internal;")
     for dataset in datasets:
         all_dataset_files = []
         for mode in modes:
@@ -89,14 +88,6 @@ def create_duckdb_file(
                     ]
                     if not dataset_files:
                         continue
-
-                    con.execute(
-                        f"""
-                        CREATE OR REPLACE VIEW opentimes.internal.{dataset}_{mode}_{year}_{geography} AS
-                        SELECT *
-                        FROM read_parquet(['{"', '".join(dataset_files)}'])
-                        """
-                    )
 
                     all_dataset_files += dataset_files
 
@@ -338,6 +329,15 @@ if __name__ == "__main__":
         ]
         for future in as_completed(futures):
             future.result()  # Ensure any exceptions are raised
+
+    # Generate the root index.html
+    html_content = template.render(folder_name="", contents=tree)
+    s3.put_object(
+        Bucket=params["s3"]["public_bucket"],
+        Key="index.html",
+        Body=html_content,
+        ContentType="text/html",
+    )
 
     purge_cloudflare_cache(
         keys, CLOUDFLARE_CACHE_ZONE_ID, CLOUDFLARE_CACHE_API_TOKEN
