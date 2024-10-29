@@ -104,8 +104,19 @@ function addMapLayers(map) {
     "source-layer": "tracts",
     filter: ["==", ["geometry-type"], "Polygon"],
     paint: {
-      "line-opacity": 0.2,
+      "line-opacity": [
+        "case",
+        ["boolean", ["feature-state", "hover"], false],
+        0.5,
+        0.2
+      ],
       "line-color": "#333",
+      "line-width": [
+        "case",
+        ["boolean", ["feature-state", "hover"], false],
+        5,
+        1
+      ]
     },
   });
 }
@@ -189,6 +200,7 @@ const colorScale = (duration) => {
   const tractIdDisplay = createTractIdDisplay();
   addColorScale(map);
 
+  let hoveredPolygonId = null;
   map.on("mousemove", (e) => {
     const features = map.queryRenderedFeatures(e.point, { layers: ["tracts_fill"] });
     const feature = features[0];
@@ -196,11 +208,33 @@ const colorScale = (duration) => {
       map.getCanvas().style.cursor = "pointer";
       tractIdDisplay.style.display = "block";
       tractIdDisplay.textContent = `Tract ID: ${feature.properties.id}`;
+      if (hoveredPolygonId !== null) {
+        map.setFeatureState(
+          { source: "protomap", sourceLayer: "tracts", id: hoveredPolygonId },
+          { hover: false }
+        );
+      }
+      hoveredPolygonId = feature.properties.id;
+      map.setFeatureState(
+        { source: "protomap", sourceLayer: "tracts", id: hoveredPolygonId },
+        { hover: true }
+      );
     } else {
       map.getCanvas().style.cursor = "";
       tractIdDisplay.style.display = "none";
       tractIdDisplay.textContent = "";
     }
+  });
+
+  // Clear hover
+  map.on("mouseleave", (e) => {
+    if (hoveredPolygonId !== null) {
+      map.setFeatureState(
+        { source: "protomap", sourceLayer: "tracts", id: hoveredPolygonId },
+        { hover: false }
+      );
+    }
+    hoveredPolygonId = null;
   });
 
   let previousStates = [];
