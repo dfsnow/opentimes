@@ -184,9 +184,6 @@ const colorScale = (duration) => {
 
   const [DuckDB, map] = await Promise.all([instantiateDB(), instantiateMap()]);
   const db = await DuckDB.connect();
-  await db.query(`
-    ATTACH 'https://data.opentimes.org/databases/0.0.1.duckdb' AS opentimes (READ_ONLY);
-  `);
   spinner.hide();
 
   const tractIdDisplay = createTractIdDisplay();
@@ -210,12 +207,18 @@ const colorScale = (duration) => {
   map.on("click", async (e) => {
     const features = map.queryRenderedFeatures(e.point, { layers: ["tracts_fill"] });
     if (features.length > 0) {
-      const feature = features[0];
       spinner.show();
+      const feature = features[0];
+      const baseUrl = `https://data.opentimes.org/times/version=0.0.1/mode=auto/year=2024/geography=tract/state=${feature.properties.state}/times-0.0.1-auto-2024-tract-${feature.properties.state}`;
+      const bigStates = ["06", "36"];
+      const urlsArray = bigStates.includes(feature.properties.state)
+        ? [`${baseUrl}-0.parquet`, `${baseUrl}-1.parquet`]
+        : [`${baseUrl}-0.parquet`];
+      const joinedUrls = urlsArray.map(url => `'${url}'`).join(',');
 
       const result = await db.query(`
         SELECT destination_id, duration_sec
-        FROM opentimes.internal.times_auto_2024_tract
+        FROM read_parquet([${joinedUrls}])
         WHERE version = '0.0.1'
             AND mode = 'auto'
             AND year = '2024'
