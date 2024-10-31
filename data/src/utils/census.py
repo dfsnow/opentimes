@@ -34,11 +34,14 @@ def calculate_weighted_mean(
             return group[value_col].mean()
         return (group[value_col] * group[weight_col]).sum() / total_weight
 
+    def calculate_group_weighted_means(group: pd.DataFrame) -> pd.Series:
+        return pd.Series(
+            {col: weighted_mean(group, weight_col, col) for col in value_cols}
+        )
+
     grouped = df.groupby(group_cols)
     weighted_means = grouped.apply(
-        lambda x: pd.Series(
-            {col: weighted_mean(x, weight_col, col) for col in value_cols}
-        )
+        calculate_group_weighted_means
     ).reset_index()
 
     return weighted_means

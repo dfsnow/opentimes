@@ -49,14 +49,18 @@ site = [
   "pyyaml==6.0.2",
   "requests==2.32.3"
 ]
-test = [
+dev = [
   "setuptools>=61.0",
+  "pandas-stubs>=2.2.3.241009",
+  "pre-commit>=4.0.1",
   "pytest>=7.3.0",
   "pytest-cov>=4.1.0",
+  "types-PyYAML>=6.0.12.20240917",
+  "types-requests>=2.32.0.20241016"
 ]
 
 [build-system]
-requires = ["setuptools >= 61.0"]
+requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
@@ -64,25 +68,12 @@ where = ["."]
 include = ["opentimes"]
 
 [tool.pyright]
+# Let ruff handle these
 reportUnusedImport = false
+reportUndefinedVariable = false
 
 [tool.ruff]
 line-length = 79
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
-
-[tool.tox]
-legacy_tox_ini = """
-[tox]
-min_version = 4.0
-envlist = py39, py38, py310, py311, py312
-
-[gh]
-python =
-    3.12 = py312
-    3.11 = py311
-    3.10 = py310
-    3.9 = py39
-    3.8 = py38
-"""

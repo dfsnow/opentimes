@@ -7,7 +7,7 @@ import uuid
 from pathlib import Path
 
 import pandas as pd
-import valhalla
+import valhalla  # type: ignore
 import yaml
 from utils.utils import format_time, get_md5_hash
 
@@ -321,7 +321,7 @@ if __name__ == "__main__":
 
     origins = (
         pd.read_parquet(input["files"]["origins_file"])
-        .loc[:, od_cols.keys()]
+        .loc[:, list(od_cols.keys())]
         .rename(columns=od_cols)
         .sort_values(by="id")
     )
@@ -333,7 +333,7 @@ if __name__ == "__main__":
 
     destinations = (
         pd.read_parquet(input["files"]["destinations_file"])
-        .loc[:, od_cols.keys()]
+        .loc[:, list(od_cols.keys())]
         .rename(columns=od_cols)
         .sort_values(by="id")
     )

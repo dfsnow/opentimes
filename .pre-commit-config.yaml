@@ -4,6 +4,16 @@ repos:
     hooks:
       - id: ruff
       - id: ruff-format
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.13.0
+    hooks:
+      - id: mypy
+        args: [--ignore-missing-imports]
+        additional_dependencies: [
+          "pandas-stubs>=2.2.3.241009",
+          "types-PyYAML>=6.0.12.20240917",
+          "types-requests>=2.32.0.20241016"
+        ]
   - repo: https://github.com/adrienverge/yamllint.git
     rev: v1.29.0
     hooks:
