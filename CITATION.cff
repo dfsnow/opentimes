@@ -1,0 +1,18 @@
+title: "OpenTimes"
+version: "0.0.1"
+type: dataset
+message: "If you use this software, please cite it using these metadata."
+abstract: "Free travel times between U.S. Census geographies"
+authors:
+  - family-names: Snow
+    given-names: Dan
+url: "https://opentimes.org"
+repository-code: "https://github.com/dfsnow/opentimes"
+cff-version: 1.2.0
+date-released: "2024-11-01"
+license: "MIT"
+keywords:
+  - "accessibility"
+  - "spatial access"
+  - "travel times"
+  - "travel time estimation"
