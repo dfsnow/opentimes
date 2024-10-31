@@ -1,5 +1,5 @@
-{{ . | replaceRE
+{{- . | replaceRE
     "(<h[2-9] id=\"([^\"]+)\".+)(</h[2-9]+>)"
     "<a class=\"header-link hover-icon\" role=\"none\" href=\"#${2}\">${1}<svg version=\"1.2\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"Header link\" aria-hidden=\"true\" class=\"header-link-icon\" viewBox=\"0 0 32 32\" width=\"0.7em\" height=\"0.7em\" fill=\"currentcolor\"><title>Link to ${2} section</title><path d=\"M14 21h-5a4.8 4.8 90 010-10h5v-3h-5a1 1 0 000 16h5ZM18 11h5a4.8 4.8 270 010 10h-5v3h5a1 1 180 000-16h-5ZM8 14.5h16v3h-16Z\" /></svg>${3}</a>"
     | safeHTML
-}}
+-}}
