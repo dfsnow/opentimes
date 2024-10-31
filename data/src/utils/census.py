@@ -2,8 +2,8 @@ import shutil
 import tempfile
 from pathlib import Path
 
-import pandas as pd
 import geopandas as gpd
+import pandas as pd
 
 
 def calculate_weighted_mean(
@@ -11,22 +11,24 @@ def calculate_weighted_mean(
     group_cols: str | list[str],
     weight_col: str,
     value_cols: str | list[str],
-):
+) -> pd.DataFrame:
     """
     Calculate the weighted mean of specified columns. Returns the unweighted
     mean if the total weight is zero.
 
     Args:
-        df: The DataFrame containing the data.
+        df: A DataFrame containing the data to be summarized.
         group_cols: The columns to group by.
         weight_col: The column to use as weights.
         value_cols: The columns to calculate the weighted mean for.
 
     Returns:
-        A DataFrame with the weighted means.
+        A DataFrame with the weighted means of the specified columns.
     """
 
-    def weighted_mean(group, weight_col, value_col):
+    def weighted_mean(
+        group: pd.DataFrame, weight_col: str, value_col: str
+    ) -> float:
         total_weight = group[weight_col].sum()
         if total_weight == 0:
             return group[value_col].mean()
@@ -47,6 +49,14 @@ def extract_centroids(df: pd.DataFrame) -> pd.DataFrame:
     Extract centroids from the INTPTLON and INTPTLAT columns of Census
     shapefiles. Returns one centroid as WGS84 and another as a planar
     projection.
+
+    Args:
+        df: A DataFrame of TIGER/Line Census data containing INTPTLON and
+            INTPTLAT columns.
+
+    Returns:
+        A DataFrame with the extracted centroids as four columns. Two
+        columns for the WGS84 coordinates and two for the planar projection.
     """
     gdf = points_to_gdf(df, "intptlon", "intptlat", "EPSG:4326")
     gdf["x_4326"] = gdf.geometry.x
@@ -55,9 +65,7 @@ def extract_centroids(df: pd.DataFrame) -> pd.DataFrame:
     gdf["x_5071"] = gdf.geometry.x
     gdf["y_5071"] = gdf.geometry.y
     gdf.drop(columns=["geometry"], inplace=True)
-    df = pd.DataFrame(gdf)
-
-    return df
+    return pd.DataFrame(gdf)
 
 
 def load_shapefile(path: str | Path) -> gpd.GeoDataFrame:
@@ -75,18 +83,14 @@ def load_shapefile(path: str | Path) -> gpd.GeoDataFrame:
         shutil.unpack_archive(path, tmpdirname)
         tmpdir_path = Path(tmpdirname)
 
-        shapefile_path = None
-        for shp_file in tmpdir_path.rglob("*.shp"):
-            shapefile_path = shp_file
-            break
-
+        shapefile_path = next(tmpdir_path.rglob("*.shp"), None)
         if shapefile_path is None:
             raise FileNotFoundError("Shapefile not found in file")
 
         gdf = gpd.read_file(shapefile_path)
-        gdf.columns = gdf.columns.str.lower()
-        gdf.columns = gdf.columns.str.replace(r"\d+", "", regex=True)
-
+        gdf.columns = gdf.columns.str.lower().str.replace(
+            r"\d+", "", regex=True
+        )
         return gdf
 
 
@@ -97,23 +101,23 @@ def points_to_gdf(
     Convert a DataFrame with x and y columns to a GeoDataFrame.
     """
     df["geometry"] = gpd.points_from_xy(x=df[x_col], y=df[y_col], crs=crs)
-    gdf = gpd.GeoDataFrame(data=df, geometry="geometry", crs=crs)
-    return gdf
+    return gpd.GeoDataFrame(data=df, geometry="geometry", crs=crs)
 
 
 def split_geoid(df: pd.DataFrame, geoid_col: str) -> pd.DataFrame:
     """
-    Split a Census GEOID into component parts and append them as new columns.
+    Split a Census GEOID in a DataFrame into component parts and append
+    them as new columns.
 
     Args:
-        df: A pandas DataFrame containing county, tract, or block GEOIDs.
-        geoid_col: The column name containing the GEOIDs.
+        df: A DataFrame containing county, tract, block group, or block GEOIDs.
+        geoid_col: The name of the column containing the GEOIDs.
 
     Returns:
         The DataFrame with the split components appended as new columns.
     """
 
-    def split_geoid_value(geoid):
+    def split_geoid_value(geoid: str) -> pd.Series:
         length_to_slices = {
             2: {"state": slice(0, 2)},
             5: {"state": slice(0, 2), "county": slice(2, 5)},
@@ -143,9 +147,7 @@ def split_geoid(df: pd.DataFrame, geoid_col: str) -> pd.DataFrame:
             )
 
         slices = length_to_slices[len(geoid)]
-        result = {key: geoid[slc] for key, slc in slices.items()}
-
-        return pd.Series(result)
+        return pd.Series({key: geoid[slc] for key, slc in slices.items()})
 
     split_df = df[geoid_col].apply(split_geoid_value)
     return df.join(split_df)
@@ -153,13 +155,12 @@ def split_geoid(df: pd.DataFrame, geoid_col: str) -> pd.DataFrame:
 
 def transform_5071_to_4326(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Convert x and y coordinates from EPSG:5071 to EPSG:4326.
+    Convert x and y coordinates from EPSG:5071 to EPSG:4326 and
+    append them as new columns.
     """
     gdf = points_to_gdf(df, "x_5071", "y_5071", "EPSG:5071")
     gdf.to_crs("EPSG:4326", inplace=True)
     gdf["x_4326"] = gdf.geometry.x
     gdf["y_4326"] = gdf.geometry.y
     gdf.drop(columns=["geometry"], inplace=True)
-    df = pd.DataFrame(gdf)
-
-    return df
+    return pd.DataFrame(gdf)

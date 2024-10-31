@@ -9,7 +9,10 @@ import yaml
 
 
 def create_duckdb_connection() -> duckdb.DuckDBPyConnection:
-    params = yaml.safe_load(open("params.yaml"))
+    """Instantiate a DuckDB connection to the R2 buckets."""
+    with open("params.yaml") as f:
+        params = yaml.safe_load(f)
+
     os.environ["AWS_PROFILE"] = params["s3"]["profile"]
 
     con = duckdb.connect(database=":memory:")
@@ -18,6 +21,8 @@ def create_duckdb_connection() -> duckdb.DuckDBPyConnection:
         con.load_extension(ext)
     # Num threads is 4x available to support faster remote queries. See:
     # https://duckdb.org/docs/guides/performance/how_to_tune_workloads.html#querying-remote-files
+    con.execute("SET threads=16;")
+
     con.execute("SET threads=16;")
     con.execute(
         f"""
@@ -58,7 +63,9 @@ def get_md5_hash(file_path):
 
 def split_file_to_str(file: str | Path, **kwargs) -> str:
     """
-    Splits the contents of a Parquet file into index strings.
+    Splits the contents of a Parquet file into chunks and return the chunk
+    boundaries as JSON. This is used to split a file of origins into smaller
+    chunks for parallelization.
 
     Args:
         file: The path to the Parquet file.
@@ -66,27 +73,25 @@ def split_file_to_str(file: str | Path, **kwargs) -> str:
             split_range function.
 
     Returns:
-        A string representation of the chunked ranges in
-            the format '["start-end", ...]'.
+        A JSON string representing the chunked ranges in
+        the format '["start-end", ...]'.
     """
     origins_df = pd.read_parquet(file)
-
     chunk_idx = split_range(len(origins_df), **kwargs)
     zfill_size = len(str(chunk_idx[-1][1]))
     chunk_str = [
         f"{str(start).zfill(zfill_size)}-{str(end).zfill(zfill_size)}"
         for start, end in chunk_idx
     ]
-    chunk_out = '["' + '", "'.join(chunk_str) + '"]'
-
-    return chunk_out
+    return '["' + '", "'.join(chunk_str) + '"]'
 
 
 def split_range(
     n: int, n_chunks: int = 256, min_chunk_size: int = 5
 ) -> list[tuple]:
     """
-    Splits a range of integers into smaller chunks.
+    Splits an integer into smaller chunks, where each chunk must be a minimum
+    size and there can be no more than N total chunks.
 
     Args:
         n: The total number of elements in the range.
@@ -94,8 +99,8 @@ def split_range(
         min_chunk_size: The minimum size of each chunk. Defaults to 5.
 
     Returns:
-        A list of tuples, where each tuple represents
-            the start and end indices of a chunk.
+        A list of tuples, where each tuple represents the zero-indexed
+        start and end indices of a chunk.
     """
     chunk_ranges = []
     if n > n_chunks * min_chunk_size:
@@ -108,9 +113,7 @@ def split_range(
         n_chunks_small = max(1, math.ceil(n / min_chunk_size))
         for i in range(n_chunks_small):
             start = i * min_chunk_size
-            end = ((i + 1) * min_chunk_size) - 1
-            if end >= n:
-                end = n - 1
+            end = min((i + 1) * min_chunk_size - 1, n - 1)
             chunk_ranges.append((start, end))
 
     if chunk_ranges[-1][1] < n:

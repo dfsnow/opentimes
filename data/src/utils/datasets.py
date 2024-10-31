@@ -1,3 +1,9 @@
+# This file is a dictionary that determines the construction of the public
+# OpenTimes files. partition_levels is the number of directories present in
+# the raw (non-public) data bucket before reaching the actual Parquet files.
+#
+# public_file_columns and order_by_columns define the columns present and order
+# of the public output files, respectively
 DATASET_DICT: dict = {
     "0.0.1": {
         "times": {
