@@ -1,7 +1,7 @@
 <meta charset="utf-8">
 
 {{ if ne .Site.Title .Title -}}
-<title>{{ .Title }}</title>
+<title>{{ .Site.Title }} | {{ .Title }}</title>
 {{ else -}}
 <title>{{ .Site.Title }}</title>
 {{ end -}}

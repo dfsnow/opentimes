@@ -1,17 +1,5 @@
 {{ define "main" }}
 <article>
-    <header class="post-header">
-        <h1 class="post-title">{{ .Title }}</h1>
-        {{- if isset .Params "date" -}}
-        <time class="post-meta" datetime='{{ .Date.Format "2006-01-02" }}'>{{ .Date.Format "January 2, 2006" }}</time>
-        {{- end -}}
-        {{- if isset .Params "rating" -}}
-        <a href="/hearts-and-ratings" class="post-rating">
-            <h3>Score: {{ .Params.rating }} / 10</h3>
-        </a>
-        {{- end -}}
-    </header>
     {{- partial "header-link.html" .Content -}}
 </article>
 {{ end }}
-
