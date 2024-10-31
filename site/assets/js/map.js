@@ -193,7 +193,15 @@ const colorScale = (duration) => {
   const spinner = new Spinner();
   spinner.show();
 
-  const [DuckDB, map] = await Promise.all([instantiateDB(), instantiateMap()]);
+  const [DuckDB, map, tractIdDisplay] = await Promise.all([
+    instantiateDB(),
+    instantiateMap(),
+    (async () => {
+      const display = createTractIdDisplay();
+      return display;
+    })()
+  ]);
+
   const db = await DuckDB.connect();
   spinner.hide();
 
