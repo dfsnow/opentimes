@@ -19,7 +19,7 @@ terraform {
     skip_requesting_account_id  = true
     skip_s3_checksum            = true
     use_path_style              = true
-    endpoint = "https://${var.cloudflare_account_id}.r2.cloudflarestorage.com"
+    endpoint                    = "https://${var.cloudflare_account_id}.r2.cloudflarestorage.com"
 
     /* Set AWS_PROFILE to "cloudflare" before running commands */
   }

@@ -19,9 +19,9 @@ resource "cloudflare_pages_project" "opentimes-org" {
   }
 
   build_config {
-    build_command       = "hugo --gc --minify"
-    destination_dir     = "public"
-    root_dir            = "site"
+    build_command   = "hugo --gc --minify"
+    destination_dir = "public"
+    root_dir        = "site"
   }
 
   deployment_configs {

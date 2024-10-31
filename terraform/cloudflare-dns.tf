@@ -17,18 +17,18 @@ resource "cloudflare_zone_settings_override" "opentimes-org" {
    managed by terraform. Likewise with the Cloudflare Pages CNAME records */
 
 resource "cloudflare_record" "opentimes-org-mx1-root" {
-  zone_id = cloudflare_zone.opentimes-org.id
-  name    = "opentimes.org"
-  type    = "MX"
-  content = "in1-smtp.messagingengine.com"
+  zone_id  = cloudflare_zone.opentimes-org.id
+  name     = "opentimes.org"
+  type     = "MX"
+  content  = "in1-smtp.messagingengine.com"
   priority = 10
 }
 
 resource "cloudflare_record" "opentimes-org-mx2-root" {
-  zone_id = cloudflare_zone.opentimes-org.id
-  name    = "opentimes.org"
-  type    = "MX"
-  content = "in2-smtp.messagingengine.com"
+  zone_id  = cloudflare_zone.opentimes-org.id
+  name     = "opentimes.org"
+  type     = "MX"
+  content  = "in2-smtp.messagingengine.com"
   priority = 20
 }
 

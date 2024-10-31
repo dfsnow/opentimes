@@ -18,9 +18,9 @@ resource "cloudflare_ruleset" "cache_data_subdomain" {
       serve_stale {
         disable_stale_while_updating = true
       }
-      respect_strong_etags = false
+      respect_strong_etags       = false
       origin_error_page_passthru = false
-      cache = true
+      cache                      = true
     }
     expression  = "(http.request.full_uri wildcard \"https://data.opentimes.org/*\")"
     description = "Cache data files for data subdomain"
@@ -37,15 +37,15 @@ resource "cloudflare_ruleset" "serve_index_data_subdomain" {
 
   rules {
     action = "rewrite"
-      action_parameters {
-        uri {
-          path {
-            expression = "concat(http.request.uri.path, \"index.html\")"
-          }
+    action_parameters {
+      uri {
+        path {
+          expression = "concat(http.request.uri.path, \"index.html\")"
         }
       }
-    expression = "starts_with(http.host, \"data\") and (ends_with(http.request.uri.path, \"/\") or http.request.uri.path == \"\") and not (ends_with(http.request.uri.path, \".json\") or ends_with(http.request.uri.path, \".parquet\"))"
-    description = "Rewrite all / to index.html in data subdomain" 
-    enabled = true
+    }
+    expression  = "starts_with(http.host, \"data\") and (ends_with(http.request.uri.path, \"/\") or http.request.uri.path == \"\") and not (ends_with(http.request.uri.path, \".json\") or ends_with(http.request.uri.path, \".parquet\"))"
+    description = "Rewrite all / to index.html in data subdomain"
+    enabled     = true
   }
 }
