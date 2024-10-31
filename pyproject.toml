@@ -1,10 +1,15 @@
 [project]
 name = "opentimes"
 version = "0.0.1"
-description = "Free multi-modal travel times between U.S. Census geographies"
-keywords = ["data engineering", "travel times", "spatial access"]
+description = "Free travel times between U.S. Census geographies"
+keywords = [
+  "accessibility",
+  "spatial access",
+  "travel times",
+  "travel time estimation"
+]
 authors = [
-  {name = "Dan Snow", email = "dan@sno.ws"}
+  {name = "Dan Snow", email = "info@opentimes.org"}
 ]
 classifiers = [
   "Development Status :: 1 - Planning",
@@ -24,8 +29,8 @@ dependencies = [
 ]
 
 [project.urls]
-Repository = "https://github.com/dfsnow/opentimes"
-Documentation = "https://opentimes.org"
+repository = "https://github.com/dfsnow/opentimes"
+homepage = "https://opentimes.org"
 
 [project.optional-dependencies]
 data = [
