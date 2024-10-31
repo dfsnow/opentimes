@@ -4,9 +4,9 @@ title = "About"
 
 # What is OpenTimes?
 
-OpenTimes is a database of around 20 billion point-to-point travel times
-and distances between United States Census geographies. It lets you download
-bulk travel data for free and with no limits.
+OpenTimes lets you download bulk travel data for free and with no limits.
+It is a database of around 20 billion point-to-point travel times and
+distances between United States Census geographies.
 
 All times are calculated using open-source software from publicly available
 data. The OpenTimes data pipelines, infrastructure, packages, and website
