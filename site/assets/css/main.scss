@@ -28,7 +28,7 @@
 html {
   font-size: 62.5%;
   height: 100%;
-  scroll-padding-top: 7em;
+  scroll-padding-top: 2em;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -173,6 +173,28 @@ ol {
   }
 
   >article {
+
+    h2,
+    h3,
+    h4,
+    h5 {
+      margin: 1.5em auto 0.5em;
+    }
+
+    p {
+      margin: 0.5em auto;
+    }
+
+    hr {
+      margin: 2.5em auto;
+    }
+
+    summary {
+      margin-top: 1em;
+      font-size: 1.17em;
+      font-weight: bold;
+    }
+
     max-width: var(--full-width);
     margin: auto;
     padding: 1em 1.25em 1.25em;

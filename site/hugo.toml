@@ -1,10 +1,17 @@
 baseURL = "https://opentimes.org/"
 languageCode = "en-us"
-title = "Opentimes"
+title = "OpenTimes"
 disableKinds = ["taxonomy", "term"]
 enableInlineShortcodes = true
 pygmentsCodeFences = true
 pygmentsUseClasses = true
+
+[markup.goldmark.renderer]
+  # Allow HTML in Markdown
+  unsafe = true
+
+[markup.goldmark.extensions]
+  linkify = false
 
 [params]
   description = "Free multi-modal travel times between U.S. Census geographies"
