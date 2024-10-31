@@ -1,0 +1,32 @@
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+name: pre-commit
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install pre-commit
+        shell: bash
+        run: pip install pre-commit
+
+      - name: Cache pre-commit environment
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Run pre-commit
+        shell: bash
+        run: pre-commit run --show-diff-on-failure --color=always --all-files
