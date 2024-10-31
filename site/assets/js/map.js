@@ -7,25 +7,20 @@ class Spinner {
   constructor() {
     this.spinner = document.createElement("div");
     this.spinner.id = "map-spinner";
-
     this.overlay = document.createElement("div");
     this.overlay.id = "map-overlay";
   }
 
   show() {
-    const contentDiv = document.querySelector(".content");
-    contentDiv.appendChild(this.overlay);
-    contentDiv.appendChild(this.spinner);
+    document.querySelector(".content").append(this.overlay, this.spinner);
   }
 
   hide() {
-    const contentDiv = document.querySelector(".content");
-    contentDiv.removeChild(this.spinner);
-    contentDiv.removeChild(this.overlay);
+    document.querySelector(".content").removeChild(this.spinner);
+    document.querySelector(".content").removeChild(this.overlay);
   }
 }
 
-// Initialize and return DuckDB instance
 async function instantiateDB() {
   const bundles = duckdb.getJsDelivrBundles();
   const bundle = await duckdb.selectBundle(bundles);
@@ -144,7 +139,7 @@ function addColorScale(map) {
 
   const legendTitle = document.createElement("div");
   legendTitle.innerHTML = "<h3>Travel time<br>(driving)</h3>";
-  scaleContainer.appendChild(legendTitle);
+  scaleContainer.append(legendTitle);
 
   const colors = [
     { color: "var(--color-less-15-min)", label: "< 15 min" },
@@ -165,13 +160,12 @@ function addColorScale(map) {
     const text = document.createElement("span");
     text.textContent = label;
     colorBox.style.backgroundColor = color;
-    item.appendChild(colorBox);
-    item.appendChild(text);
-    scaleContainer.appendChild(item);
+    item.append(colorBox, text);
+    scaleContainer.append(item);
   });
 
-  scaleContainer.appendChild(toggleButton);
-  map.getContainer().appendChild(scaleContainer);
+  scaleContainer.append(toggleButton);
+  map.getContainer().append(scaleContainer);
 }
 
 // Color scale based on duration
@@ -203,10 +197,8 @@ const colorScale = (duration) => {
   ]);
 
   const db = await DuckDB.connect();
-  spinner.hide();
-
-  const tractIdDisplay = createTractIdDisplay();
   addColorScale(map);
+  spinner.hide();
 
   let hoveredPolygonId = null;
   map.on("mousemove", (e) => {
@@ -235,7 +227,7 @@ const colorScale = (duration) => {
   });
 
   // Clear hover
-  map.on("mouseleave", (e) => {
+  map.on("mouseleave", () => {
     if (hoveredPolygonId !== null) {
       map.setFeatureState(
         { source: "protomap", sourceLayer: "tracts", id: hoveredPolygonId },
@@ -289,4 +281,3 @@ const colorScale = (duration) => {
     }
   });
 })();
-
