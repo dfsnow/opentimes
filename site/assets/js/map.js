@@ -32,6 +32,7 @@ async function instantiateDB() {
   await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
   URL.revokeObjectURL(workerUrl);
 
+
   return db;
 }
 
@@ -197,6 +198,7 @@ const colorScale = (duration) => {
   ]);
 
   const db = await DuckDB.connect();
+  db.query("LOAD parquet");
   addColorScale(map);
   spinner.hide();
 
