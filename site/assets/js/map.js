@@ -153,6 +153,15 @@ async function instantiateMap() {
 }
 
 function addMapLayers(map) {
+  const layers = map.getStyle().layers;
+  // Find the index of the first symbol layer in the map style
+  let firstSymbolId;
+  for (const layer of layers) {
+    if (layer.type === 'symbol') {
+      firstSymbolId = layer.id;
+      break;
+    }
+  }
   map.addLayer({
     id: "tracts_fill",
     type: "fill",
@@ -162,16 +171,16 @@ function addMapLayers(map) {
     paint: {
       "fill-color": [
         "case",
-        ["==", ["feature-state", "tract_color"], "color_1"], "rgba(253, 231, 37, 0.5)",
-        ["==", ["feature-state", "tract_color"], "color_2"], "rgba(122, 209, 81, 0.5)",
-        ["==", ["feature-state", "tract_color"], "color_3"], "rgba(34, 168, 132, 0.5)",
-        ["==", ["feature-state", "tract_color"], "color_4"], "rgba(42, 120, 142, 0.5)",
-        ["==", ["feature-state", "tract_color"], "color_5"], "rgba(65, 68, 135, 0.5)",
-        ["==", ["feature-state", "tract_color"], "color_6"], "rgba(68, 1, 84, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_1"], "rgba(253, 231, 37, 0.4)",
+        ["==", ["feature-state", "tract_color"], "color_2"], "rgba(122, 209, 81, 0.4)",
+        ["==", ["feature-state", "tract_color"], "color_3"], "rgba(34, 168, 132, 0.4)",
+        ["==", ["feature-state", "tract_color"], "color_4"], "rgba(42, 120, 142, 0.4)",
+        ["==", ["feature-state", "tract_color"], "color_5"], "rgba(65, 68, 135, 0.4)",
+        ["==", ["feature-state", "tract_color"], "color_6"], "rgba(68, 1, 84, 0.4)",
         "rgba(255, 255, 255, 0.0)"
       ],
     },
-  });
+  }, firstSymbolId);
 
   map.addLayer({
     id: "tracts_line",
@@ -184,7 +193,7 @@ function addMapLayers(map) {
         "case",
         ["boolean", ["feature-state", "hover"], false],
         0.5,
-        0.2
+        0.0
       ],
       "line-color": "#333",
       "line-width": [
@@ -194,7 +203,7 @@ function addMapLayers(map) {
         1
       ]
     },
-  });
+  }, firstSymbolId);
 }
 
 function updateMapFill(map, previousStates) {
