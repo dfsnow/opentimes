@@ -13,15 +13,16 @@
   --full-width: 720px;
 
   // Map color scale vars (viridis)
-  --color-less-15-min: rgba(91, 55, 125, 0.5);
-  --color-15-30-min: rgba(204, 121, 167, 0.5);
-  --color-30-45-min: rgba(86, 180, 233, 0.5);
-  --color-45-60-min: rgba(0, 158, 115, 0.5);
-  --color-60-90-min: rgba(142, 181, 2, 0.5);
-  --color-90-120-min: rgba(240, 228, 66, 0.5);
-  --color-2-3-hrs: rgba(230, 159, 0, 0.5);
-  --color-3-4-hrs: rgba(213, 50, 0, 0.5);
-  --color-4-6-hrs: rgba(158, 1, 66, 0.5);
+  --color-less-15-min: rgba(253, 231, 37, 0.5);
+  --color-15-30-min: rgba(180, 222, 44, 0.5);
+  --color-30-45-min: rgba(109, 205, 89, 0.5);
+  --color-45-60-min: rgba(53, 183, 121, 0.5);
+  --color-60-90-min: rgba(31, 158, 137, 0.5);
+  --color-90-120-min: rgba(38, 130, 142, 0.5);
+  --color-2-3-hrs: rgba(49, 104, 142, 0.5);
+  --color-3-4-hrs: rgba(62, 74, 137, 0.5);
+  --color-4-6-hrs: rgba(72, 40, 120, 0.5);
+  --color-more-6-hrs: rgba(68, 1, 84, 0.5);
 }
 
 html {

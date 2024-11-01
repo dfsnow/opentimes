@@ -78,15 +78,16 @@ function addMapLayers(map) {
     paint: {
       "fill-color": [
         "case",
-        ["==", ["feature-state", "tract_color"], "color_1"], "rgba(91, 55, 125, 0.5)",
-        ["==", ["feature-state", "tract_color"], "color_2"], "rgba(204, 121, 167, 0.5)",
-        ["==", ["feature-state", "tract_color"], "color_3"], "rgba(86, 180, 233, 0.5)",
-        ["==", ["feature-state", "tract_color"], "color_4"], "rgba(0, 158, 115, 0.5)",
-        ["==", ["feature-state", "tract_color"], "color_5"], "rgba(142, 182, 2, 0.5)",
-        ["==", ["feature-state", "tract_color"], "color_6"], "rgba(240, 228, 66, 0.5)",
-        ["==", ["feature-state", "tract_color"], "color_7"], "rgba(230, 159, 0, 0.5)",
-        ["==", ["feature-state", "tract_color"], "color_8"], "rgba(213, 50, 0, 0.5)",
-        ["==", ["feature-state", "tract_color"], "color_9"], "rgba(183, 1, 77, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_1"], "rgba(253, 231, 37, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_2"], "rgba(180, 222, 44, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_3"], "rgba(109, 205, 89, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_4"], "rgba(53, 183, 121, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_5"], "rgba(31, 158, 137, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_6"], "rgba(38, 130, 142, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_7"], "rgba(49, 104, 142, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_8"], "rgba(62, 74, 137, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_9"], "rgba(72, 40, 120, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_10"], "rgba(68, 1, 84, 0.5)",
         "rgba(255, 255, 255, 0.0)"
       ],
     },
@@ -151,6 +152,7 @@ function addColorScale(map) {
     { color: "var(--color-2-3-hrs)", label: "2-3 hrs" },
     { color: "var(--color-3-4-hrs)", label: "3-4 hrs" },
     { color: "var(--color-4-6-hrs)", label: "4-6 hrs" },
+    { color: "var(--color-more-6-hrs)", label: "> 6 hrs" },
   ];
 
   colors.forEach(({ color, label }) => {
@@ -178,6 +180,7 @@ const colorScale = (duration) => {
   if (duration < 10800) return "color_7";
   if (duration < 14400) return "color_8";
   if (duration < 21600) return "color_9";
+  if (duration < 28800) return "color_10";
   return "none";
 };
 
