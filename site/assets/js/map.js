@@ -1,7 +1,71 @@
 import * as duckdb from "https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.29.0/+esm";
 
+const zoomThresholds = [6, 8];
 const protocol = new pmtiles.Protocol();
 maplibregl.addProtocol("pmtiles", protocol.tile);
+
+class ColorScale {
+  constructor(map) {
+    this.map = map;
+    this.scaleContainer = document.createElement("div");
+    this.toggleButton = document.createElement("button");
+    this.colors = [
+      { color: "var(--map-color-1)", label: "< 15 min" },
+      { color: "var(--map-color-2)", label: "15-30 min" },
+      { color: "var(--map-color-3)", label: "30-45 min" },
+      { color: "var(--map-color-4)", label: "45-60 min" },
+      { color: "var(--map-color-5)", label: "60-75 min" },
+      { color: "var(--map-color-6)", label: "75-90 min" },
+    ];
+    this.init();
+  }
+
+  init() {
+    this.scaleContainer.id = "map-color-scale";
+    this.toggleButton.id = "map-color-scale-toggle";
+
+    this.toggleButton.innerHTML = "&#x2212;"; // Unicode for minus sign
+    this.toggleButton.onclick = () => {
+      const isCollapsed = this.scaleContainer.classList.toggle("collapsed");
+      this.toggleButton.innerHTML = isCollapsed ? "&#x2b;" : "&#x2212;"; // Unicode for plus and minus signs
+    };
+
+    const legendTitle = document.createElement("div");
+    legendTitle.innerHTML = "<h3>Travel time<br>(driving)</h3>";
+    this.scaleContainer.append(legendTitle);
+
+    this.colors.forEach(({ color, label }) => {
+      const item = document.createElement("div");
+      const colorBox = document.createElement("div");
+      const text = document.createElement("span");
+      text.textContent = label;
+      colorBox.style.backgroundColor = color;
+      item.append(colorBox, text);
+      this.scaleContainer.append(item);
+    });
+
+    this.scaleContainer.append(this.toggleButton);
+    this.map.getContainer().append(this.scaleContainer);
+  }
+
+  updateLabels(zoom) {
+    const labels = this.getLabelsForZoom(zoom);
+    const items = this.scaleContainer.querySelectorAll("div > span");
+    items.forEach((item, index) => {
+      item.textContent = labels[index];
+    });
+  }
+
+  getLabelsForZoom(zoom) {
+    if (zoom < zoomThresholds[0]) {
+      return ["< 1 hr", "1-2 hrs", "2-3 hrs", "3-4 hrs", "4-5 hrs", "5-6 hrs"];
+    } else if (zoom < zoomThresholds[1]) {
+      return ["< 30 min", "30-60 min", "1.0-1.5 hrs", "1.5-2.0 hrs", "2.5-3.0 hrs", "3.0-3.5 hrs"];
+    } else {
+      return ["< 15 min", "15-30 min", "30-45 min", "45-60 min", "60-75 min", "75-90 min"];
+    }
+  }
+}
 
 class Spinner {
   constructor() {
@@ -79,15 +143,11 @@ function addMapLayers(map) {
       "fill-color": [
         "case",
         ["==", ["feature-state", "tract_color"], "color_1"], "rgba(253, 231, 37, 0.5)",
-        ["==", ["feature-state", "tract_color"], "color_2"], "rgba(180, 222, 44, 0.5)",
-        ["==", ["feature-state", "tract_color"], "color_3"], "rgba(109, 205, 89, 0.5)",
-        ["==", ["feature-state", "tract_color"], "color_4"], "rgba(53, 183, 121, 0.5)",
-        ["==", ["feature-state", "tract_color"], "color_5"], "rgba(31, 158, 137, 0.5)",
-        ["==", ["feature-state", "tract_color"], "color_6"], "rgba(38, 130, 142, 0.5)",
-        ["==", ["feature-state", "tract_color"], "color_7"], "rgba(49, 104, 142, 0.5)",
-        ["==", ["feature-state", "tract_color"], "color_8"], "rgba(62, 74, 137, 0.5)",
-        ["==", ["feature-state", "tract_color"], "color_9"], "rgba(72, 40, 120, 0.5)",
-        ["==", ["feature-state", "tract_color"], "color_10"], "rgba(68, 1, 84, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_2"], "rgba(122, 209, 81, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_3"], "rgba(34, 168, 132, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_4"], "rgba(42, 120, 142, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_5"], "rgba(65, 68, 135, 0.5)",
+        ["==", ["feature-state", "tract_color"], "color_6"], "rgba(68, 1, 84, 0.5)",
         "rgba(255, 255, 255, 0.0)"
       ],
     },
@@ -117,6 +177,24 @@ function addMapLayers(map) {
   });
 }
 
+function updateMapFill(map, previousStates) {
+  previousStates.forEach(state =>
+    map.setFeatureState(
+      { source: "protomap", sourceLayer: "tracts", id: state.id },
+      { tract_color: getColorScale(state.duration, map.getZoom()) }
+    )
+  );
+}
+
+function wipeMapPreviousState(map, previousStates) {
+  previousStates.forEach(state =>
+    map.setFeatureState(
+      { source: "protomap", sourceLayer: "tracts", id: state.id },
+      { tract_color: "none" }
+    )
+  );
+}
+
 // Create display for current tract
 function createTractIdDisplay() {
   const display = document.createElement("div");
@@ -126,63 +204,27 @@ function createTractIdDisplay() {
   return display;
 }
 
-function addColorScale(map) {
-  const scaleContainer = document.createElement("div");
-  const toggleButton = document.createElement("button");
-  scaleContainer.id = "map-color-scale";
-  toggleButton.id = "map-color-scale-toggle";
-
-  toggleButton.innerHTML = "&#x2212;"; // Unicode for minus sign
-  toggleButton.onclick = () => {
-    const isCollapsed = scaleContainer.classList.toggle("collapsed");
-    toggleButton.innerHTML = isCollapsed ? "&#x2b;" : "&#x2212;"; // Unicode for plus and minus signs
-  };
-
-  const legendTitle = document.createElement("div");
-  legendTitle.innerHTML = "<h3>Travel time<br>(driving)</h3>";
-  scaleContainer.append(legendTitle);
-
-  const colors = [
-    { color: "var(--color-less-15-min)", label: "< 15 min" },
-    { color: "var(--color-15-30-min)", label: "15-30 min" },
-    { color: "var(--color-30-45-min)", label: "30-45 min" },
-    { color: "var(--color-45-60-min)", label: "45-60 min" },
-    { color: "var(--color-60-90-min)", label: "60-90 min" },
-    { color: "var(--color-90-120-min)", label: "90-120 min" },
-    { color: "var(--color-2-3-hrs)", label: "2-3 hrs" },
-    { color: "var(--color-3-4-hrs)", label: "3-4 hrs" },
-    { color: "var(--color-4-6-hrs)", label: "4-6 hrs" },
-    { color: "var(--color-more-6-hrs)", label: "> 6 hrs" },
-  ];
-
-  colors.forEach(({ color, label }) => {
-    const item = document.createElement("div");
-    const colorBox = document.createElement("div");
-    const text = document.createElement("span");
-    text.textContent = label;
-    colorBox.style.backgroundColor = color;
-    item.append(colorBox, text);
-    scaleContainer.append(item);
-  });
-
-  scaleContainer.append(toggleButton);
-  map.getContainer().append(scaleContainer);
-}
-
-// Color scale based on duration
-const colorScale = (duration) => {
-  if (duration < 900) return "color_1";
-  if (duration < 1800) return "color_2";
-  if (duration < 2700) return "color_3";
-  if (duration < 3600) return "color_4";
-  if (duration < 5400) return "color_5";
-  if (duration < 7200) return "color_6";
-  if (duration < 10800) return "color_7";
-  if (duration < 14400) return "color_8";
-  if (duration < 21600) return "color_9";
-  if (duration < 28800) return "color_10";
+// Color scale based on duration and zoom
+const getColorScale = (duration, zoom) => {
+  const thresholds = getThresholdsForZoom(zoom);
+  if (duration < thresholds[0]) return "color_1";
+  if (duration < thresholds[1]) return "color_2";
+  if (duration < thresholds[2]) return "color_3";
+  if (duration < thresholds[3]) return "color_4";
+  if (duration < thresholds[4]) return "color_5";
+  if (duration < thresholds[5]) return "color_6";
   return "none";
 };
+
+function getThresholdsForZoom(zoom) {
+  if (zoom < zoomThresholds[0]) {
+    return [3600, 7200, 10800, 14400, 21600, 28800];
+  } else if (zoom < zoomThresholds[1]) {
+    return [1800, 3600, 5400, 7200, 10800, 14400];
+  } else {
+    return [900, 1800, 2700, 3600, 5400, 7200];
+  }
+}
 
 (async () => {
   const spinner = new Spinner();
@@ -197,9 +239,9 @@ const colorScale = (duration) => {
     })()
   ]);
 
+  const colorScale = new ColorScale(map);
   const db = await DuckDB.connect();
   db.query("LOAD parquet");
-  addColorScale(map);
   spinner.hide();
 
   let hoveredPolygonId = null;
@@ -264,22 +306,33 @@ const colorScale = (duration) => {
             AND origin_id = '${feature.properties.id}'
       `);
 
-      previousStates.forEach(state =>
-        map.setFeatureState(
-          { source: "protomap", sourceLayer: "tracts", id: state.id },
-          { tract_color: "none" }
-        )
-      );
-
+      wipeMapPreviousState(map, previousStates)
       previousStates = result.toArray().map(row => {
-        const destinationId = row.toJSON().destination_id;
         map.setFeatureState(
-          { source: "protomap", sourceLayer: "tracts", id: destinationId },
-          { tract_color: colorScale(row.duration_sec) }
+          { source: "protomap", sourceLayer: "tracts", id: row.destination_id },
+          { tract_color: getColorScale(row.duration_sec, map.getZoom()) }
         );
-        return { id: destinationId };
+        return { id: row.destination_id, duration: row.duration_sec };
       });
       spinner.hide();
     }
+  });
+
+  let previousZoomLevel = null;
+  map.on("zoom", () => {
+    const currentZoomLevel = map.getZoom();
+    if (previousZoomLevel !== null) {
+      const crossedThreshold = zoomThresholds.some(
+        (threshold) =>
+          (previousZoomLevel < threshold && currentZoomLevel >= threshold) ||
+          (previousZoomLevel >= threshold && currentZoomLevel < threshold)
+      );
+
+      if (crossedThreshold) {
+        updateMapFill(map, previousStates);
+        colorScale.updateLabels(currentZoomLevel);
+      }
+    }
+    previousZoomLevel = currentZoomLevel;
   });
 })();

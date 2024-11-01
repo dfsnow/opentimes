@@ -11,18 +11,12 @@
   --link-color: #2979bc;
   --visited-link-color: #8f5baa;
   --full-width: 720px;
-
-  // Map color scale vars (viridis)
-  --color-less-15-min: rgba(253, 231, 37, 0.5);
-  --color-15-30-min: rgba(180, 222, 44, 0.5);
-  --color-30-45-min: rgba(109, 205, 89, 0.5);
-  --color-45-60-min: rgba(53, 183, 121, 0.5);
-  --color-60-90-min: rgba(31, 158, 137, 0.5);
-  --color-90-120-min: rgba(38, 130, 142, 0.5);
-  --color-2-3-hrs: rgba(49, 104, 142, 0.5);
-  --color-3-4-hrs: rgba(62, 74, 137, 0.5);
-  --color-4-6-hrs: rgba(72, 40, 120, 0.5);
-  --color-more-6-hrs: rgba(68, 1, 84, 0.5);
+  --map-color-1: rgba(253, 231, 37, 0.5);
+  --map-color-2: rgba(122, 209, 81, 0.5);
+  --map-color-3: rgba(34, 168, 132, 0.5);
+  --map-color-4: rgba(42, 120, 142, 0.5);
+  --map-color-5: rgba(65, 68, 135, 0.5);
+  --map-color-6: rgba(68, 1, 84, 0.5);
 }
 
 html {
@@ -370,8 +364,17 @@ blockquote p,
   padding: 10px;
   border-radius: 5px;
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+  min-width: 90px;
+}
+
+#map-color-scale.collapsed {
+  padding: 0;
   min-width: 30px;
   min-height: 30px;
+
+  >div:not(:last-child) {
+    display: none;
+  }
 }
 
 #map-color-scale div {
@@ -411,13 +414,6 @@ blockquote p,
   line-height: 1;
 }
 
-#map-color-scale.collapsed {
-  padding: 0;
-
-  >div:not(:last-child) {
-    display: none;
-  }
-}
 
 @keyframes spinner {
   0% {
