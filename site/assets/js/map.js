@@ -7,9 +7,31 @@ maplibregl.addProtocol("pmtiles", protocol.tile);
 class ColorScale {
   constructor(map) {
     this.map = map;
-    this.scaleContainer = document.createElement("div");
-    this.toggleButton = document.createElement("button");
-    this.colors = [
+    this.scaleContainer = this.createScaleContainer();
+    this.toggleButton = this.createToggleButton();
+    this.colors = this.getColors();
+    this.init();
+  }
+
+  createScaleContainer() {
+    const container = document.createElement("div");
+    container.id = "map-color-scale";
+    return container;
+  }
+
+  createToggleButton() {
+    const button = document.createElement("button");
+    button.id = "map-color-scale-toggle";
+    button.innerHTML = "&#x2212;";
+    button.onclick = () => {
+      const isCollapsed = this.scaleContainer.classList.toggle("collapsed");
+      button.innerHTML = isCollapsed ? "&#x2b;" : "&#x2212;";
+    };
+    return button;
+  }
+
+  getColors() {
+    return [
       { color: "var(--map-color-1)", label: "< 15 min" },
       { color: "var(--map-color-2)", label: "15-30 min" },
       { color: "var(--map-color-3)", label: "30-45 min" },
@@ -17,19 +39,9 @@ class ColorScale {
       { color: "var(--map-color-5)", label: "60-75 min" },
       { color: "var(--map-color-6)", label: "75-90 min" },
     ];
-    this.init();
   }
 
   init() {
-    this.scaleContainer.id = "map-color-scale";
-    this.toggleButton.id = "map-color-scale-toggle";
-
-    this.toggleButton.innerHTML = "&#x2212;"; // Unicode for minus sign
-    this.toggleButton.onclick = () => {
-      const isCollapsed = this.scaleContainer.classList.toggle("collapsed");
-      this.toggleButton.innerHTML = isCollapsed ? "&#x2b;" : "&#x2212;"; // Unicode for plus and minus signs
-    };
-
     const legendTitle = document.createElement("div");
     legendTitle.innerHTML = "<h3>Travel time<br>(driving)</h3>";
     this.scaleContainer.append(legendTitle);
@@ -69,10 +81,20 @@ class ColorScale {
 
 class Spinner {
   constructor() {
-    this.spinner = document.createElement("div");
-    this.spinner.id = "map-spinner";
-    this.overlay = document.createElement("div");
-    this.overlay.id = "map-overlay";
+    this.spinner = this.createSpinner();
+    this.overlay = this.createOverlay();
+  }
+
+  createSpinner() {
+    const spinner = document.createElement("div");
+    spinner.id = "map-spinner";
+    return spinner;
+  }
+
+  createOverlay() {
+    const overlay = document.createElement("div");
+    overlay.id = "map-overlay";
+    return overlay;
   }
 
   show() {
@@ -96,11 +118,9 @@ async function instantiateDB() {
   await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
   URL.revokeObjectURL(workerUrl);
 
-
   return db;
 }
 
-// Initialize and configure map instance
 async function instantiateMap() {
   const map = new maplibregl.Map({
     style: "https://tiles.openfreemap.org/styles/positron",
@@ -195,7 +215,6 @@ function wipeMapPreviousState(map, previousStates) {
   );
 }
 
-// Create display for current tract
 function createTractIdDisplay() {
   const display = document.createElement("div");
   display.id = "map-info";
@@ -204,7 +223,6 @@ function createTractIdDisplay() {
   return display;
 }
 
-// Color scale based on duration and zoom
 const getColorScale = (duration, zoom) => {
   const thresholds = getThresholdsForZoom(zoom);
   if (duration < thresholds[0]) return "color_1";
@@ -233,10 +251,7 @@ function getThresholdsForZoom(zoom) {
   const [DuckDB, map, tractIdDisplay] = await Promise.all([
     instantiateDB(),
     instantiateMap(),
-    (async () => {
-      const display = createTractIdDisplay();
-      return display;
-    })()
+    (async () => createTractIdDisplay())()
   ]);
 
   const colorScale = new ColorScale(map);
@@ -319,7 +334,7 @@ function getThresholdsForZoom(zoom) {
   });
 
   let previousZoomLevel = null;
-  map.on("zoom", () => {
+  map.on("zoom", debounce(() => {
     const currentZoomLevel = map.getZoom();
     if (previousZoomLevel !== null) {
       const crossedThreshold = zoomThresholds.some(
@@ -334,5 +349,13 @@ function getThresholdsForZoom(zoom) {
       }
     }
     previousZoomLevel = currentZoomLevel;
-  });
+  }, 100));
 })();
+
+function debounce(func, wait) {
+  let timeout;
+  return function(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
