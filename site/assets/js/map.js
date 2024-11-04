@@ -1,6 +1,9 @@
 import * as duckdb from "https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.29.0/+esm";
 
+const baseUrl = "https://data.opentimes.org/times/version=0.0.1/mode=auto/year=2024/geography=tract"
+const bigStates = ["06", "36"];
 const zoomThresholds = [6, 8];
+
 const protocol = new pmtiles.Protocol();
 maplibregl.addProtocol("pmtiles", protocol.tile);
 
@@ -131,6 +134,7 @@ async function instantiateMap() {
     container: "map",
     maxZoom: 12,
     minZoom: 2,
+    hash: true,
     maxBounds: [
       [-175.0, -9.0],
       [-20.0, 72.1],
@@ -157,7 +161,7 @@ function addMapLayers(map) {
   // Find the index of the first symbol layer in the map style
   let firstSymbolId;
   for (const layer of layers) {
-    if (layer.type === 'symbol') {
+    if (layer.type === "symbol") {
       firstSymbolId = layer.id;
       break;
     }
@@ -253,7 +257,61 @@ function getThresholdsForZoom(zoom) {
   }
 }
 
+async function runQuery(map, db, state, id, previousStates) {
+  const queryUrl = `${baseUrl}/state=${state}/times-0.0.1-auto-2024-tract-${state}`;
+  const urlsArray = bigStates.includes(state)
+    ? [`${queryUrl}-0.parquet`, `${queryUrl}-1.parquet`]
+    : [`${queryUrl}-0.parquet`];
+  const joinedUrls = urlsArray.map(url => `'${url}'`).join(',');
+
+  let result;
+  try {
+    result = await db.query(`
+      SELECT destination_id, duration_sec
+      FROM read_parquet([${joinedUrls}])
+      WHERE version = '0.0.1'
+          AND mode = 'auto'
+          AND year = '2024'
+          AND geography = 'tract'
+          AND centroid_type = 'weighted'
+          AND state = '${state}'
+          AND origin_id = '${id}'
+    `);
+  } catch (error) {
+    console.error("Error executing query:", error);
+    return previousStates;
+  }
+
+  if (result.length === 0) {
+    console.error("No results found for the query.");
+    return previousStates;
+  }
+
+  wipeMapPreviousState(map, previousStates)
+  const returnStates = result.toArray().map(row => {
+    map.setFeatureState(
+      { source: "protomap", sourceLayer: "tracts", id: row.destination_id },
+      { tract_color: getColorScale(row.duration_sec, map.getZoom()) }
+    );
+    return { id: row.destination_id, duration: row.duration_sec };
+  });
+
+  return returnStates;
+}
+
+function debounce(func, wait) {
+  let timeout;
+  return function(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
+
 (async () => {
+  let hoveredPolygonId = null;
+  let previousStates = [];
+  let previousZoomLevel = null;
+
   const spinner = new Spinner();
   spinner.show();
 
@@ -266,9 +324,25 @@ function getThresholdsForZoom(zoom) {
   const colorScale = new ColorScale(map);
   const db = await DuckDB.connect();
   db.query("LOAD parquet");
+
+  // Load the previous map click if there was one
+  let idParam = new URLSearchParams(window.location.search).get("id");
+  if (idParam) {
+    previousStates = await runQuery(
+      map, db,
+      idParam.substring(0, 2), idParam,
+      previousStates
+    );
+  }
+
+  // Remove the hash if map is at starting location
+  if (window.location.hash === "#10/40.75/-74") {
+    console.log(window.location.hash);
+    window.history.replaceState({}, "", window.location.pathname + window.location.search);
+  }
+
   spinner.hide();
 
-  let hoveredPolygonId = null;
   map.on("mousemove", (e) => {
     const features = map.queryRenderedFeatures(e.point, { layers: ["tracts_fill"] });
     const feature = features[0];
@@ -305,44 +379,24 @@ function getThresholdsForZoom(zoom) {
     hoveredPolygonId = null;
   });
 
-  let previousStates = [];
   map.on("click", async (e) => {
     const features = map.queryRenderedFeatures(e.point, { layers: ["tracts_fill"] });
     if (features.length > 0) {
       spinner.show();
       const feature = features[0];
-      const baseUrl = `https://data.opentimes.org/times/version=0.0.1/mode=auto/year=2024/geography=tract/state=${feature.properties.state}/times-0.0.1-auto-2024-tract-${feature.properties.state}`;
-      const bigStates = ["06", "36"];
-      const urlsArray = bigStates.includes(feature.properties.state)
-        ? [`${baseUrl}-0.parquet`, `${baseUrl}-1.parquet`]
-        : [`${baseUrl}-0.parquet`];
-      const joinedUrls = urlsArray.map(url => `'${url}'`).join(',');
+      previousStates = await runQuery(map, db, feature.properties.state, feature.properties.id, previousStates);
 
-      const result = await db.query(`
-        SELECT destination_id, duration_sec
-        FROM read_parquet([${joinedUrls}])
-        WHERE version = '0.0.1'
-            AND mode = 'auto'
-            AND year = '2024'
-            AND geography = 'tract'
-            AND centroid_type = 'weighted'
-            AND state = '${feature.properties.state}'
-            AND origin_id = '${feature.properties.id}'
-      `);
-
-      wipeMapPreviousState(map, previousStates)
-      previousStates = result.toArray().map(row => {
-        map.setFeatureState(
-          { source: "protomap", sourceLayer: "tracts", id: row.destination_id },
-          { tract_color: getColorScale(row.duration_sec, map.getZoom()) }
-        );
-        return { id: row.destination_id, duration: row.duration_sec };
-      });
+      // Update the URL with ID
+      window.history.replaceState({}, "", `?id=${feature.properties.id}${window.location.hash}`);
+      idParam = feature.properties.id;
       spinner.hide();
     }
   });
 
-  let previousZoomLevel = null;
+  map.on("moveend", () => {
+    window.history.replaceState({}, "", `${idParam ? `?id=${idParam}` : ""}${window.location.hash}`);
+  });
+
   map.on("zoom", debounce(() => {
     const currentZoomLevel = map.getZoom();
     if (previousZoomLevel !== null) {
@@ -360,11 +414,3 @@ function getThresholdsForZoom(zoom) {
     previousZoomLevel = currentZoomLevel;
   }, 100));
 })();
-
-function debounce(func, wait) {
-  let timeout;
-  return function(...args) {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func.apply(this, args), wait);
-  };
-}
