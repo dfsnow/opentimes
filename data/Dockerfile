@@ -24,7 +24,7 @@ RUN userdel -f valhalla && \
     install -d -m 0755 -o valhalla -g valhalla /home/valhalla
 
 # Install Python dependencies for opentimes work inside docker
-COPY --from=ghcr.io/astral-sh/uv:0.4.30 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.5.0 /uv /uvx /bin/
 COPY pyproject.toml uv.lock ./
 RUN uv pip install --no-cache-dir --system --break-system-packages .[data]
 USER valhalla
