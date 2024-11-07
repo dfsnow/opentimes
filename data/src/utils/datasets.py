@@ -7,7 +7,7 @@
 DATASET_DICT: dict = {
     "0.0.1": {
         "times": {
-            "partition_levels": 7,
+            "partition_levels": 6,
             "public_file_columns": [
                 "centroid_type",
                 "origin_id",
@@ -21,7 +21,7 @@ DATASET_DICT: dict = {
             ],
         },
         "points": {
-            "partition_levels": 8,
+            "partition_levels": 7,
             "public_file_columns": [
                 "centroid_type",
                 "point_type",
@@ -34,7 +34,7 @@ DATASET_DICT: dict = {
             ],
         },
         "missing_pairs": {
-            "partition_levels": 7,
+            "partition_levels": 6,
             "public_file_columns": [
                 "centroid_type",
                 "origin_id",
@@ -46,7 +46,7 @@ DATASET_DICT: dict = {
             ],
         },
         "metadata": {
-            "partition_levels": 7,
+            "partition_levels": 6,
             "public_file_columns": [
                 "centroid_type",
                 "run_id",
