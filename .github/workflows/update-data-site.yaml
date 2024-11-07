@@ -14,6 +14,7 @@ env:
   # See: https://github.com/aws/aws-cli/issues/5262#issuecomment-705832151
   AWS_EC2_METADATA_DISABLED: true
   PYTHONUNBUFFERED: "1"
+  UV_SYSTEM_PYTHON: 1
 
 jobs:
   update-site:
@@ -23,16 +24,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          cache-suffix: "site-data"
+          cache-dependency-glob: |
+            pyproject.toml
+            uv.lock
+
+      - name: Install Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-          cache: 'pip'
+          python-version-file: .python-version
 
       - name: Install Python dependencies
         id: install-python-dependencies
         shell: bash
-        run: pip install .[site] .[data]
+        run: uv pip install ".[site]" ".[data]"
 
       - name: Setup Cloudflare credentials
         uses: ./.github/actions/setup-cloudflare-s3
