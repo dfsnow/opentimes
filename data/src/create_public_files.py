@@ -3,7 +3,10 @@ import re
 
 import yaml
 from utils.constants import DATASET_DICT
+from utils.logging import create_logger
 from utils.utils import create_duckdb_connection
+
+logger = create_logger(__name__)
 
 
 def create_public_files(
@@ -24,13 +27,11 @@ def create_public_files(
         mode: Travel mode, one of ['walk', 'bicycle', 'car', 'transit'].
         year: Year of the data.
         geography: Census geography of the data. See params.yaml for list.
-
-    Returns:
-        None
     """
     params = yaml.safe_load(open("params.yaml"))
     states = params["input"]["state"]
     con = create_duckdb_connection()
+    logger.info("Successfully connected to DuckDB")
 
     # Check that the input strings are valid
     datasets = list(DATASET_DICT[version].keys())
@@ -60,7 +61,6 @@ def create_public_files(
     for state in states:
         filename = f"{dataset}-{version}-{mode}-{year}-{geography}-{state}"
         partitions = "/*" * DATASET_DICT[version][dataset]["partition_levels"]
-        print("Creating file:", filename)
 
         con.sql(
             f"""
@@ -92,11 +92,12 @@ def create_public_files(
             );
             """
         )
+        logger.info(f"Created file: {filename}")
 
     con.close()
 
 
-if __name__ == "__main__":
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", required=True, type=str)
     parser.add_argument("--version", required=True, type=str)
@@ -104,7 +105,10 @@ if __name__ == "__main__":
     parser.add_argument("--year", required=True, type=str)
     parser.add_argument("--geography", required=True, type=str)
     args = parser.parse_args()
-
     create_public_files(
         args.dataset, args.version, args.mode, args.year, args.geography
     )
+
+
+if __name__ == "__main__":
+    main()
