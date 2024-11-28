@@ -8,6 +8,18 @@ from utils.logging import create_logger
 
 logger = create_logger(__name__)
 
+BLOCKLOC_FINAL_COLS = [
+    "county",
+    "tract",
+    "block_group",
+    "block",
+    "population",
+    "x_4326",
+    "y_4326",
+    "x_5071",
+    "y_5071",
+]
+
 
 def create_blockloc(year: str, state: str) -> None:
     """
@@ -72,19 +84,7 @@ def create_blockloc(year: str, state: str) -> None:
     # columns used as partition keys (year, state)
     join_cols = ["state", "county", "tract", "block"]
     gdf = gdf.merge(df, left_on=join_cols, right_on=join_cols, how="left")
-    gdf = gdf[
-        [
-            "county",
-            "tract",
-            "block_group",
-            "block",
-            "population",
-            "x_4326",
-            "y_4326",
-            "x_5071",
-            "y_5071",
-        ]
-    ]
+    gdf = gdf[BLOCKLOC_FINAL_COLS]
 
     # Check for additional rows or empty values after the join
     if len(gdf) != original_row_count:

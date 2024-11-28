@@ -14,7 +14,7 @@ CENSUS_API_KEY = os.getenv("CENSUS_API_KEY")
 
 def fetch_blockpop(year: str, state: str) -> None:
     """
-    Fetches block-level population data from the Census API. Pulls from the
+    Fetch block-level population data from the Census API. Pulls from the
     PL 94-171 dataset, which is used for redistricting.
 
     Args:

@@ -10,8 +10,11 @@ from utils.census import (
     split_geoid,
     transform_5071_to_4326,
 )
+from utils.logging import create_logger
 
-FINAL_COLS = [
+logger = create_logger(__name__)
+
+CENLOC_FINAL_COLS = [
     "geoid",
     "x_4326",
     "y_4326",
@@ -33,9 +36,6 @@ def create_cenloc(year: str, geography: str, state: str | None = None) -> None:
         year: The year of the TIGER/Line data.
         geography: The geography type of the shapefile.
         state: (Optional) The two-digit state FIPS code for the shapefile.
-
-    Returns:
-        None
     """
     blockloc_dir = Path.cwd() / "intermediate" / "blockloc" / f"year={year}"
     tiger_dir = (
@@ -75,12 +75,14 @@ def create_cenloc(year: str, geography: str, state: str | None = None) -> None:
         ]
     )
     tiger_gdf.to_crs("EPSG:5071", inplace=True)
+    logger.info(f"Loaded {len(tiger_gdf)} {geography} geographies")
 
     # Load the block locations and pop. data associated with the target year.
     # Convert the block location point columns to geometry
     blockloc = pd.read_parquet(blockloc_dir)
     blockloc = points_to_gdf(blockloc, "x_5071", "y_5071", "EPSG:5071")
     blockloc = blockloc[["x_5071", "y_5071", "geometry", "population"]]
+    logger.info(f"Loaded {len(blockloc)} block locations")
 
     # Spatially join the block-level data to the original TIGER polygon. Need
     # a spatial join here since GEOIDs (for an attribute join) can change over
@@ -95,16 +97,19 @@ def create_cenloc(year: str, geography: str, state: str | None = None) -> None:
         weight_col="population",
         value_cols=["x_5071", "y_5071"],
     )
+    logger.info(f"Calculated {len(block_centroids)} {geography} centroids")
 
     block_centroids = transform_5071_to_4326(block_centroids)
     block_centroids = suffix_coord_cols(block_centroids)
     gdf = tiger_gdf.merge(block_centroids, on="geoid", how="inner")
+    logger.info(f"Merged block centroids back to {geography} geographies")
 
     # Extract the original centroid of the TIGER data from the INTPT cols
     gdf = gdf.join(
         extract_centroids(gdf.copy())[["x_4326", "y_4326", "x_5071", "y_5071"]]
     )
-    gdf = gdf[FINAL_COLS]
+    gdf = gdf[CENLOC_FINAL_COLS]
+    logger.info(f"Extracted original centroids from {geography} geographies")
 
     # Add the state FIPS code to each geography if it's missing. This is
     # usually easy to recover from the FIPS code. For ZCTAs you need to
@@ -125,8 +130,10 @@ def create_cenloc(year: str, geography: str, state: str | None = None) -> None:
         gdf = points_to_gdf(gdf, "x_5071", "y_5071", "EPSG:5071")
         gdf = gdf.sjoin(state_gdf, how="inner", predicate="within")
         gdf.drop(columns=["index_right", "geometry"], inplace=True)
+        logger.info("Joined state FIPS to ZCTAs")
     elif not state:
         gdf["state"] = split_geoid(gdf.copy(), "geoid")["state"]
+        logger.info("Extracted state FIPS from GEOIDs")
 
     # Check for additional new rows or empty values after the join
     if len(gdf) > original_row_count:
@@ -142,15 +149,18 @@ def create_cenloc(year: str, geography: str, state: str | None = None) -> None:
             state_gdf = state_gdf.drop(columns=["state"])
             state_output_dir = output_dir / f"state={state}"
             state_output_dir.mkdir(parents=True, exist_ok=True)
+            state_output_file = state_output_dir / f"{state}.parquet"
             state_gdf = state_gdf.sort_values(by=["geoid"])
             state_gdf.to_parquet(
-                state_output_dir / f"{state}.parquet",
+                state_output_file,
                 engine="pyarrow",
                 index=False,
             )
+            logger.info(f"Wrote file to: {state_output_file}")
     else:
         gdf = gdf.sort_values(by=["geoid"])
         gdf.to_parquet(output_file, engine="pyarrow", index=False)
+        logger.info(f"Wrote file to: {output_file}")
 
 
 def suffix_coord_cols(df: pd.DataFrame) -> pd.DataFrame:
@@ -161,11 +171,14 @@ def suffix_coord_cols(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-if __name__ == "__main__":
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--year", required=True, type=str)
     parser.add_argument("--geography", required=True, type=str)
     parser.add_argument("--state", required=False, type=str)
     args = parser.parse_args()
-
     create_cenloc(args.year, args.geography, args.state)
+
+
+if __name__ == "__main__":
+    main()

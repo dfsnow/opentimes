@@ -27,7 +27,7 @@ def fetch_shapefile(
     year: str, geography: str, state: str | None = None
 ) -> None:
     """
-    Fetches a TIGER/Line shapefile and saves it to a directory.
+    Fetch a TIGER/Line shapefile and save it to a directory.
 
     The output directory is partitioned by year, geography, and optionally state.
 
@@ -36,15 +36,19 @@ def fetch_shapefile(
         geography: The geography type of the shapefile.
         state: The two-digit state FIPS code for the shapefile.
     """
-    base_dir = (
+    output_dir = (
         Path.cwd()
         / "input"
         / "tiger"
         / f"year={year}"
         / f"geography={geography}"
     )
-    output_dir = base_dir / f"state={state}" if state else base_dir
-    output_file = output_dir / f"{state if state else geography}.zip"
+    if not state:
+        output_file = output_dir / f"{geography}.zip"
+    else:
+        output_dir = output_dir / f"state={state}"
+        output_file = output_dir / f"{state}.zip"
+
     output_dir.mkdir(parents=True, exist_ok=True)
 
     tiger_geo_name = TIGER_GEO_NAMES[geography]
@@ -71,7 +75,6 @@ def main() -> None:
     parser.add_argument("--geography", required=True, type=str)
     parser.add_argument("--state", required=False, type=str)
     args = parser.parse_args()
-
     fetch_shapefile(year=args.year, geography=args.geography, state=args.state)
 
 
