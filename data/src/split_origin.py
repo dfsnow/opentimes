@@ -1,11 +1,10 @@
 import argparse
-from pathlib import Path
 
 import yaml
+from utils.constants import DOCKER_INTERNAL_PATH
 from utils.utils import split_file_to_str
 
-DOCKER_PATH = Path("/data")
-params = yaml.safe_load(open(DOCKER_PATH / "params.yaml"))
+params = yaml.safe_load(open(DOCKER_INTERNAL_PATH / "params.yaml"))
 
 
 def split_origin(
@@ -16,7 +15,7 @@ def split_origin(
     min_chunk_size: int = 5,
 ) -> None:
     origins_file = (
-        DOCKER_PATH
+        DOCKER_INTERNAL_PATH
         / "intermediate"
         / "cenloc"
         / f"year={year}"

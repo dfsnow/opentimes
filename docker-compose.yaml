@@ -55,6 +55,7 @@ services:
     environment:
       - GITHUB_SHA # For passing to the metadata output dataframe
       - PYTHONUNBUFFERED="1" # For proper printing in GitHub Actions
+      - DOCKER_INTERNAL_PATH=/data # Used to set wd within Python scripts
       - use_tiles_ignore_pbf=True
       - update_existing_config=False
       - force_rebuild=False

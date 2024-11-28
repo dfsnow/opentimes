@@ -9,16 +9,12 @@ from pathlib import Path
 import pandas as pd
 import valhalla  # type: ignore
 import yaml
+from utils.constants import DOCKER_INTERNAL_PATH
 from utils.utils import format_time, get_md5_hash
 
-# Path within the valhalla-run Docker container that input/output directories
-# are mounted to
-DOCKER_PATH = Path("/data")
-
-# Load params, env vars, and JSON used for config
-params = yaml.safe_load(open(DOCKER_PATH / "params.yaml"))
+params = yaml.safe_load(open(DOCKER_INTERNAL_PATH / "params.yaml"))
 os.environ["AWS_PROFILE"] = params["s3"]["profile"]
-with open(DOCKER_PATH / "valhalla.json", "r") as f:
+with open(DOCKER_INTERNAL_PATH / "valhalla.json", "r") as f:
     valhalla_data = json.load(f)
 
 
@@ -233,29 +229,31 @@ if __name__ == "__main__":
     }
     input["dirs"] = {
         "valhalla_tiles": Path(
-            DOCKER_PATH,
+            DOCKER_INTERNAL_PATH,
             f"intermediate/valhalla_tiles/year={args.year}/",
             f"geography=state/state={args.state}",
         )
     }
     input["files"] = {
         "valhalla_tiles_file": Path(
-            DOCKER_PATH,
+            DOCKER_INTERNAL_PATH,
             f"intermediate/valhalla_tiles/year={args.year}",
             f"geography=state/state={args.state}/valhalla_tiles.tar.zst",
         ),
         "origins_file": Path(
-            DOCKER_PATH, f"intermediate/cenloc/{input['main']['path']}"
+            DOCKER_INTERNAL_PATH,
+            f"intermediate/cenloc/{input['main']['path']}",
         ),
         "destinations_file": Path(
-            DOCKER_PATH, f"intermediate/destpoint/{input['main']['path']}"
+            DOCKER_INTERNAL_PATH,
+            f"intermediate/destpoint/{input['main']['path']}",
         ),
     }
 
     # Setup file paths for all outputs both locally and on the remote
     output = {}
     output["prefix"] = {
-        "local": Path(DOCKER_PATH / "output"),
+        "local": Path(DOCKER_INTERNAL_PATH / "output"),
         "s3": Path(params["s3"]["data_bucket"]),
     }
     output["main"] = {
