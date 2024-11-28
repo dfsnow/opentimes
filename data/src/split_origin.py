@@ -14,6 +14,17 @@ def split_origin(
     n_chunks: int = 256,
     min_chunk_size: int = 5,
 ) -> None:
+    """
+    Split a Parquet file of origins into N chunks, where each chunk is at least
+    a certain size.
+
+    Args:
+        year: The year of the input origins data.
+        geography: The geography type of the origins data.
+        state: The two-digit state FIPS code of the origins data.
+        n_chunks: The maximum number of chunks. Defaults to 256.
+        min_chunk_size: The minimum size of each chunk. Defaults to 5.
+    """
     origins_file = (
         DOCKER_INTERNAL_PATH
         / "intermediate"
@@ -31,7 +42,7 @@ def split_origin(
     print(file_chunks)
 
 
-if __name__ == "__main__":
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--year", required=True, type=str)
     parser.add_argument("--geography", required=True, type=str)
@@ -49,7 +60,6 @@ if __name__ == "__main__":
         default=params["actions"]["min_chunk_size"],
     )
     args = parser.parse_args()
-
     split_origin(
         args.year,
         args.geography,
@@ -57,3 +67,7 @@ if __name__ == "__main__":
         int(args.n_chunks),
         int(args.min_chunk_size),
     )
+
+
+if __name__ == "__main__":
+    main()
