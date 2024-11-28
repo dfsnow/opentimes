@@ -38,9 +38,7 @@ def fetch_blockpop(year: str, state: str) -> None:
         response.raise_for_status()
 
         if "Invalid Key" in response.text:
-            msg = "Invalid Census API key provided"
-            logger.error(msg)
-            raise ValueError(msg)
+            raise ValueError("Invalid Census API key provided")
 
         data = pd.DataFrame(
             response.json()[1:],

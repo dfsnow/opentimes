@@ -4,6 +4,9 @@ from pathlib import Path
 
 import pandas as pd
 from utils.census import extract_centroids, load_shapefile, split_geoid
+from utils.logging import create_logger
+
+logger = create_logger(__name__)
 
 
 def create_blockloc(year: str, state: str) -> None:
@@ -14,9 +17,6 @@ def create_blockloc(year: str, state: str) -> None:
     Args:
         year: The year of the decennial Census.
         state: The two-digit state FIPS code.
-
-    Returns:
-        None
     """
 
     # Pop. data only exists for decennial years, so round down to the nearest
@@ -38,7 +38,6 @@ def create_blockloc(year: str, state: str) -> None:
         / f"state={state}"
         / f"{state}.zip"
     )
-
     output_dir = (
         Path.cwd()
         / "intermediate"
@@ -53,6 +52,7 @@ def create_blockloc(year: str, state: str) -> None:
     # a Hive-partition and not included in the actual data
     df = pd.read_parquet(pop_file)
     df["state"] = state
+    logger.info(f"Loaded {len(df)} rows from {pop_file}")
 
     # Load and cleanup block shapefile file
     gdf = load_shapefile(loc_file)
@@ -62,6 +62,7 @@ def create_blockloc(year: str, state: str) -> None:
         columns=[col for col in gdf.columns if col not in cols_to_keep],
         inplace=True,
     )
+    logger.info(f"Loaded {len(gdf)} rows from {loc_file}")
 
     # Load the Census WGS84 centroid for conversion to planar projection
     gdf = extract_centroids(gdf)
@@ -92,12 +93,18 @@ def create_blockloc(year: str, state: str) -> None:
         raise ValueError("Missing values detected after join operation.")
 
     gdf.to_parquet(output_file, engine="pyarrow", index=False)
+    logger.info(
+        f"Merged block locations and populations. Wrote to: {output_file}"
+    )
 
 
-if __name__ == "__main__":
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--year", required=True, type=str)
     parser.add_argument("--state", required=False, type=str)
     args = parser.parse_args()
-
     create_blockloc(args.year, args.state)
+
+
+if __name__ == "__main__":
+    main()
