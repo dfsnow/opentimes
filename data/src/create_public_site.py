@@ -16,7 +16,8 @@ from utils.utils import format_size
 
 logger = create_logger(__name__)
 
-params = yaml.safe_load(open("params.yaml"))
+with open("params.yaml") as file:
+    params = yaml.safe_load(file)
 session = boto3.Session(profile_name=params["s3"]["profile"])
 s3 = session.client("s3", endpoint_url=params["s3"]["endpoint"])
 

@@ -28,7 +28,8 @@ def create_public_files(
         year: Year of the data.
         geography: Census geography of the data. See params.yaml for list.
     """
-    params = yaml.safe_load(open("params.yaml"))
+    with open("params.yaml") as file:
+        params = yaml.safe_load(file)
     states = params["input"]["state"]
     con = create_duckdb_connection()
     logger.info("Successfully connected to DuckDB")

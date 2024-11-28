@@ -2,7 +2,8 @@ import os
 
 import yaml
 
-params = yaml.safe_load(open("params.yaml"))
+with open("params.yaml") as file:
+    params = yaml.safe_load(file)
 
 year = "2024"
 states = params["input"]["state"]

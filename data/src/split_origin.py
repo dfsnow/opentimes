@@ -4,7 +4,8 @@ import yaml
 from utils.constants import DOCKER_INTERNAL_PATH
 from utils.utils import split_file_to_str
 
-params = yaml.safe_load(open(DOCKER_INTERNAL_PATH / "params.yaml"))
+with open(DOCKER_INTERNAL_PATH / "params.yaml") as file:
+    params = yaml.safe_load(file)
 
 
 def split_origin(
