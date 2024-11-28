@@ -70,10 +70,20 @@ def generate_html_files(
     tree: dict,
     bucket_name: str,
     folder_path: str | Path = "",
-):
+) -> None:
     """
-    Generate index.html files using Jinja2 for each folder.
+    Generate static index.html files representing the directory structure
+    of each folder (ala nginx). Each index file contains a table with three
+    columns:
+        - "Item": A link to the file or directory.
+        - "Last Modified": The max last modified time of the file, or of
+          contained files in the case of a directory
+        - "Size": The file size, or total size of all files in a directory
 
+    Args:
+        tree: Dictionary of the bucket structure, as returned by get_r2_objects.
+        bucket_name: Name of the R2 bucket.
+        folder_path: Path within the R2 bucket to generate files for.
     """
     index_file_path = Path(folder_path) / "index.html"
     html_content = jinja_index_template.render(
@@ -98,18 +108,16 @@ def generate_html_files(
                 logger.error(f"Failed after {retries} attempts")
                 raise e
 
-    logger.info(f"Rendered index.html for {str(index_file_path.as_posix())}")
-
     # Recursively create subfolders and their index.html
     for item, subtree in tree.items():
         if isinstance(subtree, dict) and "filename" not in subtree:
             generate_html_files(subtree, bucket_name, Path(folder_path) / item)
 
 
-if __name__ == "__main__":
-    logger.info("Retrieving objects from S3 bucket")
+def main() -> None:
+    logger.info("Retrieving objects from R2 bucket")
     tree, keys = get_r2_objects(s3, params["s3"]["public_bucket"])
-    logger.info(f"Retrieved {len(keys)} objects from S3 bucket")
+    logger.info(f"Retrieved {len(keys)} objects from R2 bucket")
 
     versions = list(DATASET_DICT.keys())
     for version in versions:
@@ -136,23 +144,34 @@ if __name__ == "__main__":
         append_duckdb_info(tree, version, db_path)
         logger.info(f"DuckDB file created at {db_path}")
 
-    # Recursively create subfolders and their index.html
+    # Recursively create subfolders and their index.html. Using parallelism
+    # here because otherwise this takes forever
     logger.info("Generating HTML index files")
     with ThreadPoolExecutor() as executor:
-        futures = [
+        futures_dict = {
             executor.submit(
                 generate_html_files,
                 subtree,
                 params["s3"]["public_bucket"],
                 Path(item),
-            )
+            ): item
             for item, subtree in tree.items()
             if isinstance(subtree, dict) and "filename" not in subtree
-        ]
-        for future in as_completed(futures):
-            future.result()  # Ensure any exceptions are raised
+        }
+        for future in as_completed(futures_dict):
+            directory = futures_dict[future]
+            try:
+                future.result()
+                logger.info(
+                    f"Successfully generated HTML files for directory: {directory}"
+                )
+            except Exception as e:
+                logger.error(
+                    f"Failed to generate HTML files for directory {directory}: {str(e)}"
+                )
+                raise e
 
-    # Generate the root index.html
+    logger.info("Generating root index.html file")
     html_content = jinja_index_template.render(folder_name="", contents=tree)
     s3.put_object(
         Bucket=params["s3"]["public_bucket"],
@@ -161,6 +180,7 @@ if __name__ == "__main__":
         ContentType="text/html",
     )
 
+    logger.info(f"Purging {len(keys)} keys from Cloudflare cache")
     purge_cloudflare_cache(
         keys,
         params["s3"]["public_data_url"],
@@ -168,3 +188,7 @@ if __name__ == "__main__":
         CLOUDFLARE_CACHE_API_TOKEN,
     )
     logger.info("Public site created successfully")
+
+
+if __name__ == "__main__":
+    main()
