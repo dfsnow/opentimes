@@ -1,40 +1,8 @@
 import hashlib
 import math
-import os
 from pathlib import Path
 
-import duckdb
 import pandas as pd
-import yaml
-
-
-def create_duckdb_connection() -> duckdb.DuckDBPyConnection:
-    """Instantiate a DuckDB connection to the R2 buckets."""
-    with open("params.yaml") as f:
-        params = yaml.safe_load(f)
-
-    os.environ["AWS_PROFILE"] = params["s3"]["profile"]
-
-    con = duckdb.connect(database=":memory:")
-    for ext in ["parquet", "httpfs", "aws"]:
-        con.install_extension(ext)
-        con.load_extension(ext)
-    # Num threads is 4x available to support faster remote queries. See:
-    # https://duckdb.org/docs/guides/performance/how_to_tune_workloads.html#querying-remote-files
-    con.execute("SET threads=16;")
-
-    con.execute("SET threads=16;")
-    con.execute(
-        f"""
-        CREATE SECRET (
-            TYPE R2,
-            PROVIDER CREDENTIAL_CHAIN,
-            ACCOUNT_ID '{params["s3"]["account_id"]}'
-        );
-        """
-    )
-
-    return con
 
 
 def format_size(size):

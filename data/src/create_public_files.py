@@ -3,8 +3,8 @@ import re
 
 import yaml
 from utils.constants import DATASET_DICT
+from utils.duckdb import create_duckdb_connection
 from utils.logging import create_logger
-from utils.utils import create_duckdb_connection
 
 logger = create_logger(__name__)
 
