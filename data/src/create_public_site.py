@@ -10,7 +10,7 @@ import requests as r
 import yaml
 from botocore.exceptions import ClientError
 from jinja2 import Environment, FileSystemLoader
-from utils.datasets import DATASET_DICT
+from utils.constants import DATASET_DICT
 from utils.utils import format_size
 
 # Load parameters and connect to S3/R2

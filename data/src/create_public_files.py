@@ -2,7 +2,7 @@ import argparse
 import re
 
 import yaml
-from utils.datasets import DATASET_DICT
+from utils.constants import DATASET_DICT
 from utils.utils import create_duckdb_connection
 
 
