@@ -3,6 +3,9 @@ from pathlib import Path
 
 import pandas as pd
 from utils.census import load_shapefile, points_to_gdf
+from utils.logging import create_logger
+
+logger = create_logger(__name__)
 
 
 def create_destpoint(
@@ -18,9 +21,6 @@ def create_destpoint(
         state: The two-digit state FIPS code for the point data.
         buffer: The amount to buffer the input shapefile (in meters) when
             when determining destination points.
-
-    Returns:
-        None
     """
     cenloc_dir = (
         Path.cwd()
@@ -53,8 +53,10 @@ def create_destpoint(
     boundary = boundary[boundary["geoid"] == state]
     boundary = boundary[["geometry"]]
     boundary.to_crs(crs="EPSG:5071", inplace=True)
+    logger.info(f"Loaded state boundary for {state}")
     if buffer:
         boundary["geometry"] = boundary["geometry"].buffer(distance=buffer)
+        logger.info(f"Buffered state boundary by {buffer} meters")
 
     # Load the Census geography centroids (weighted and unweighted), and keep
     # only centroids of either kind that are within the buffered state
@@ -67,25 +69,29 @@ def create_destpoint(
     cenloc_gdf_wt = cenloc_gdf_wt.sjoin(
         boundary, how="inner", predicate="within"
     )
-
     cenloc_final = cenloc[
         cenloc["geoid"].isin(cenloc_gdf["geoid"])
         | cenloc["geoid"].isin(cenloc_gdf_wt["geoid"])
     ]
+    logger.info(f"Found {len(cenloc_final)} {geography} geographies in buffer")
+
     cenloc_final = cenloc_final[
         [c for c in cenloc.columns if c not in ["geometry", "state"]]
     ]
-
     cenloc_final = cenloc_final.sort_values(by=["geoid"])
     cenloc_final.to_parquet(output_file, engine="pyarrow", index=False)
+    logger.info(f"Wrote to: {output_file}")
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--year", required=True, type=str)
     parser.add_argument("--geography", required=True, type=str)
     parser.add_argument("--state", required=True, type=str)
     parser.add_argument("--buffer", required=False, type=int)
     args = parser.parse_args()
-
     create_destpoint(args.year, args.geography, args.state, args.buffer)
+
+
+if __name__ == "__main__":
+    main()
