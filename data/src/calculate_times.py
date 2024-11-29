@@ -1,7 +1,6 @@
 import argparse
 import json
 import os
-import re
 import time
 import uuid
 from pathlib import Path
@@ -10,177 +9,20 @@ import pandas as pd
 import valhalla  # type: ignore
 import yaml
 from utils.constants import DOCKER_INTERNAL_PATH
+from utils.logging import create_logger
+from utils.times import TravelTimeCalculator, TravelTimeConfig
 from utils.utils import format_time, get_md5_hash
+
+logger = create_logger(__name__)
 
 with open(DOCKER_INTERNAL_PATH / "params.yaml") as file:
     params = yaml.safe_load(file)
-os.environ["AWS_PROFILE"] = params["s3"]["profile"]
 with open(DOCKER_INTERNAL_PATH / "valhalla.json", "r") as f:
     valhalla_data = json.load(f)
+os.environ["AWS_PROFILE"] = params["s3"]["profile"]
 
 
-def calculate_times(
-    actor,
-    o_start_idx: int,
-    d_start_idx: int,
-    o_end_idx: int,
-    d_end_idx: int,
-    origins: pd.DataFrame,
-    destinations: pd.DataFrame,
-    max_split_size_origins: int,
-    max_split_size_destinations: int,
-    mode: str,
-) -> pd.DataFrame:
-    """Calculates travel times and distances between origins and destinations.
-
-    Args:
-        actor: Valhalla actor instance for making matrix API requests.
-        o_start_idx: Starting index for the origins DataFrame.
-        d_start_idx: Starting index for the destinations DataFrame.
-        origins: DataFrame containing origin points with 'lat' and 'lon' columns.
-        destinations: DataFrame containing destination points with 'lat' and 'lon' columns.
-        max_split_size: Maximum number of points to process in one iteration.
-        mode: Travel mode for the Valhalla API (e.g., 'auto', 'bicycle').
-
-    Returns:
-        DataFrame containing origin IDs, destination IDs, travel durations, and distances.
-    """
-    start_time = time.time()
-    job_string = (
-        f"Routing origin indices {o_start_idx}-{o_end_idx - 1} to "
-        f"destination indices {d_start_idx}-{d_end_idx - 1}"
-    )
-    print(job_string)
-
-    # Get the subset of origin and destination points and convert them to lists
-    # then squash them into the request body
-    origins_list = (
-        origins.iloc[o_start_idx:o_end_idx]
-        .apply(lambda row: {"lat": row["lat"], "lon": row["lon"]}, axis=1)
-        .tolist()
-    )
-    destinations_list = (
-        destinations.iloc[d_start_idx:d_end_idx]
-        .apply(lambda row: {"lat": row["lat"], "lon": row["lon"]}, axis=1)
-        .tolist()
-    )
-    request_json = json.dumps(
-        {
-            "sources": origins_list,
-            "targets": destinations_list,
-            "costing": mode,
-            "verbose": False,
-        }
-    )
-
-    # Make the actual request to the matrix API
-    response = actor.matrix(request_json)
-    response_data = json.loads(response)
-
-    # Parse the response data and convert it to a dataframe. Recover the
-    # origin and destination indices and append them to the dataframe
-    durations = response_data["sources_to_targets"]["durations"]
-    distances = response_data["sources_to_targets"]["distances"]
-    origin_ids = (
-        origins.iloc[o_start_idx:o_end_idx]["id"]
-        .repeat(d_end_idx - d_start_idx)
-        .tolist()
-    )
-    destination_ids = destinations.iloc[d_start_idx:d_end_idx][
-        "id"
-    ].tolist() * (o_end_idx - o_start_idx)
-
-    df = pd.DataFrame(
-        {
-            "origin_id": origin_ids,
-            "destination_id": destination_ids,
-            "duration_sec": [i for sl in durations for i in sl],
-            "distance_km": [i for sl in distances for i in sl],
-        }
-    )
-
-    elapsed_time = time.time() - start_time
-    print(job_string, f": {format_time(elapsed_time)}")
-    return df
-
-
-def calculate_times_with_backoff(
-    actor,
-    origins,
-    destinations,
-    max_split_size_origins,
-    max_split_size_destinations,
-    mode,
-):
-    results = []
-    n_origins_chunk = len(origins)
-    n_destinations_chunk = len(destinations)
-
-    def binary_search_times(o_start_idx, d_start_idx, o_end_idx, d_end_idx):
-        if o_start_idx + 1 >= o_end_idx and d_start_idx + 1 >= d_end_idx:
-            df = pd.merge(
-                pd.DataFrame(
-                    origins[o_start_idx:o_end_idx], columns=["origin_id"]
-                ),
-                pd.DataFrame(
-                    destinations[d_start_idx:d_end_idx],
-                    columns=["destination_id"],
-                ),
-                how="cross",
-            )
-            df["distance_km"] = pd.Series([], dtype=float)
-            df["duration_sec"] = pd.Series([], dtype=float)
-
-            return [df]
-        try:
-            times = calculate_times(
-                actor=actor,
-                o_start_idx=o_start_idx,
-                d_start_idx=d_start_idx,
-                o_end_idx=o_end_idx,
-                d_end_idx=d_end_idx,
-                origins=origins,
-                destinations=destinations,
-                max_split_size_origins=max_split_size_origins,
-                max_split_size_destinations=max_split_size_destinations,
-                mode=mode,
-            )
-            return [times]
-        except Exception as e:
-            print(f"Error: {e}, backing off and retrying...")
-            mid_o = (o_start_idx + o_end_idx) // 2
-            mid_d = (d_start_idx + d_end_idx) // 2
-            return (
-                binary_search_times(o_start_idx, d_start_idx, mid_o, mid_d)
-                + binary_search_times(mid_o, d_start_idx, o_end_idx, mid_d)
-                + binary_search_times(o_start_idx, mid_d, mid_o, d_end_idx)
-                + binary_search_times(mid_o, mid_d, o_end_idx, d_end_idx)
-            )
-
-    for o in range(0, n_origins_chunk, max_split_size_origins):
-        for d in range(0, n_destinations_chunk, max_split_size_destinations):
-            results.extend(
-                binary_search_times(
-                    o,
-                    d,
-                    min(o + max_split_size_origins, n_origins_chunk),
-                    min(d + max_split_size_destinations, n_destinations_chunk),
-                )
-            )
-
-    return results
-
-
-def create_write_path(key: str, out_type: str, output_dict: dict) -> str:
-    """Tiny helper to create Parquet output write paths."""
-    return (
-        "s3://" + output_dict[out_type][key].as_posix()
-        if out_type == "s3"
-        else output_dict[out_type][key].as_posix()
-    )
-
-
-if __name__ == "__main__":
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", required=True, type=str)
     parser.add_argument("--year", required=True, type=str)
@@ -192,187 +34,37 @@ if __name__ == "__main__":
     args = parser.parse_args()
     script_start_time = time.time()
 
-    if args.mode not in params["times"]["mode"]:
-        raise ValueError(
-            "Invalid mode, must be one of: ", params["times"]["mode"]
-        )
-    if args.centroid_type not in ["weighted", "unweighted"]:
-        raise ValueError(
-            "Invalid centroid_type, must be one of: ['weighted', 'unweighted']"
-        )
-    if args.chunk:
-        if not re.match(r"^\d+-\d+$", args.chunk):
-            raise ValueError(
-                "Invalid chunk argument. Must be two numbers separated by a dash (e.g., '1-2')."
-            )
+    config = TravelTimeConfig(args, params=params, logger=logger)
+    inputs = config.load_default_inputs()
 
-    # Split and check chunk value
-    chunk_start_idx, chunk_end_idx = map(int, args.chunk.split("-"))
-    chunk_end_idx = chunk_end_idx + 1
-    chunk_size = chunk_end_idx - chunk_start_idx
-    chunk_msg = f", chunk: {args.chunk}" if args.chunk else ""
-    print(
-        f"Starting routing for version: {params['times']['version']},",
-        f"mode: {args.mode}, year: {args.year}, geography: {args.geography},",
-        f"state: {args.state}, centroid type: {args.centroid_type}"
-        + chunk_msg,
+    chunk_msg = f", chunk: {config.args.chunk}" if config.args.chunk else ""
+    logger.info(
+        f"Starting routing for version: {config.params['times']['version']},",
+        f"mode: {config.args.mode}, year: {config.args.year},",
+        f"geography: {config.args.geography}, state: {config.args.state},",
+        f"centroid type: {config.args.centroid_type}" + chunk_msg,
     )
 
-    ##### FILE PATHS #####
-
-    # Setup file paths for inputs (pre-made network file and OD points)
-    input = {}
-    input["main"] = {
-        "path": Path(
-            f"year={args.year}/geography={args.geography}/"
-            f"state={args.state}/{args.state}.parquet",
-        )
-    }
-    input["dirs"] = {
-        "valhalla_tiles": Path(
-            DOCKER_INTERNAL_PATH,
-            f"intermediate/valhalla_tiles/year={args.year}/",
-            f"geography=state/state={args.state}",
-        )
-    }
-    input["files"] = {
-        "valhalla_tiles_file": Path(
-            DOCKER_INTERNAL_PATH,
-            f"intermediate/valhalla_tiles/year={args.year}",
-            f"geography=state/state={args.state}/valhalla_tiles.tar.zst",
-        ),
-        "origins_file": Path(
-            DOCKER_INTERNAL_PATH,
-            f"intermediate/cenloc/{input['main']['path']}",
-        ),
-        "destinations_file": Path(
-            DOCKER_INTERNAL_PATH,
-            f"intermediate/destpoint/{input['main']['path']}",
-        ),
-    }
-
-    # Setup file paths for all outputs both locally and on the remote
-    output = {}
-    output["prefix"] = {
-        "local": Path(DOCKER_INTERNAL_PATH / "output"),
-        "s3": Path(params["s3"]["data_bucket"]),
-    }
-    output["main"] = {
-        "path": Path(
-            f"version={params['times']['version']}/mode={args.mode}/",
-            f"year={args.year}/geography={args.geography}/state={args.state}/",
-            f"centroid_type={args.centroid_type}",
-        ),
-        "file": Path(
-            f"part-{args.chunk}.parquet" if args.chunk else "part-0.parquet"
-        ),
-    }
-    output["dirs"] = {
-        "times": Path("times", output["main"]["path"]),
-        "origins": Path("points", output["main"]["path"], "point_type=origin"),
-        "destinations": Path(
-            "points", output["main"]["path"], "point_type=destination"
-        ),
-        "missing_pairs": Path("missing_pairs", output["main"]["path"]),
-        "metadata": Path("metadata", output["main"]["path"]),
-    }
-    for loc in ["local", "s3"]:
-        output[loc] = {
-            "times_file": Path(
-                output["prefix"][loc],
-                output["dirs"]["times"],
-                output["main"]["file"],
-            ),
-            "origins_file": Path(
-                output["prefix"][loc],
-                output["dirs"]["origins"],
-                output["main"]["file"],
-            ),
-            "destinations_file": Path(
-                output["prefix"][loc],
-                output["dirs"]["destinations"],
-                output["main"]["file"],
-            ),
-            "missing_pairs_file": Path(
-                output["prefix"][loc],
-                output["dirs"]["missing_pairs"],
-                output["main"]["file"],
-            ),
-            "metadata_file": Path(
-                output["prefix"][loc],
-                output["dirs"]["metadata"],
-                output["main"]["file"],
-            ),
-        }
-
-    # Make sure outputs have somewhere to write to
-    for path in output["dirs"].values():
-        path = output["prefix"]["local"] / path
-        path.mkdir(parents=True, exist_ok=True)
-
-    ##### DATA PREP #####
-
-    # Load origins and destinations
-    od_cols = {
-        "weighted": {"geoid": "id", "x_4326_wt": "lon", "y_4326_wt": "lat"},
-        "unweighted": {"geoid": "id", "x_4326": "lon", "y_4326": "lat"},
-    }[args.centroid_type]
-
-    origins = (
-        pd.read_parquet(input["files"]["origins_file"])
-        .loc[:, list(od_cols.keys())]
-        .rename(columns=od_cols)
-        .sort_values(by="id")
-    )
-    n_origins = len(origins)
-
-    # Subset the origins if a chunk is used
-    if args.chunk:
-        origins = origins.iloc[chunk_start_idx:chunk_end_idx]
-
-    destinations = (
-        pd.read_parquet(input["files"]["destinations_file"])
-        .loc[:, list(od_cols.keys())]
-        .rename(columns=od_cols)
-        .sort_values(by="id")
-    )
-    n_destinations = len(destinations)
-    n_origins_chunk = len(origins)
-    n_destinations_chunk = len(destinations)
-
-    print(
-        f"Routing from {len(origins)} origins",
-        f"to {len(destinations)} destinations",
+    logger.info(
+        f"Routing from {inputs.n_origins_chunk} origins",
+        f"to {inputs.n_destinations} destinations",
     )
 
-    ##### CALCULATE TIMES #####
-
-    max_split_size_origins = min(params["times"]["max_split_size"], chunk_size)
-    max_split_size_destinations = min(
-        params["times"]["max_split_size"], n_destinations
-    )
-
-    # Initialize the Valhalla actor bindings
+    # Initialize the default Valhalla actor bindings
     actor = valhalla.Actor((Path.cwd() / "valhalla.json").as_posix())
 
     # Calculate times for each chunk and append to a list
-    results = calculate_times_with_backoff(
-        actor=actor,
-        origins=origins,
-        destinations=destinations,
-        max_split_size_origins=max_split_size_origins,
-        max_split_size_destinations=max_split_size_destinations,
-        mode=args.mode,
-    )
+    tt_calc = TravelTimeCalculator(actor, config, inputs)
+    results_df = tt_calc.get_times()
 
-    print(
+    logger.info(
         "Finished calculating times in",
         f"{format_time(time.time() - script_start_time)}",
     )
-
-    # Concatenate all results into a single DataFrame
-    results_df = pd.concat(results, ignore_index=True)
-    del results
+    logger.info(
+        f"Routed from {inputs.n_origins} origins",
+        f"to {inputs.n_destinations} destinations",
+    )
 
     # Extract missing pairs to a separate dataframe
     missing_pairs_df = results_df[results_df["duration_sec"].isnull()]
@@ -387,90 +79,45 @@ if __name__ == "__main__":
         by=["origin_id", "destination_id"]
     )
 
-    ##### SAVE OUTPUTS #####
-
-    out_types = ["local", "s3"] if args.write_to_s3 else ["local"]
-    compression_type = params["output"]["compression"]["type"]
-    compression_level = params["output"]["compression"]["level"]
-    storage_options = {
-        "s3": {
-            "client_kwargs": {
-                "endpoint_url": params["s3"]["endpoint"],
-            }
-        },
-        "local": {},
-    }
-    print(
-        f"Routed from {len(origins)} origins",
-        f"to {len(destinations)} destinations",
-    )
-    print(
+    out_locations = ["local", "s3"] if args.write_to_s3 else ["local"]
+    logger.info(
         f"Calculated times between {len(results_df)} pairs.",
         f"Times missing between {len(missing_pairs_df)} pairs.",
-        f"Saving outputs to: {', '.join(out_types)}",
+        f"Saving outputs to: {', '.join(out_locations)}",
     )
-
     # Loop through files and write to both local and remote paths
-    for out_type in out_types:
-        results_df.to_parquet(
-            create_write_path("times_file", out_type, output),
-            engine="pyarrow",
-            compression=compression_type,
-            compression_level=compression_level,
-            index=False,
-            storage_options=storage_options[out_type],
-        )
-        origins.to_parquet(
-            create_write_path("origins_file", out_type, output),
-            engine="pyarrow",
-            compression=compression_type,
-            compression_level=compression_level,
-            index=False,
-            storage_options=storage_options[out_type],
-        )
-        destinations.to_parquet(
-            create_write_path("destinations_file", out_type, output),
-            engine="pyarrow",
-            compression=compression_type,
-            compression_level=compression_level,
-            index=False,
-            storage_options=storage_options[out_type],
-        )
-        missing_pairs_df.to_parquet(
-            create_write_path("missing_pairs_file", out_type, output),
-            engine="pyarrow",
-            compression=compression_type,
-            compression_level=compression_level,
-            index=False,
-            storage_options=storage_options[out_type],
-        )
+    for loc in out_locations:
+        config.paths.write_to_parquet(results_df, "times", loc)
+        config.paths.write_to_parquet(inputs.origins_chunk, "origins", loc)
+        config.paths.write_to_parquet(inputs.destinations, "destinations", loc)
+        config.paths.write_to_parquet(missing_pairs_df, "missing_pairs", loc)
 
-    ##### SAVE METADATA #####
-
+    # Construct and save a metadata DataFrame
     run_id = str(uuid.uuid4().hex[:8])
     git_commit_sha = str(os.getenv("GITHUB_SHA"))
     git_commit_sha_short = str(git_commit_sha[:8] if git_commit_sha else None)
     input_file_hashes = {
-        f: get_md5_hash(input["files"][f]) for f in input["files"].keys()
+        f: get_md5_hash(config.paths.input["files"][f])
+        for f in config.paths.input["files"].keys()
     }
     output_file_hashes = {
-        f: get_md5_hash(output["local"][f])
-        for f in output["local"].keys()
+        f: get_md5_hash(config.paths.output["local"][f])
+        for f in config.paths.output["local"].keys()
         if f != "metadata_file"
     }
 
     # Create a metadata dataframe of all settings and data used for creating inputs
     # and generating times
-    metadata = pd.DataFrame(
+    metadata_df = pd.DataFrame(
         {
             "run_id": run_id,
             "calc_datetime_finished": pd.Timestamp.now(tz="UTC"),
             "calc_time_elapsed_sec": time.time() - script_start_time,
             "calc_chunk_id": args.chunk,
-            "calc_chunk_n_origins": n_origins_chunk,
-            "calc_chunk_n_destinations": n_destinations_chunk,
-            "calc_n_origins": n_origins,
-            "calc_n_destinations": n_destinations,
+            "calc_chunk_n_origins": inputs.n_origins_chunk,
+            "calc_chunk_n_destinations": inputs.n_destinations_chunk,
+            "calc_n_origins": inputs.n_origins,
+            "calc_n_destinations": inputs.n_destinations,
             "git_commit_sha_short": git_commit_sha_short,
             "git_commit_sha_long": git_commit_sha,
             "param_network_buffer_m": params["input"]["network_buffer_m"],
@@ -498,21 +145,17 @@ if __name__ == "__main__":
         },
         index=[0],
     )
+    for loc in out_locations:
+        config.paths.write_to_parquet(metadata_df, "metadata", loc)
 
-    for out_type in out_types:
-        metadata.to_parquet(
-            create_write_path("metadata_file", out_type, output),
-            engine="pyarrow",
-            compression=compression_type,
-            compression_level=compression_level,
-            index=False,
-            storage_options=storage_options[out_type],
-        )
-
-    print(
-        f"Finished routing for version: {params['times']['version']},",
-        f"mode: {args.mode}, year: {args.year}, geography: {args.geography},",
-        f"state: {args.state}, centroid type: {args.centroid_type}"
-        + chunk_msg,
+    logger.info(
+        f"Finished routing for version: {config.params['times']['version']},",
+        f"mode: {config.args.mode}, year: {config.args.year},",
+        f"geography: {config.args.geography}, state: {config.args.state},"
+        f"centroid type: {config.args.centroid_type}" + chunk_msg,
         f"in {format_time(time.time() - script_start_time)}",
     )
+
+
+if __name__ == "__main__":
+    main()
