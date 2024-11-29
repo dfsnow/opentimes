@@ -39,15 +39,20 @@ def main() -> None:
 
     chunk_msg = f", chunk: {config.args.chunk}" if config.args.chunk else ""
     logger.info(
-        f"Starting routing for version: {config.params['times']['version']},",
-        f"mode: {config.args.mode}, year: {config.args.year},",
-        f"geography: {config.args.geography}, state: {config.args.state},",
-        f"centroid type: {config.args.centroid_type}" + chunk_msg,
+        "Starting routing for version: %s, mode: %s, year: %s, "
+        "geography: %s, state: %s, centroid type: %s%s",
+        config.params["times"]["version"],
+        config.args.mode,
+        config.args.year,
+        config.args.geography,
+        config.args.state,
+        config.args.centroid_type,
+        chunk_msg,
     )
-
     logger.info(
-        f"Routing from {inputs.n_origins_chunk} origins",
-        f"to {inputs.n_destinations} destinations",
+        "Routing from %s origins to %s destinations",
+        len(inputs.origins_chunk),
+        inputs.n_destinations,
     )
 
     # Initialize the default Valhalla actor bindings
@@ -58,12 +63,13 @@ def main() -> None:
     results_df = tt_calc.get_times()
 
     logger.info(
-        "Finished calculating times in",
-        f"{format_time(time.time() - script_start_time)}",
+        "Finished calculating times in %s",
+        format_time(time.time() - script_start_time),
     )
     logger.info(
-        f"Routed from {inputs.n_origins} origins",
-        f"to {inputs.n_destinations} destinations",
+        "Routed from %s origins to %s destinations",
+        inputs.n_origins,
+        inputs.n_destinations,
     )
 
     # Extract missing pairs to a separate dataframe
@@ -81,10 +87,13 @@ def main() -> None:
 
     out_locations = ["local", "s3"] if args.write_to_s3 else ["local"]
     logger.info(
-        f"Calculated times between {len(results_df)} pairs.",
-        f"Times missing between {len(missing_pairs_df)} pairs.",
-        f"Saving outputs to: {', '.join(out_locations)}",
+        "Calculated times between %s pairs. Times missing between %s pairs. "
+        "Saving outputs to: %s",
+        len(results_df),
+        len(missing_pairs_df),
+        ", ".join(out_locations),
     )
+
     # Loop through files and write to both local and remote paths
     for loc in out_locations:
         config.paths.write_to_parquet(results_df, "times", loc)
@@ -149,11 +158,16 @@ def main() -> None:
         config.paths.write_to_parquet(metadata_df, "metadata", loc)
 
     logger.info(
-        f"Finished routing for version: {config.params['times']['version']},",
-        f"mode: {config.args.mode}, year: {config.args.year},",
-        f"geography: {config.args.geography}, state: {config.args.state},"
-        f"centroid type: {config.args.centroid_type}" + chunk_msg,
-        f"in {format_time(time.time() - script_start_time)}",
+        "Finished routing for version: %s, mode: %s, year: %s, "
+        "geography: %s, state: %s, centroid type: %s%s in %s",
+        config.params["times"]["version"],
+        config.args.mode,
+        config.args.year,
+        config.args.geography,
+        config.args.state,
+        config.args.centroid_type,
+        chunk_msg,
+        format_time(time.time() - script_start_time),
     )
 
 

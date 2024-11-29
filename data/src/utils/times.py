@@ -216,7 +216,7 @@ class TravelTimePaths:
         self, df: pd.DataFrame, dataset: str, location: str = "local"
     ) -> None:
         df.to_parquet(
-            self.get_path(dataset, location),
+            self.get_path(dataset, path_type="output", location=location),
             engine="pyarrow",
             compression=self.compression_type,
             compression_level=self.compression_level,
@@ -329,21 +329,23 @@ class TravelTimeCalculator:
         self.config = config
         self.inputs = inputs
 
-    def calculate_times(
+    def _calculate_times(
         self,
         o_start_idx: int,
         d_start_idx: int,
         o_end_idx: int,
         d_end_idx: int,
     ) -> pd.DataFrame:
-        """Calculates travel times and distances between origins and destinations.
+        """
+        Calculates travel times and distances between origins and destinations.
 
         Args:
             o_start_idx: Starting index for the origins DataFrame.
             d_start_idx: Starting index for the destinations DataFrame.
 
         Returns:
-            DataFrame containing origin IDs, destination IDs, travel durations, and distances.
+            DataFrame containing origin IDs, destination IDs, travel durations,
+            and distances.
         """
         start_time = time.time()
         job_string = (
@@ -400,72 +402,60 @@ class TravelTimeCalculator:
         )
 
         elapsed_time = time.time() - start_time
-        self.config.logger.info(job_string, f": {format_time(elapsed_time)}")
+        self.config.logger.info(f"{job_string}: {format_time(elapsed_time)}")
         return df
+
+    def _binary_search(self, o_start_idx, d_start_idx, o_end_idx, d_end_idx):
+        if o_start_idx + 1 >= o_end_idx and d_start_idx + 1 >= d_end_idx:
+            df = pd.merge(
+                pd.DataFrame(
+                    self.inputs.origins[o_start_idx:o_end_idx],
+                    columns=["origin_id"],
+                ),
+                pd.DataFrame(
+                    self.inputs.destinations[d_start_idx:d_end_idx],
+                    columns=["destination_id"],
+                ),
+                how="cross",
+            )
+            df["distance_km"] = pd.Series([], dtype=float)
+            df["duration_sec"] = pd.Series([], dtype=float)
+
+            return [df]
+        try:
+            times = self._calculate_times(
+                o_start_idx=o_start_idx,
+                d_start_idx=d_start_idx,
+                o_end_idx=o_end_idx,
+                d_end_idx=d_end_idx,
+            )
+            return [times]
+        except Exception as e:
+            self.config.logger.info(f"Error: {e}, backing off and retrying...")
+            mid_o = (o_start_idx + o_end_idx) // 2
+            mid_d = (d_start_idx + d_end_idx) // 2
+            return (
+                self._binary_search(o_start_idx, d_start_idx, mid_o, mid_d)
+                + self._binary_search(mid_o, d_start_idx, o_end_idx, mid_d)
+                + self._binary_search(o_start_idx, mid_d, mid_o, d_end_idx)
+                + self._binary_search(mid_o, mid_d, o_end_idx, d_end_idx)
+            )
 
     def get_times(self):
         results = []
+        msso = self.inputs.max_split_size_origins
+        noc = self.inputs.n_origins_chunk
+        mssd = self.inputs.max_split_size_destinations
+        ndc = self.inputs.n_destinations_chunk
 
-        def binary_search_times(
-            o_start_idx, d_start_idx, o_end_idx, d_end_idx
-        ):
-            if o_start_idx + 1 >= o_end_idx and d_start_idx + 1 >= d_end_idx:
-                df = pd.merge(
-                    pd.DataFrame(
-                        self.inputs.origins[o_start_idx:o_end_idx],
-                        columns=["origin_id"],
-                    ),
-                    pd.DataFrame(
-                        self.inputs.destinations[d_start_idx:d_end_idx],
-                        columns=["destination_id"],
-                    ),
-                    how="cross",
-                )
-                df["distance_km"] = pd.Series([], dtype=float)
-                df["duration_sec"] = pd.Series([], dtype=float)
-
-                return [df]
-            try:
-                times = self.calculate_times(
-                    o_start_idx=o_start_idx,
-                    d_start_idx=d_start_idx,
-                    o_end_idx=o_end_idx,
-                    d_end_idx=d_end_idx,
-                )
-                return [times]
-            except Exception as e:
-                self.config.logger.info(
-                    f"Error: {e}, backing off and retrying..."
-                )
-                mid_o = (o_start_idx + o_end_idx) // 2
-                mid_d = (d_start_idx + d_end_idx) // 2
-                return (
-                    binary_search_times(o_start_idx, d_start_idx, mid_o, mid_d)
-                    + binary_search_times(mid_o, d_start_idx, o_end_idx, mid_d)
-                    + binary_search_times(o_start_idx, mid_d, mid_o, d_end_idx)
-                    + binary_search_times(mid_o, mid_d, o_end_idx, d_end_idx)
-                )
-
-        for o in range(
-            0, self.inputs.n_origins_chunk, self.inputs.max_split_size_origins
-        ):
-            for d in range(
-                0,
-                self.inputs.n_destinations_chunk,
-                self.inputs.max_split_size_destinations,
-            ):
+        for o in range(0, noc, msso):
+            for d in range(0, ndc, mssd):
                 results.extend(
-                    binary_search_times(
+                    self._binary_search(
                         o,
                         d,
-                        min(
-                            o + self.inputs.max_split_size_origins,
-                            self.inputs.n_origins_chunk,
-                        ),
-                        min(
-                            d + self.inputs.max_split_size_destinations,
-                            self.inputs.n_destinations_chunk,
-                        ),
+                        min(o + msso, noc),
+                        min(d + mssd, ndc),
                     )
                 )
 
