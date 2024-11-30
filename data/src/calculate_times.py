@@ -14,6 +14,7 @@ from utils.times import (
     TravelTimeCalculator,
     TravelTimeConfig,
     TravelTimeInputs,
+    snap_df_to_osm,
 )
 from utils.utils import format_time, get_md5_hash
 
@@ -64,6 +65,16 @@ def main() -> None:
     # Initialize the default Valhalla actor bindings
     actor = valhalla.Actor((Path.cwd() / "valhalla.json").as_posix())
 
+    # Use the Vahalla Locate API to append coordinates that are snapped to OSM
+    if config.params["times"]["use_snapped"]:
+        logger.info("Snapping coordinates to OSM network")
+        inputs.origins_chunk = snap_df_to_osm(
+            inputs.origins_chunk, config.args.mode, actor
+        )
+        inputs.destinations = snap_df_to_osm(
+            inputs.destinations, config.args.mode, actor
+        )
+
     # Calculate times for each chunk and append to a list
     tt_calc = TravelTimeCalculator(actor, config, inputs)
     results_df = tt_calc.get_times()
@@ -93,8 +104,8 @@ def main() -> None:
 
         # Create a new input class, keeping only pairs that were unroutable
         inputs_sp = TravelTimeInputs(
-            origins=inputs.origins[
-                inputs.origins["id"].isin(
+            origins=inputs.origins_chunk[
+                inputs.origins_chunk["id"].isin(
                     missing_pairs_df.index.get_level_values("origin_id")
                 )
             ].reset_index(drop=True),
