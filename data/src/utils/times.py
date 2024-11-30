@@ -492,7 +492,7 @@ class TravelTimeCalculator:
 
         except Exception as e:
             if print_log:
-                self.config.logger.error(f"{e}. Backing off and retrying...")
+                self.config.logger.error(f"{e}. Starting binary search...")
             mo = (o_start_idx + o_end_idx) // 2
             md = (d_start_idx + d_end_idx) // 2
             return (
@@ -536,8 +536,10 @@ class TravelTimeCalculator:
                 ]
             )
         else:
-            results_df = pd.concat(results, ignore_index=True).set_index(
-                ["origin_id", "destination_id"]
+            results_df = (
+                pd.concat(results, ignore_index=True)
+                .set_index(["origin_id", "destination_id"])
+                .sort_index()
             )
             del results
             return results_df
