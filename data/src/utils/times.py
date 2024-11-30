@@ -58,6 +58,13 @@ class TravelTimeArgs:
                 "Invalid chunk argument. Must be two numbers "
                 "separated by a dash (e.g., '1-2')."
             )
+        if chunk:
+            parts = chunk.split("-")
+            if len(parts[0]) != len(parts[1]):
+                raise ValueError(
+                    "Invalid chunk argument. Both numbers must have"
+                    "the same number of digits (including zero-padding)."
+                )
 
 
 class TravelTimePaths:
