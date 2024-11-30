@@ -22,8 +22,6 @@ logger = create_logger(__name__)
 
 with open(DOCKER_INTERNAL_PATH / "params.yaml") as file:
     params = yaml.safe_load(file)
-with open(DOCKER_INTERNAL_PATH / "valhalla.json", "r") as f:
-    valhalla_data = json.load(f)
 os.environ["AWS_PROFILE"] = params["s3"]["profile"]
 
 
@@ -57,9 +55,9 @@ def main() -> None:
     )
     logger.info(
         "Routing from %s origins to %s destinations (%s pairs)",
-        f"{len(inputs.origins_chunk):,}",
+        f"{len(inputs.origins):,}",
         f"{inputs.n_destinations:,}",
-        f"{len(inputs.origins_chunk) * inputs.n_destinations:,}",
+        f"{len(inputs.origins) * inputs.n_destinations:,}",
     )
 
     # Initialize the default Valhalla actor bindings
@@ -68,8 +66,8 @@ def main() -> None:
     # Use the Vahalla Locate API to append coordinates that are snapped to OSM
     if config.params["times"]["use_snapped"]:
         logger.info("Snapping coordinates to OSM network")
-        inputs.origins_chunk = snap_df_to_osm(
-            inputs.origins_chunk, config.args.mode, actor
+        inputs.origins = snap_df_to_osm(
+            inputs.origins, config.args.mode, actor
         )
         inputs.destinations = snap_df_to_osm(
             inputs.destinations, config.args.mode, actor
@@ -85,7 +83,7 @@ def main() -> None:
     )
     logger.info(
         "Routed from %s origins to %s destinations",
-        f"{inputs.n_origins_chunk:,}",
+        f"{inputs.n_origins:,}",
         f"{inputs.n_destinations:,}",
     )
 
@@ -104,8 +102,8 @@ def main() -> None:
 
         # Create a new input class, keeping only pairs that were unroutable
         inputs_sp = TravelTimeInputs(
-            origins=inputs.origins_chunk[
-                inputs.origins_chunk["id"].isin(
+            origins=inputs.origins[
+                inputs.origins["id"].isin(
                     missing_pairs_df.index.get_level_values("origin_id")
                 )
             ].reset_index(drop=True),
@@ -151,7 +149,7 @@ def main() -> None:
     )
     for loc in out_locations:
         config.paths.write_to_parquet(results_df, "times", loc)
-        config.paths.write_to_parquet(inputs.origins_chunk, "origins", loc)
+        config.paths.write_to_parquet(inputs.origins, "origins", loc)
         config.paths.write_to_parquet(inputs.destinations, "destinations", loc)
         config.paths.write_to_parquet(missing_pairs_df, "missing_pairs", loc)
 
@@ -171,15 +169,19 @@ def main() -> None:
 
     # Create a metadata dataframe of all settings and data used for creating inputs
     # and generating times
+    with open(DOCKER_INTERNAL_PATH / "valhalla.json", "r") as f:
+        valhalla_data = json.load(f)
+    with open(DOCKER_INTERNAL_PATH / "valhalla_sp.json", "r") as f:
+        valhalla_data_sp = json.load(f)
     metadata_df = pd.DataFrame(
         {
             "run_id": run_id,
             "calc_datetime_finished": pd.Timestamp.now(tz="UTC"),
             "calc_time_elapsed_sec": time.time() - script_start_time,
             "calc_chunk_id": args.chunk,
-            "calc_chunk_n_origins": inputs.n_origins_chunk,
-            "calc_chunk_n_destinations": inputs.n_destinations_chunk,
-            "calc_n_origins": inputs.n_origins,
+            "calc_chunk_n_origins": inputs.n_origins,
+            "calc_chunk_n_destinations": inputs.n_destinations,
+            "calc_n_origins": inputs.n_origins_full,
             "calc_n_destinations": inputs.n_destinations,
             "git_commit_sha_short": git_commit_sha_short,
             "git_commit_sha_long": git_commit_sha,
@@ -204,6 +206,9 @@ def main() -> None:
             ],
             "valhalla_config_data": json.dumps(
                 valhalla_data, separators=(",", ":")
+            ),
+            "valhalla_config_data_second_pass": json.dumps(
+                valhalla_data_sp, separators=(",", ":")
             ),
         },
         index=[0],

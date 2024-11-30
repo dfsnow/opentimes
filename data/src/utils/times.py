@@ -254,20 +254,17 @@ class TravelTimeInputs:
     ) -> None:
         self.origins = origins
         self.destinations = destinations
-        self.origins_chunk: pd.DataFrame
+        self.n_origins_full: int = len(self.origins)
 
         self.chunk = chunk
         self.chunk_start_idx: int
         self.chunk_end_idx: int
         self.chunk_size: int = int(10e7)
         self._set_chunk_attributes()
-        self._set_origins_chunk()
+        self._subset_origins()
 
         self.n_origins: int = len(self.origins)
         self.n_destinations: int = len(self.destinations)
-        self.n_origins_chunk: int = len(self.origins_chunk)
-        self.n_destinations_chunk: int = len(self.destinations)
-
         self.max_split_size_origins = min(
             max_split_size_origins, self.chunk_size
         )
@@ -283,12 +280,12 @@ class TravelTimeInputs:
             self.chunk_end_idx = int(chunk_end_idx) + 1
             self.chunk_size = self.chunk_end_idx - self.chunk_start_idx
 
-    def _set_origins_chunk(self) -> None:
+    def _subset_origins(self) -> None:
         """Sets the origins chunk (if chunk is specified)."""
-        df = self.origins
         if self.chunk:
-            df = df.iloc[self.chunk_start_idx : self.chunk_end_idx]
-        self.origins_chunk = df
+            self.origins = self.origins.iloc[
+                self.chunk_start_idx : self.chunk_end_idx
+            ]
 
 
 class TravelTimeConfig:
@@ -389,7 +386,7 @@ class TravelTimeCalculator:
         # Get the subset of origin and destination points and convert them to
         # lists, then squash them into the request body
         origins_list = (
-            self.inputs.origins_chunk.iloc[o_start_idx:o_end_idx]
+            self.inputs.origins.iloc[o_start_idx:o_end_idx]
             .apply(col_dict, axis=1)
             .tolist()
         )
@@ -463,13 +460,11 @@ class TravelTimeCalculator:
 
         if o_start_idx + 1 >= o_end_idx and d_start_idx + 1 >= d_end_idx:
             df = pd.merge(
-                pd.DataFrame(
-                    self.inputs.origins[o_start_idx:o_end_idx],
-                    columns=["origin_id"],
+                self.inputs.origins["id"][o_start_idx:o_end_idx].rename(
+                    "origin_id"
                 ),
-                pd.DataFrame(
-                    self.inputs.destinations[d_start_idx:d_end_idx],
-                    columns=["destination_id"],
+                self.inputs.destinations["id"][d_start_idx:d_end_idx].rename(
+                    "destination_id"
                 ),
                 how="cross",
             )
@@ -518,9 +513,9 @@ class TravelTimeCalculator:
         """
         results = []
         max_spl_o = self.inputs.max_split_size_origins
-        n_oc = self.inputs.n_origins_chunk
+        n_oc = self.inputs.n_origins
         m_spl_d = self.inputs.max_split_size_destinations
-        n_dc = self.inputs.n_destinations_chunk
+        n_dc = self.inputs.n_destinations
 
         for o in range(0, n_oc, max_spl_o):
             for d in range(0, n_dc, m_spl_d):
@@ -582,29 +577,27 @@ def snap_df_to_osm(
 
     # Use the first element of nodes to populate the snapped lat/lon, otherwise
     # fallback to the correlated lat/lon from edges
+    def get_col(x: dict, col: str):
+        return (
+            x["nodes"][0][col]
+            if x["nodes"]
+            else (x["edges"][0][f"correlated_{col}"] if x["edges"] else None)
+        )
+
     response_df = pd.DataFrame(
         [
             {
-                "lon_snapped": item["nodes"][0]["lon"]
-                if item["nodes"]
-                else (
-                    item["edges"][0]["correlated_lon"]
-                    if item["edges"]
-                    else None
-                ),
-                "lat_snapped": item["nodes"][0]["lat"]
-                if item["nodes"]
-                else (
-                    item["edges"][0]["correlated_lat"]
-                    if item["edges"]
-                    else None
-                ),
+                "lon_snapped": get_col(item, "lon"),
+                "lat_snapped": get_col(item, "lat"),
             }
             for item in response_data
         ]
     )
 
-    df = pd.concat([df, response_df], axis=1)
+    df = pd.concat(
+        [df.reset_index(drop=True), response_df.reset_index(drop=True)],
+        axis=1,
+    )
     df.fillna({"lon_snapped": df["lon"]}, inplace=True)
     df.fillna({"lat_snapped": df["lat"]}, inplace=True)
     df["is_snapped"] = df["lon"] != df["lon_snapped"]
