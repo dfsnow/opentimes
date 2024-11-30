@@ -45,6 +45,8 @@ services:
       - ./data/build/:/custom_files:rw
       - ./data/valhalla.json:/custom_files/valhalla.json:rw
       - ./data/valhalla.json:/data/valhalla.json:rw
+      - ./data/valhalla_sp.json:/data/valhalla_sp.json:rw
+      - ./data/valhalla_sp.json:/custom_files/valhalla_sp.json:rw
       - ./data/output:/data/output:rw
       # Read only volumes to serve data to the container
       - $HOME/.aws/credentials:/home/valhalla/.aws/credentials:ro

@@ -196,7 +196,7 @@
     "max_distance_disable_hierarchy_culling": 0,
     "max_exclude_locations": 50,
     "max_exclude_polygons_length": 10000,
-    "max_radius": 200,
+    "max_radius": 2000,
     "max_reachability": 100,
     "max_timedep_distance": 500000,
     "max_timedep_distance_matrix": 0,
@@ -266,9 +266,9 @@
   },
   "thor": {
     "clear_reserved_memory": false,
-    "costmatrix_allow_second_pass": false,
-    "costmatrix_check_reverse_connection": false,
-    "extended_search": false,
+    "costmatrix_allow_second_pass": true,
+    "costmatrix_check_reverse_connection": true,
+    "extended_search": true,
     "logging": {
       "color": false,
       "file_name": "path_to_some_file.log",

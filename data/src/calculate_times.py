@@ -10,7 +10,11 @@ import valhalla  # type: ignore
 import yaml
 from utils.constants import DOCKER_INTERNAL_PATH
 from utils.logging import create_logger
-from utils.times import TravelTimeCalculator, TravelTimeConfig
+from utils.times import (
+    TravelTimeCalculator,
+    TravelTimeConfig,
+    TravelTimeInputs,
+)
 from utils.utils import format_time, get_md5_hash
 
 logger = create_logger(__name__)
@@ -51,9 +55,10 @@ def main() -> None:
         chunk_msg,
     )
     logger.info(
-        "Routing from %s origins to %s destinations",
-        len(inputs.origins_chunk),
-        inputs.n_destinations,
+        "Routing from %s origins to %s destinations (%s pairs)",
+        f"{len(inputs.origins_chunk):,}",
+        f"{inputs.n_destinations:,}",
+        f"{len(inputs.origins_chunk) * inputs.n_destinations:,}",
     )
 
     # Initialize the default Valhalla actor bindings
@@ -69,21 +74,59 @@ def main() -> None:
     )
     logger.info(
         "Routed from %s origins to %s destinations",
-        inputs.n_origins,
-        inputs.n_destinations,
+        f"{inputs.n_origins_chunk:,}",
+        f"{inputs.n_destinations:,}",
     )
 
     # Extract missing pairs to a separate DataFrame
     missing_pairs_df = results_df[results_df["duration_sec"].isnull()]
-    missing_pairs_df = (
-        pd.DataFrame(missing_pairs_df)
-        .drop(columns=["duration_sec", "distance_km"])
-        .sort_values(by=["origin_id", "destination_id"])
-    )
+    n_missing_pairs = len(missing_pairs_df)
+
+    # If there are missing pairs, rerun the routing for only those pairs
+    # using a more aggressive (but time consuming) second pass approach
+    if n_missing_pairs > 0:
+        logger.info(
+            "Found %s missing pairs, rerouting with a more aggressive method",
+            f"{n_missing_pairs:,}",
+        )
+        actor_sp = valhalla.Actor((Path.cwd() / "valhalla_sp.json").as_posix())
+
+        # Create a new input class, keeping only pairs that were unroutable
+        inputs_sp = TravelTimeInputs(
+            origins=inputs.origins[
+                inputs.origins["id"].isin(
+                    missing_pairs_df.index.get_level_values("origin_id")
+                )
+            ].reset_index(drop=True),
+            destinations=inputs.destinations[
+                inputs.destinations["id"].isin(
+                    missing_pairs_df.index.get_level_values("destination_id")
+                )
+            ].reset_index(drop=True),
+            chunk=None,
+            max_split_size_origins=inputs.max_split_size_origins,
+            max_split_size_destinations=inputs.max_split_size_destinations,
+        )
+
+        # Route using the more aggressive settings and update the results
+        tt_calc_sp = TravelTimeCalculator(actor_sp, config, inputs_sp)
+        results_df.update(tt_calc_sp.get_times())
+
+        # Extract the missing pairs again since they may have changed
+        missing_pairs_df = results_df[results_df["duration_sec"].isnull()]
+        logger.info(
+            "Found %s additional pairs via second pass",
+            f"{n_missing_pairs - len(missing_pairs_df):,}",
+        )
 
     # Drop missing pairs and sort for more efficient compression
-    results_df = results_df.dropna(subset=["duration_sec"]).sort_values(
-        by=["origin_id", "destination_id"]
+    missing_pairs_df = (
+        missing_pairs_df.drop(columns=["duration_sec", "distance_km"])
+        .sort_index()
+        .reset_index()
+    )
+    results_df = (
+        results_df.dropna(subset=["duration_sec"]).sort_index().reset_index()
     )
 
     # Loop through files and write to both local and remote paths
@@ -91,8 +134,8 @@ def main() -> None:
     logger.info(
         "Calculated times between %s pairs. Times missing between %s pairs. "
         "Saving outputs to: %s",
-        len(results_df),
-        len(missing_pairs_df),
+        f"{len(results_df):,}",
+        f"{len(missing_pairs_df):,}",
         ", ".join(out_locations),
     )
     for loc in out_locations:
