@@ -31,14 +31,14 @@
     },
     "service_defaults": {
       "heading_tolerance": 60,
-      "minimum_reachability": 50,
+      "minimum_reachability": 20,
       "node_snap_tolerance": 5,
-      "radius": 0,
+      "radius": 2000,
       "search_cutoff": 350000,
       "street_side_max_distance": 1000,
       "street_side_tolerance": 5
     },
-    "use_connectivity": true
+    "use_connectivity": false
   },
   "meili": {
     "auto": {
