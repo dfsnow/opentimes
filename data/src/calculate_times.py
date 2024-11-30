@@ -84,7 +84,7 @@ def main() -> None:
     # using a more aggressive (but time consuming) second pass approach
     if len(missing_pairs_df) > 0:
         logger.info(
-            "Found %s missing pairs. Rerouting with a more aggressive method",
+            "Found %s missing pairs, rerouting with a more aggressive method",
             len(missing_pairs_df),
         )
         actor_sp = valhalla.Actor((Path.cwd() / "valhalla_sp.json").as_posix())

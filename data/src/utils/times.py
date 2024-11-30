@@ -10,7 +10,7 @@ import pandas as pd
 import valhalla  # type: ignore
 
 from utils.constants import DOCKER_INTERNAL_PATH
-from utils.utils import format_time
+from utils.utils import format_time, suppress_stdout
 
 
 class TravelTimeArgs:
@@ -403,8 +403,9 @@ class TravelTimeCalculator:
         )
 
         # Make the actual JSON request to the matrix API
-        response = self.actor.matrix(request_json)
-        response_data = json.loads(response)
+        with suppress_stdout():
+            response = self.actor.matrix(request_json)
+            response_data = json.loads(response)
 
         # Parse the response data and convert it to a DataFrame. Recover the
         # origin and destination indices and append them to the DataFrame
@@ -483,7 +484,7 @@ class TravelTimeCalculator:
                 elapsed_time = time.time() - start_time
                 self.config.logger.info(
                     "Routed %s pairs in %s",
-                    (o_end_idx - o_start_idx) * (d_end_idx - d_start_idx) + 2,
+                    (o_end_idx - o_start_idx) * (d_end_idx - d_start_idx),
                     format_time(elapsed_time),
                 )
 

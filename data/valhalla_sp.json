@@ -21,7 +21,7 @@
       "status"
     ],
     "logging": {
-      "color": true,
+      "color": false,
       "file_name": "path_to_some_file.log",
       "long_request": 100.0,
       "type": "std_out"
@@ -78,7 +78,7 @@
       "size": 500
     },
     "logging": {
-      "color": true,
+      "color": false,
       "file_name": "path_to_some_file.log",
       "type": "std_out"
     },
@@ -122,7 +122,7 @@
     "include_platforms": false,
     "landmarks": "/data/valhalla/landmarks.sqlite",
     "logging": {
-      "color": true,
+      "color": false,
       "file_name": "path_to_some_file.log",
       "type": "std_out"
     },
@@ -144,7 +144,7 @@
   },
   "odin": {
     "logging": {
-      "color": true,
+      "color": false,
       "file_name": "path_to_some_file.log",
       "type": "std_out"
     },
@@ -270,7 +270,7 @@
     "costmatrix_check_reverse_connection": true,
     "extended_search": true,
     "logging": {
-      "color": true,
+      "color": false,
       "file_name": "path_to_some_file.log",
       "long_request": 110.0,
       "type": "std_out"

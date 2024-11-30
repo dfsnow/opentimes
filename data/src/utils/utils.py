@@ -1,5 +1,8 @@
 import hashlib
 import math
+import os
+import sys
+from contextlib import contextmanager
 from pathlib import Path
 
 import pandas as pd
@@ -89,3 +92,23 @@ def split_range(
         chunk_ranges[-1] = (start, n - 1)
 
     return chunk_ranges
+
+
+# https://stackoverflow.com/a/17954769
+@contextmanager
+def suppress_stdout():
+    """Redirect stdout to /dev/null. Useful for sinking Valhalla output."""
+    fd = sys.stdout.fileno()
+
+    def _redirect_stdout(to):
+        sys.stdout.close()
+        os.dup2(to.fileno(), fd)
+        sys.stdout = os.fdopen(fd, "w")
+
+    with os.fdopen(os.dup(fd), "w") as old_stdout:
+        with open(os.devnull, "w") as file:
+            _redirect_stdout(to=file)
+        try:
+            yield
+        finally:
+            _redirect_stdout(to=old_stdout)
