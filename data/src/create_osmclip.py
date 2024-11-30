@@ -1,6 +1,8 @@
 import argparse
 from pathlib import Path
 
+import geopandas as gpd
+from shapely.geometry import box
 from utils.census import load_shapefile
 from utils.logging import create_logger
 
@@ -41,10 +43,18 @@ def create_osmclip(year: str, state: str, buffer: int = 0) -> None:
     gdf = gdf[["geometry"]]
     logger.info(f"Loaded state boundary for {state}")
     if buffer:
-        gdf.to_crs(crs="EPSG:5071", inplace=True)
+        gdf = gdf.to_crs(crs="EPSG:5071")
         gdf["geometry"] = gdf["geometry"].buffer(distance=buffer)
         logger.info(f"Buffered state boundary by {buffer} meters")
-    gdf.to_crs(crs="EPSG:4326", inplace=True)
+
+    # Clip to a large bbox surrounding the U.S. to prevent wrapping dateline
+    bbox = box(-177.0, -32, -16.0, 70.0)
+    bbox_gdf = gpd.GeoDataFrame({"geometry": [bbox]}, crs="EPSG:4326")
+    gdf.reset_index(drop=True, inplace=True)
+    gdf = gdf.intersection(bbox_gdf.to_crs(crs="EPSG:5071"), align=True)
+    logger.info("Clipped state boundary to U.S. bounding box")
+
+    gdf = gdf.to_crs(crs="EPSG:4326")
     gdf.to_file(output_file, driver="GeoJSON")
     logger.info(f"Wrote to: {output_file}")
 
