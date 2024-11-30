@@ -62,7 +62,7 @@ class TravelTimeArgs:
             parts = chunk.split("-")
             if len(parts[0]) != len(parts[1]):
                 raise ValueError(
-                    "Invalid chunk argument. Both numbers must have"
+                    "Invalid chunk argument. Both numbers must have "
                     "the same number of digits (including zero-padding)."
                 )
 
@@ -248,29 +248,28 @@ class TravelTimeInputs:
         self,
         origins: pd.DataFrame,
         destinations: pd.DataFrame,
+        pairs: pd.DataFrame | None,
         chunk: str | None,
-        max_split_size_origins: int,
-        max_split_size_destinations: int,
+        max_pairs: int,
     ) -> None:
         self.origins = origins
         self.destinations = destinations
+        self.pairs: pd.DataFrame
         self.n_origins_full: int = len(self.origins)
 
         self.chunk = chunk
         self.chunk_start_idx: int
         self.chunk_end_idx: int
         self.chunk_size: int = int(10e7)
+
         self._set_chunk_attributes()
         self._subset_origins()
+        self._set_pairs(pairs)
 
         self.n_origins: int = len(self.origins)
         self.n_destinations: int = len(self.destinations)
-        self.max_split_size_origins = min(
-            max_split_size_origins, self.chunk_size
-        )
-        self.max_split_size_destinations = min(
-            max_split_size_destinations, self.n_destinations
-        )
+        self.n_pairs: int = len(self.pairs)
+        self.max_pairs = min(max_pairs, self.n_pairs)
 
     def _set_chunk_attributes(self) -> None:
         """Sets the origin chunk indices given the input chunk string."""
@@ -279,6 +278,18 @@ class TravelTimeInputs:
             self.chunk_start_idx = int(chunk_start_idx)
             self.chunk_end_idx = int(chunk_end_idx) + 1
             self.chunk_size = self.chunk_end_idx - self.chunk_start_idx
+
+    def _set_pairs(self, pairs) -> None:
+        """
+        Sets the universe pairs to calculate times for. Uses the argument by
+        default, otherwise takes the cross product of origins and destinations.
+        """
+        if not pairs:
+            self.pairs = pd.merge(
+                self.origins["id"].rename("origin_id"),
+                self.destinations["id"].rename("destination_id"),
+                how="cross",
+            ).set_index(["origin_id", "destination_id"], drop=False)
 
     def _subset_origins(self) -> None:
         """Sets the origins chunk (if chunk is specified)."""
@@ -335,9 +346,9 @@ class TravelTimeConfig:
         return TravelTimeInputs(
             origins=origins,
             destinations=destinations,
+            pairs=None,
             chunk=self.args.chunk,
-            max_split_size_origins=self.params["times"]["max_split_size"],
-            max_split_size_destinations=self.params["times"]["max_split_size"],
+            max_pairs=self.params["times"]["max_pairs"],
         )
 
 
@@ -359,19 +370,15 @@ class TravelTimeCalculator:
 
     def _calculate_times(
         self,
-        o_start_idx: int,
-        d_start_idx: int,
-        o_end_idx: int,
-        d_end_idx: int,
+        start_idx: int,
+        end_idx: int,
     ) -> pd.DataFrame:
         """
         Calculates travel times and distances between origins and destinations.
 
         Args:
-            o_start_idx: Starting index for the origins DataFrame.
-            d_start_idx: Starting index for the destinations DataFrame.
-            o_end_idx: Ending index for the origins DataFrame.
-            d_end_idx: Ending index for the destinations DataFrame.
+            start_idx: Starting index for the pairs DataFrame.
+            end_idx: Ending index for the pairs DataFrame.
 
         Returns:
             DataFrame containing origin IDs, destination IDs, travel durations,
@@ -383,108 +390,101 @@ class TravelTimeCalculator:
             col_suffix = "_snapped" if snapped else ""
             return {"lat": x[f"lat{col_suffix}"], "lon": x[f"lon{col_suffix}"]}
 
-        # Get the subset of origin and destination points and convert them to
-        # lists, then squash them into the request body
-        origins_list = (
-            self.inputs.origins.iloc[o_start_idx:o_end_idx]
-            .apply(col_dict, axis=1)
-            .tolist()
-        )
-        destinations_list = (
-            self.inputs.destinations.iloc[d_start_idx:d_end_idx]
-            .apply(col_dict, axis=1)
-            .tolist()
-        )
-        request_json = json.dumps(
-            {
-                "sources": origins_list,
-                "targets": destinations_list,
-                "costing": self.config.args.mode,
-                "verbose": False,
-            }
-        )
+        results = []
+        for origin in self.inputs.pairs.iloc[start_idx:end_idx].origin_id:
+            origins_list = (
+                self.inputs.origins[self.inputs.origins.id == origin]
+                .apply(col_dict, axis=1)
+                .tolist()
+            )
+            destinations_list = (
+                pd.merge(
+                    self.inputs.pairs.loc[origin].reset_index(drop=True),
+                    self.inputs.destinations,
+                    how="left",
+                    left_on="destination_id",
+                    right_on="id",
+                )
+                .apply(col_dict, axis=1)
+                .tolist()
+            )
+            request_json = json.dumps(
+                {
+                    "sources": origins_list,
+                    "targets": destinations_list,
+                    "costing": self.config.args.mode,
+                    "verbose": False,
+                }
+            )
 
-        # Make the actual JSON request to the matrix API
-        with suppress_stdout():
-            response = self.actor.matrix(request_json)
-            response_data = json.loads(response)
+            # Make the actual JSON request to the matrix API
+            with suppress_stdout():
+                response = self.actor.matrix(request_json)
+                response_data = json.loads(response)
 
-        # Parse the response data and convert it to a DataFrame. Recover the
-        # origin and destination indices and append them to the DataFrame
-        durations = response_data["sources_to_targets"]["durations"]
-        distances = response_data["sources_to_targets"]["distances"]
-        origin_ids = (
-            self.inputs.origins.iloc[o_start_idx:o_end_idx]["id"]
-            .repeat(d_end_idx - d_start_idx)
-            .tolist()
-        )
-        destination_ids = self.inputs.destinations.iloc[d_start_idx:d_end_idx][
-            "id"
-        ].tolist() * (o_end_idx - o_start_idx)
+            # Parse the response data and convert it to a DataFrame. Recover the
+            # origin and destination indices and append them to the DataFrame
+            durations = response_data["sources_to_targets"]["durations"]
+            distances = response_data["sources_to_targets"]["distances"]
+            d_ids = (
+                self.inputs.pairs.loc[origin]
+                .reset_index(drop=True)
+                .destination_id
+            )
 
-        df = pd.DataFrame(
-            {
-                "origin_id": origin_ids,
-                "destination_id": destination_ids,
-                "duration_sec": [i for sl in durations for i in sl],
-                "distance_km": [i for sl in distances for i in sl],
-            }
-        )
+            df = pd.DataFrame(
+                {
+                    "origin_id": origin,
+                    "destination_id": d_ids,
+                    "duration_sec": [i for sl in durations for i in sl],
+                    "distance_km": [i for sl in distances for i in sl],
+                }
+            )
+            breakpoint()
 
-        return df
+            results.append(df)
+
+        breakpoint()
+        results_df = pd.concat(results, ignore_index=True)
+        return results_df
 
     def _binary_search(
         self,
-        o_start_idx: int,
-        d_start_idx: int,
-        o_end_idx: int,
-        d_end_idx: int,
+        start_idx: int,
+        end_idx: int,
         print_log: bool = True,
     ) -> list[pd.DataFrame]:
         """
-        Recursively split the origins and destinations into smaller chunks.
+        Recursively split the origin destination pairs into smaller chunks.
 
         Necessary because Valhalla will terminate certain unroutable requests.
-        Binary searching all origins and destinations will return all routable
-        values AROUND the unroutable ones.
+        Binary searching all pairs will return all routable values AROUND the
+        unroutable ones.
         """
         start_time = time.time()
         if print_log:
             self.config.logger.info(
-                "Routing origin indices %s-%s to destination indices %s-%s",
-                o_start_idx,
-                max(o_end_idx - 1, 0),
-                d_start_idx,
-                max(d_end_idx - 1, 0),
+                "Routing pairs %s-%s out of %s (%s)",
+                start_idx + 1,
+                end_idx,
+                self.inputs.n_pairs,
+                f"{(end_idx / self.inputs.n_pairs) * 100:.2f}%",
             )
 
-        if o_start_idx + 1 >= o_end_idx and d_start_idx + 1 >= d_end_idx:
-            df = pd.merge(
-                self.inputs.origins["id"][o_start_idx:o_end_idx].rename(
-                    "origin_id"
-                ),
-                self.inputs.destinations["id"][d_start_idx:d_end_idx].rename(
-                    "destination_id"
-                ),
-                how="cross",
-            )
+        if start_idx + 1 >= end_idx:
+            df = self.inputs.pairs.iloc[start_idx:end_idx].copy()
             df["distance_km"] = pd.Series([], dtype=float)
             df["duration_sec"] = pd.Series([], dtype=float)
-
             return [df]
+
         try:
-            times = self._calculate_times(
-                o_start_idx=o_start_idx,
-                d_start_idx=d_start_idx,
-                o_end_idx=o_end_idx,
-                d_end_idx=d_end_idx,
-            )
+            times = self._calculate_times(start_idx=start_idx, end_idx=end_idx)
 
             if print_log:
                 elapsed_time = time.time() - start_time
                 self.config.logger.info(
                     "Routed %s pairs in %s",
-                    f"{(o_end_idx - o_start_idx) * (d_end_idx - d_start_idx):,}",
+                    end_idx - start_idx,
                     format_time(elapsed_time),
                 )
 
@@ -493,14 +493,10 @@ class TravelTimeCalculator:
         except Exception as e:
             if print_log:
                 self.config.logger.error(f"{e}. Starting binary search...")
-            mo = (o_start_idx + o_end_idx) // 2
-            md = (d_start_idx + d_end_idx) // 2
-            return (
-                self._binary_search(o_start_idx, d_start_idx, mo, md, False)
-                + self._binary_search(mo, d_start_idx, o_end_idx, md, False)
-                + self._binary_search(o_start_idx, md, mo, d_end_idx, False)
-                + self._binary_search(mo, md, o_end_idx, d_end_idx, False)
-            )
+            mid_idx = (start_idx + end_idx) // 2
+            return self._binary_search(
+                start_idx, mid_idx, False
+            ) + self._binary_search(mid_idx, end_idx, False)
 
     def get_times(self) -> pd.DataFrame:
         """
@@ -512,22 +508,13 @@ class TravelTimeCalculator:
             and distances for all inputs.
         """
         results = []
-        max_spl_o = self.inputs.max_split_size_origins
-        n_oc = self.inputs.n_origins
-        m_spl_d = self.inputs.max_split_size_destinations
-        n_dc = self.inputs.n_destinations
+        max_pairs = self.inputs.max_pairs
+        n_pairs = self.inputs.n_pairs
 
-        for o in range(0, n_oc, max_spl_o):
-            for d in range(0, n_dc, m_spl_d):
-                results.extend(
-                    self._binary_search(
-                        o,
-                        d,
-                        min(o + max_spl_o, n_oc),
-                        min(d + m_spl_d, n_dc),
-                        True,
-                    )
-                )
+        for i in range(0, n_pairs, max_pairs):
+            results.extend(
+                self._binary_search(i, min(i + max_pairs, n_pairs), True)
+            )
 
         # Return empty result set if nothing is routable
         if len(results) == 0:

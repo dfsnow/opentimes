@@ -55,9 +55,9 @@ def main() -> None:
     )
     logger.info(
         "Routing from %s origins to %s destinations (%s pairs)",
-        f"{len(inputs.origins):,}",
-        f"{inputs.n_destinations:,}",
-        f"{len(inputs.origins) * inputs.n_destinations:,}",
+        len(inputs.origins),
+        inputs.n_destinations,
+        len(inputs.origins) * inputs.n_destinations,
     )
 
     # Initialize the default Valhalla actor bindings
@@ -76,19 +76,14 @@ def main() -> None:
     # Calculate times for each chunk and append to a list
     tt_calc = TravelTimeCalculator(actor, config, inputs)
     results_df = tt_calc.get_times()
-
     logger.info(
-        "Finished calculating times in %s",
+        "Finished calculating first pass times in %s",
         format_time(time.time() - script_start_time),
-    )
-    logger.info(
-        "Routed from %s origins to %s destinations",
-        f"{inputs.n_origins:,}",
-        f"{inputs.n_destinations:,}",
     )
 
     # Extract missing pairs to a separate DataFrame
     missing_pairs_df = results_df[results_df["duration_sec"].isnull()]
+    missing_pairs_df = missing_pairs_df.reset_index()
     n_missing_pairs = len(missing_pairs_df)
 
     # If there are missing pairs, rerun the routing for only those pairs
@@ -102,20 +97,20 @@ def main() -> None:
 
         # Create a new input class, keeping only pairs that were unroutable
         inputs_sp = TravelTimeInputs(
-            origins=inputs.origins[
-                inputs.origins["id"].isin(
-                    missing_pairs_df.index.get_level_values("origin_id")
-                )
-            ].reset_index(drop=True),
-            destinations=inputs.destinations[
-                inputs.destinations["id"].isin(
-                    missing_pairs_df.index.get_level_values("destination_id")
-                )
-            ].reset_index(drop=True),
+            origins=inputs.origins,
+            destinations=inputs.destinations,
+            pairs=missing_pairs_df,
             chunk=None,
-            max_split_size_origins=inputs.max_split_size_origins,
-            max_split_size_destinations=inputs.max_split_size_destinations,
+            max_pairs=inputs.max_pairs,
         )
+
+        logger.info(
+            "Routing second pass from %s origins to %s destinations (%s pairs)",
+            len(inputs_sp.origins),
+            inputs_sp.n_destinations,
+            len(inputs_sp.origins) * inputs_sp.n_destinations,
+        )
+        breakpoint()
 
         # Route using the more aggressive settings and update the results
         tt_calc_sp = TravelTimeCalculator(actor_sp, config, inputs_sp)
@@ -125,7 +120,7 @@ def main() -> None:
         missing_pairs_df = results_df[results_df["duration_sec"].isnull()]
         logger.info(
             "Found %s additional pairs via second pass",
-            f"{n_missing_pairs - len(missing_pairs_df):,}",
+            n_missing_pairs - len(missing_pairs_df),
         )
 
     # Drop missing pairs and sort for more efficient compression
@@ -143,8 +138,8 @@ def main() -> None:
     logger.info(
         "Calculated times between %s pairs. Times missing between %s pairs. "
         "Saving outputs to: %s",
-        f"{len(results_df):,}",
-        f"{len(missing_pairs_df):,}",
+        len(results_df),
+        len(missing_pairs_df),
         ", ".join(out_locations),
     )
     for loc in out_locations:

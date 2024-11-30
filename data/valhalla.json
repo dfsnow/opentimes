@@ -38,7 +38,7 @@
       "street_side_max_distance": 1000,
       "street_side_tolerance": 5
     },
-    "use_connectivity": false
+    "use_connectivity": true
   },
   "meili": {
     "auto": {
