@@ -380,12 +380,6 @@ class TravelTimeCalculator:
             DataFrame containing origin IDs, destination IDs, travel durations,
             and distances.
         """
-        start_time = time.time()
-        job_string = (
-            f"Routing origin indices {o_start_idx}-{o_end_idx - 1} to "
-            f"destination indices {d_start_idx}-{d_end_idx - 1}"
-        )
-        self.config.logger.info(job_string)
 
         # Get the subset of origin and destination points and convert them to
         # lists then squash them into the request body
@@ -434,11 +428,16 @@ class TravelTimeCalculator:
             }
         )
 
-        elapsed_time = time.time() - start_time
-        self.config.logger.info(f"{job_string}: {format_time(elapsed_time)}")
         return df
 
-    def _binary_search(self, o_start_idx, d_start_idx, o_end_idx, d_end_idx):
+    def _binary_search(
+        self,
+        o_start_idx: int,
+        d_start_idx: int,
+        o_end_idx: int,
+        d_end_idx: int,
+        print_log: bool = True,
+    ) -> list[pd.DataFrame]:
         """
         Recursively split the origins and destinations into smaller chunks.
 
@@ -446,6 +445,16 @@ class TravelTimeCalculator:
         Binary searching all origins and destinations will return all routable
         values AROUND the unroutable ones.
         """
+        start_time = time.time()
+        if print_log:
+            self.config.logger.info(
+                "Routing origin indices %s-%s to destination indices %s-%s",
+                o_start_idx,
+                max(o_end_idx - 1, 0),
+                d_start_idx,
+                max(d_end_idx - 1, 0),
+            )
+
         if o_start_idx + 1 >= o_end_idx and d_start_idx + 1 >= d_end_idx:
             df = pd.merge(
                 pd.DataFrame(
@@ -469,16 +478,27 @@ class TravelTimeCalculator:
                 o_end_idx=o_end_idx,
                 d_end_idx=d_end_idx,
             )
+
+            if print_log:
+                elapsed_time = time.time() - start_time
+                self.config.logger.info(
+                    "Routed %s pairs in %s",
+                    (o_end_idx - o_start_idx) * (d_end_idx - d_start_idx) + 2,
+                    format_time(elapsed_time),
+                )
+
             return [times]
+
         except Exception as e:
-            self.config.logger.info(f"Error: {e}, backing off and retrying...")
-            mid_o = (o_start_idx + o_end_idx) // 2
-            mid_d = (d_start_idx + d_end_idx) // 2
+            if print_log:
+                self.config.logger.error(f"{e}. Backing off and retrying...")
+            mo = (o_start_idx + o_end_idx) // 2
+            md = (d_start_idx + d_end_idx) // 2
             return (
-                self._binary_search(o_start_idx, d_start_idx, mid_o, mid_d)
-                + self._binary_search(mid_o, d_start_idx, o_end_idx, mid_d)
-                + self._binary_search(o_start_idx, mid_d, mid_o, d_end_idx)
-                + self._binary_search(mid_o, mid_d, o_end_idx, d_end_idx)
+                self._binary_search(o_start_idx, d_start_idx, mo, md, False)
+                + self._binary_search(mo, d_start_idx, o_end_idx, md, False)
+                + self._binary_search(o_start_idx, md, mo, d_end_idx, False)
+                + self._binary_search(mo, md, o_end_idx, d_end_idx, False)
             )
 
     def get_times(self) -> pd.DataFrame:
@@ -500,10 +520,7 @@ class TravelTimeCalculator:
             for d in range(0, ndc, mssd):
                 results.extend(
                     self._binary_search(
-                        o,
-                        d,
-                        min(o + msso, noc),
-                        min(d + mssd, ndc),
+                        o, d, min(o + msso, noc), min(d + mssd, ndc), True
                     )
                 )
 
