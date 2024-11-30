@@ -31835,8 +31835,8 @@ stages:
     outs:
     - path: ./intermediate/osmclip/year=2021/geography=state/state=02/02.geojson
       hash: md5
-      md5: e3bb40b9b8136f2d3b2734eb53dd0479
-      size: 42703
+      md5: d802573c5e74255dc7382a2d4e8aa6c9
+      size: 34369
   create_osmclip_by_state@2021-18:
     cmd: python ./src/create_osmclip.py --year 2021 --state 18 --buffer 340000
     deps:
@@ -31931,8 +31931,8 @@ stages:
     outs:
     - path: ./intermediate/osmclip/year=2024/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
   create_osmclip_by_state@2024-18:
     cmd: python ./src/create_osmclip.py --year 2024 --state 18 --buffer 340000
     deps:
@@ -32327,8 +32327,8 @@ stages:
     outs:
     - path: ./intermediate/osmclip/year=2021/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
   create_osmclip_by_state@2023-04:
     cmd: python ./src/create_osmclip.py --year 2023 --state 04 --buffer 340000
     deps:
@@ -33059,8 +33059,8 @@ stages:
     outs:
     - path: ./intermediate/osmclip/year=2024/geography=state/state=02/02.geojson
       hash: md5
-      md5: e2c3c8683fb81925a40d84155bac459f
-      size: 44898
+      md5: 84f2a83a16749fe7e97d972719b28fe1
+      size: 36564
   create_osmclip_by_state@2022-55:
     cmd: python ./src/create_osmclip.py --year 2022 --state 55 --buffer 340000
     deps:
@@ -33311,8 +33311,8 @@ stages:
     outs:
     - path: ./intermediate/osmclip/year=2020/geography=state/state=02/02.geojson
       hash: md5
-      md5: d543ba39f71375fd89791c027baaf3bf
-      size: 42592
+      md5: 3ca803471d6e1579044879b33270f1b2
+      size: 34258
   create_osmclip_by_state@2020-44:
     cmd: python ./src/create_osmclip.py --year 2020 --state 44 --buffer 340000
     deps:
@@ -33431,8 +33431,8 @@ stages:
     outs:
     - path: ./intermediate/osmclip/year=2023/geography=state/state=02/02.geojson
       hash: md5
-      md5: e2c3c8683fb81925a40d84155bac459f
-      size: 44898
+      md5: 84f2a83a16749fe7e97d972719b28fe1
+      size: 36564
   create_osmclip_by_state@2022-32:
     cmd: python ./src/create_osmclip.py --year 2022 --state 32 --buffer 340000
     deps:
@@ -33611,8 +33611,8 @@ stages:
     outs:
     - path: ./intermediate/osmclip/year=2022/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
   create_osmclip_by_state@2020-10:
     cmd: python ./src/create_osmclip.py --year 2020 --state 10 --buffer 340000
     deps:
@@ -33959,8 +33959,8 @@ stages:
     outs:
     - path: ./intermediate/osmclip/year=2023/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
   create_osmclip_by_state@2022-41:
     cmd: python ./src/create_osmclip.py --year 2022 --state 41 --buffer 340000
     deps:
@@ -34139,8 +34139,8 @@ stages:
     outs:
     - path: ./intermediate/osmclip/year=2022/geography=state/state=02/02.geojson
       hash: md5
-      md5: b62a2f6a5cb6f6fbe5f1e5fa2ca4b67b
-      size: 42703
+      md5: 38fa52db180926cef8e44f9fce41f137
+      size: 34369
   create_osmclip_by_state@2020-09:
     cmd: python ./src/create_osmclip.py --year 2020 --state 09 --buffer 340000
     deps:
@@ -34703,8 +34703,8 @@ stages:
     outs:
     - path: ./intermediate/osmclip/year=2020/geography=state/state=15/15.geojson
       hash: md5
-      md5: 531db0bbed2f36e7f7ef53fdfe09cb05
-      size: 19916
+      md5: 775eaa221897e64c2acd26ab022d1160
+      size: 16974
   create_osmclip_by_state@2022-21:
     cmd: python ./src/create_osmclip.py --year 2022 --state 21 --buffer 340000
     deps:
@@ -34816,8 +34816,8 @@ stages:
       size: 6347
     - path: ./intermediate/osmclip/year=2020/geography=state/state=02/02.geojson
       hash: md5
-      md5: d543ba39f71375fd89791c027baaf3bf
-      size: 42592
+      md5: 3ca803471d6e1579044879b33270f1b2
+      size: 34258
     outs:
     - path: ./intermediate/destpoint/year=2020/geography=state/state=02/02.parquet
       hash: md5
@@ -34986,8 +34986,8 @@ stages:
       size: 6347
     - path: ./intermediate/osmclip/year=2020/geography=state/state=15/15.geojson
       hash: md5
-      md5: 531db0bbed2f36e7f7ef53fdfe09cb05
-      size: 19916
+      md5: 775eaa221897e64c2acd26ab022d1160
+      size: 16974
     outs:
     - path: ./intermediate/destpoint/year=2020/geography=state/state=15/15.parquet
       hash: md5
@@ -35683,8 +35683,8 @@ stages:
       size: 8565
     - path: ./intermediate/osmclip/year=2020/geography=state/state=02/02.geojson
       hash: md5
-      md5: d543ba39f71375fd89791c027baaf3bf
-      size: 42592
+      md5: 3ca803471d6e1579044879b33270f1b2
+      size: 34258
     outs:
     - path: ./intermediate/destpoint/year=2020/geography=county/state=02/02.parquet
       hash: md5
@@ -35853,8 +35853,8 @@ stages:
       size: 6667
     - path: ./intermediate/osmclip/year=2020/geography=state/state=15/15.geojson
       hash: md5
-      md5: 531db0bbed2f36e7f7ef53fdfe09cb05
-      size: 19916
+      md5: 775eaa221897e64c2acd26ab022d1160
+      size: 16974
     outs:
     - path: ./intermediate/destpoint/year=2020/geography=county/state=15/15.parquet
       hash: md5
@@ -36551,8 +36551,8 @@ stages:
       size: 9326
     - path: ./intermediate/osmclip/year=2020/geography=state/state=02/02.geojson
       hash: md5
-      md5: d543ba39f71375fd89791c027baaf3bf
-      size: 42592
+      md5: 3ca803471d6e1579044879b33270f1b2
+      size: 34258
     outs:
     - path: 
         ./intermediate/destpoint/year=2020/geography=county_subdivision/state=02/02.parquet
@@ -36731,8 +36731,8 @@ stages:
       size: 9795
     - path: ./intermediate/osmclip/year=2020/geography=state/state=15/15.geojson
       hash: md5
-      md5: 531db0bbed2f36e7f7ef53fdfe09cb05
-      size: 19916
+      md5: 775eaa221897e64c2acd26ab022d1160
+      size: 16974
     outs:
     - path: 
         ./intermediate/destpoint/year=2020/geography=county_subdivision/state=15/15.parquet
@@ -37468,8 +37468,8 @@ stages:
       size: 20332
     - path: ./intermediate/osmclip/year=2020/geography=state/state=02/02.geojson
       hash: md5
-      md5: d543ba39f71375fd89791c027baaf3bf
-      size: 42592
+      md5: 3ca803471d6e1579044879b33270f1b2
+      size: 34258
     outs:
     - path: ./intermediate/destpoint/year=2020/geography=tract/state=02/02.parquet
       hash: md5
@@ -37638,8 +37638,8 @@ stages:
       size: 43091
     - path: ./intermediate/osmclip/year=2020/geography=state/state=15/15.geojson
       hash: md5
-      md5: 531db0bbed2f36e7f7ef53fdfe09cb05
-      size: 19916
+      md5: 775eaa221897e64c2acd26ab022d1160
+      size: 16974
     outs:
     - path: ./intermediate/destpoint/year=2020/geography=tract/state=15/15.parquet
       hash: md5
@@ -38335,8 +38335,8 @@ stages:
       size: 46269
     - path: ./intermediate/osmclip/year=2020/geography=state/state=02/02.geojson
       hash: md5
-      md5: d543ba39f71375fd89791c027baaf3bf
-      size: 42592
+      md5: 3ca803471d6e1579044879b33270f1b2
+      size: 34258
     outs:
     - path: ./intermediate/destpoint/year=2020/geography=block_group/state=02/02.parquet
       hash: md5
@@ -38505,8 +38505,8 @@ stages:
       size: 94689
     - path: ./intermediate/osmclip/year=2020/geography=state/state=15/15.geojson
       hash: md5
-      md5: 531db0bbed2f36e7f7ef53fdfe09cb05
-      size: 19916
+      md5: 775eaa221897e64c2acd26ab022d1160
+      size: 16974
     outs:
     - path: ./intermediate/destpoint/year=2020/geography=block_group/state=15/15.parquet
       hash: md5
@@ -39202,8 +39202,8 @@ stages:
       size: 25370
     - path: ./intermediate/osmclip/year=2020/geography=state/state=02/02.geojson
       hash: md5
-      md5: d543ba39f71375fd89791c027baaf3bf
-      size: 42592
+      md5: 3ca803471d6e1579044879b33270f1b2
+      size: 34258
     outs:
     - path: ./intermediate/destpoint/year=2020/geography=zcta/state=02/02.parquet
       hash: md5
@@ -39372,8 +39372,8 @@ stages:
       size: 13842
     - path: ./intermediate/osmclip/year=2020/geography=state/state=15/15.geojson
       hash: md5
-      md5: 531db0bbed2f36e7f7ef53fdfe09cb05
-      size: 19916
+      md5: 775eaa221897e64c2acd26ab022d1160
+      size: 16974
     outs:
     - path: ./intermediate/destpoint/year=2020/geography=zcta/state=15/15.parquet
       hash: md5
@@ -40069,8 +40069,8 @@ stages:
       size: 6347
     - path: ./intermediate/osmclip/year=2021/geography=state/state=02/02.geojson
       hash: md5
-      md5: e3bb40b9b8136f2d3b2734eb53dd0479
-      size: 42703
+      md5: d802573c5e74255dc7382a2d4e8aa6c9
+      size: 34369
     outs:
     - path: ./intermediate/destpoint/year=2021/geography=state/state=02/02.parquet
       hash: md5
@@ -40239,8 +40239,8 @@ stages:
       size: 6347
     - path: ./intermediate/osmclip/year=2021/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/destpoint/year=2021/geography=state/state=15/15.parquet
       hash: md5
@@ -40936,8 +40936,8 @@ stages:
       size: 8565
     - path: ./intermediate/osmclip/year=2021/geography=state/state=02/02.geojson
       hash: md5
-      md5: e3bb40b9b8136f2d3b2734eb53dd0479
-      size: 42703
+      md5: d802573c5e74255dc7382a2d4e8aa6c9
+      size: 34369
     outs:
     - path: ./intermediate/destpoint/year=2021/geography=county/state=02/02.parquet
       hash: md5
@@ -41106,8 +41106,8 @@ stages:
       size: 6667
     - path: ./intermediate/osmclip/year=2021/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/destpoint/year=2021/geography=county/state=15/15.parquet
       hash: md5
@@ -41804,8 +41804,8 @@ stages:
       size: 9326
     - path: ./intermediate/osmclip/year=2021/geography=state/state=02/02.geojson
       hash: md5
-      md5: e3bb40b9b8136f2d3b2734eb53dd0479
-      size: 42703
+      md5: d802573c5e74255dc7382a2d4e8aa6c9
+      size: 34369
     outs:
     - path: 
         ./intermediate/destpoint/year=2021/geography=county_subdivision/state=02/02.parquet
@@ -41984,8 +41984,8 @@ stages:
       size: 9795
     - path: ./intermediate/osmclip/year=2021/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: 
         ./intermediate/destpoint/year=2021/geography=county_subdivision/state=15/15.parquet
@@ -42721,8 +42721,8 @@ stages:
       size: 20332
     - path: ./intermediate/osmclip/year=2021/geography=state/state=02/02.geojson
       hash: md5
-      md5: e3bb40b9b8136f2d3b2734eb53dd0479
-      size: 42703
+      md5: d802573c5e74255dc7382a2d4e8aa6c9
+      size: 34369
     outs:
     - path: ./intermediate/destpoint/year=2021/geography=tract/state=02/02.parquet
       hash: md5
@@ -42891,8 +42891,8 @@ stages:
       size: 43091
     - path: ./intermediate/osmclip/year=2021/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/destpoint/year=2021/geography=tract/state=15/15.parquet
       hash: md5
@@ -43588,8 +43588,8 @@ stages:
       size: 46269
     - path: ./intermediate/osmclip/year=2021/geography=state/state=02/02.geojson
       hash: md5
-      md5: e3bb40b9b8136f2d3b2734eb53dd0479
-      size: 42703
+      md5: d802573c5e74255dc7382a2d4e8aa6c9
+      size: 34369
     outs:
     - path: ./intermediate/destpoint/year=2021/geography=block_group/state=02/02.parquet
       hash: md5
@@ -43758,8 +43758,8 @@ stages:
       size: 94689
     - path: ./intermediate/osmclip/year=2021/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/destpoint/year=2021/geography=block_group/state=15/15.parquet
       hash: md5
@@ -44455,8 +44455,8 @@ stages:
       size: 25370
     - path: ./intermediate/osmclip/year=2021/geography=state/state=02/02.geojson
       hash: md5
-      md5: e3bb40b9b8136f2d3b2734eb53dd0479
-      size: 42703
+      md5: d802573c5e74255dc7382a2d4e8aa6c9
+      size: 34369
     outs:
     - path: ./intermediate/destpoint/year=2021/geography=zcta/state=02/02.parquet
       hash: md5
@@ -44625,8 +44625,8 @@ stages:
       size: 13842
     - path: ./intermediate/osmclip/year=2021/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/destpoint/year=2021/geography=zcta/state=15/15.parquet
       hash: md5
@@ -45322,8 +45322,8 @@ stages:
       size: 6347
     - path: ./intermediate/osmclip/year=2022/geography=state/state=02/02.geojson
       hash: md5
-      md5: b62a2f6a5cb6f6fbe5f1e5fa2ca4b67b
-      size: 42703
+      md5: 38fa52db180926cef8e44f9fce41f137
+      size: 34369
     outs:
     - path: ./intermediate/destpoint/year=2022/geography=state/state=02/02.parquet
       hash: md5
@@ -45492,8 +45492,8 @@ stages:
       size: 6347
     - path: ./intermediate/osmclip/year=2022/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/destpoint/year=2022/geography=state/state=15/15.parquet
       hash: md5
@@ -46189,8 +46189,8 @@ stages:
       size: 8565
     - path: ./intermediate/osmclip/year=2022/geography=state/state=02/02.geojson
       hash: md5
-      md5: b62a2f6a5cb6f6fbe5f1e5fa2ca4b67b
-      size: 42703
+      md5: 38fa52db180926cef8e44f9fce41f137
+      size: 34369
     outs:
     - path: ./intermediate/destpoint/year=2022/geography=county/state=02/02.parquet
       hash: md5
@@ -46359,8 +46359,8 @@ stages:
       size: 6667
     - path: ./intermediate/osmclip/year=2022/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/destpoint/year=2022/geography=county/state=15/15.parquet
       hash: md5
@@ -47057,8 +47057,8 @@ stages:
       size: 9326
     - path: ./intermediate/osmclip/year=2022/geography=state/state=02/02.geojson
       hash: md5
-      md5: b62a2f6a5cb6f6fbe5f1e5fa2ca4b67b
-      size: 42703
+      md5: 38fa52db180926cef8e44f9fce41f137
+      size: 34369
     outs:
     - path: 
         ./intermediate/destpoint/year=2022/geography=county_subdivision/state=02/02.parquet
@@ -47237,8 +47237,8 @@ stages:
       size: 9795
     - path: ./intermediate/osmclip/year=2022/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: 
         ./intermediate/destpoint/year=2022/geography=county_subdivision/state=15/15.parquet
@@ -47974,8 +47974,8 @@ stages:
       size: 20332
     - path: ./intermediate/osmclip/year=2022/geography=state/state=02/02.geojson
       hash: md5
-      md5: b62a2f6a5cb6f6fbe5f1e5fa2ca4b67b
-      size: 42703
+      md5: 38fa52db180926cef8e44f9fce41f137
+      size: 34369
     outs:
     - path: ./intermediate/destpoint/year=2022/geography=tract/state=02/02.parquet
       hash: md5
@@ -48144,8 +48144,8 @@ stages:
       size: 43091
     - path: ./intermediate/osmclip/year=2022/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/destpoint/year=2022/geography=tract/state=15/15.parquet
       hash: md5
@@ -48841,8 +48841,8 @@ stages:
       size: 46269
     - path: ./intermediate/osmclip/year=2022/geography=state/state=02/02.geojson
       hash: md5
-      md5: b62a2f6a5cb6f6fbe5f1e5fa2ca4b67b
-      size: 42703
+      md5: 38fa52db180926cef8e44f9fce41f137
+      size: 34369
     outs:
     - path: ./intermediate/destpoint/year=2022/geography=block_group/state=02/02.parquet
       hash: md5
@@ -49011,8 +49011,8 @@ stages:
       size: 94689
     - path: ./intermediate/osmclip/year=2022/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/destpoint/year=2022/geography=block_group/state=15/15.parquet
       hash: md5
@@ -49708,8 +49708,8 @@ stages:
       size: 25370
     - path: ./intermediate/osmclip/year=2022/geography=state/state=02/02.geojson
       hash: md5
-      md5: b62a2f6a5cb6f6fbe5f1e5fa2ca4b67b
-      size: 42703
+      md5: 38fa52db180926cef8e44f9fce41f137
+      size: 34369
     outs:
     - path: ./intermediate/destpoint/year=2022/geography=zcta/state=02/02.parquet
       hash: md5
@@ -49878,8 +49878,8 @@ stages:
       size: 13842
     - path: ./intermediate/osmclip/year=2022/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/destpoint/year=2022/geography=zcta/state=15/15.parquet
       hash: md5
@@ -50575,8 +50575,8 @@ stages:
       size: 6347
     - path: ./intermediate/osmclip/year=2023/geography=state/state=02/02.geojson
       hash: md5
-      md5: e2c3c8683fb81925a40d84155bac459f
-      size: 44898
+      md5: 84f2a83a16749fe7e97d972719b28fe1
+      size: 36564
     outs:
     - path: ./intermediate/destpoint/year=2023/geography=state/state=02/02.parquet
       hash: md5
@@ -50745,8 +50745,8 @@ stages:
       size: 6347
     - path: ./intermediate/osmclip/year=2023/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/destpoint/year=2023/geography=state/state=15/15.parquet
       hash: md5
@@ -51442,8 +51442,8 @@ stages:
       size: 8565
     - path: ./intermediate/osmclip/year=2023/geography=state/state=02/02.geojson
       hash: md5
-      md5: e2c3c8683fb81925a40d84155bac459f
-      size: 44898
+      md5: 84f2a83a16749fe7e97d972719b28fe1
+      size: 36564
     outs:
     - path: ./intermediate/destpoint/year=2023/geography=county/state=02/02.parquet
       hash: md5
@@ -51612,8 +51612,8 @@ stages:
       size: 6667
     - path: ./intermediate/osmclip/year=2023/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/destpoint/year=2023/geography=county/state=15/15.parquet
       hash: md5
@@ -52310,8 +52310,8 @@ stages:
       size: 9326
     - path: ./intermediate/osmclip/year=2023/geography=state/state=02/02.geojson
       hash: md5
-      md5: e2c3c8683fb81925a40d84155bac459f
-      size: 44898
+      md5: 84f2a83a16749fe7e97d972719b28fe1
+      size: 36564
     outs:
     - path: 
         ./intermediate/destpoint/year=2023/geography=county_subdivision/state=02/02.parquet
@@ -52490,8 +52490,8 @@ stages:
       size: 9795
     - path: ./intermediate/osmclip/year=2023/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: 
         ./intermediate/destpoint/year=2023/geography=county_subdivision/state=15/15.parquet
@@ -53227,8 +53227,8 @@ stages:
       size: 20332
     - path: ./intermediate/osmclip/year=2023/geography=state/state=02/02.geojson
       hash: md5
-      md5: e2c3c8683fb81925a40d84155bac459f
-      size: 44898
+      md5: 84f2a83a16749fe7e97d972719b28fe1
+      size: 36564
     outs:
     - path: ./intermediate/destpoint/year=2023/geography=tract/state=02/02.parquet
       hash: md5
@@ -53397,8 +53397,8 @@ stages:
       size: 43091
     - path: ./intermediate/osmclip/year=2023/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/destpoint/year=2023/geography=tract/state=15/15.parquet
       hash: md5
@@ -54094,8 +54094,8 @@ stages:
       size: 46269
     - path: ./intermediate/osmclip/year=2023/geography=state/state=02/02.geojson
       hash: md5
-      md5: e2c3c8683fb81925a40d84155bac459f
-      size: 44898
+      md5: 84f2a83a16749fe7e97d972719b28fe1
+      size: 36564
     outs:
     - path: ./intermediate/destpoint/year=2023/geography=block_group/state=02/02.parquet
       hash: md5
@@ -54264,8 +54264,8 @@ stages:
       size: 94689
     - path: ./intermediate/osmclip/year=2023/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/destpoint/year=2023/geography=block_group/state=15/15.parquet
       hash: md5
@@ -54961,8 +54961,8 @@ stages:
       size: 25370
     - path: ./intermediate/osmclip/year=2023/geography=state/state=02/02.geojson
       hash: md5
-      md5: e2c3c8683fb81925a40d84155bac459f
-      size: 44898
+      md5: 84f2a83a16749fe7e97d972719b28fe1
+      size: 36564
     outs:
     - path: ./intermediate/destpoint/year=2023/geography=zcta/state=02/02.parquet
       hash: md5
@@ -55131,8 +55131,8 @@ stages:
       size: 13842
     - path: ./intermediate/osmclip/year=2023/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/destpoint/year=2023/geography=zcta/state=15/15.parquet
       hash: md5
@@ -55828,8 +55828,8 @@ stages:
       size: 6347
     - path: ./intermediate/osmclip/year=2024/geography=state/state=02/02.geojson
       hash: md5
-      md5: e2c3c8683fb81925a40d84155bac459f
-      size: 44898
+      md5: 84f2a83a16749fe7e97d972719b28fe1
+      size: 36564
     outs:
     - path: ./intermediate/destpoint/year=2024/geography=state/state=02/02.parquet
       hash: md5
@@ -55998,8 +55998,8 @@ stages:
       size: 6347
     - path: ./intermediate/osmclip/year=2024/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/destpoint/year=2024/geography=state/state=15/15.parquet
       hash: md5
@@ -56695,8 +56695,8 @@ stages:
       size: 8565
     - path: ./intermediate/osmclip/year=2024/geography=state/state=02/02.geojson
       hash: md5
-      md5: e2c3c8683fb81925a40d84155bac459f
-      size: 44898
+      md5: 84f2a83a16749fe7e97d972719b28fe1
+      size: 36564
     outs:
     - path: ./intermediate/destpoint/year=2024/geography=county/state=02/02.parquet
       hash: md5
@@ -56865,8 +56865,8 @@ stages:
       size: 6667
     - path: ./intermediate/osmclip/year=2024/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/destpoint/year=2024/geography=county/state=15/15.parquet
       hash: md5
@@ -57563,8 +57563,8 @@ stages:
       size: 9326
     - path: ./intermediate/osmclip/year=2024/geography=state/state=02/02.geojson
       hash: md5
-      md5: e2c3c8683fb81925a40d84155bac459f
-      size: 44898
+      md5: 84f2a83a16749fe7e97d972719b28fe1
+      size: 36564
     outs:
     - path: 
         ./intermediate/destpoint/year=2024/geography=county_subdivision/state=02/02.parquet
@@ -57743,8 +57743,8 @@ stages:
       size: 9795
     - path: ./intermediate/osmclip/year=2024/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: 
         ./intermediate/destpoint/year=2024/geography=county_subdivision/state=15/15.parquet
@@ -58480,8 +58480,8 @@ stages:
       size: 20332
     - path: ./intermediate/osmclip/year=2024/geography=state/state=02/02.geojson
       hash: md5
-      md5: e2c3c8683fb81925a40d84155bac459f
-      size: 44898
+      md5: 84f2a83a16749fe7e97d972719b28fe1
+      size: 36564
     outs:
     - path: ./intermediate/destpoint/year=2024/geography=tract/state=02/02.parquet
       hash: md5
@@ -58650,8 +58650,8 @@ stages:
       size: 43091
     - path: ./intermediate/osmclip/year=2024/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/destpoint/year=2024/geography=tract/state=15/15.parquet
       hash: md5
@@ -59347,8 +59347,8 @@ stages:
       size: 46269
     - path: ./intermediate/osmclip/year=2024/geography=state/state=02/02.geojson
       hash: md5
-      md5: e2c3c8683fb81925a40d84155bac459f
-      size: 44898
+      md5: 84f2a83a16749fe7e97d972719b28fe1
+      size: 36564
     outs:
     - path: ./intermediate/destpoint/year=2024/geography=block_group/state=02/02.parquet
       hash: md5
@@ -59517,8 +59517,8 @@ stages:
       size: 94689
     - path: ./intermediate/osmclip/year=2024/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/destpoint/year=2024/geography=block_group/state=15/15.parquet
       hash: md5
@@ -60214,8 +60214,8 @@ stages:
       size: 25370
     - path: ./intermediate/osmclip/year=2024/geography=state/state=02/02.geojson
       hash: md5
-      md5: e2c3c8683fb81925a40d84155bac459f
-      size: 44898
+      md5: 84f2a83a16749fe7e97d972719b28fe1
+      size: 36564
     outs:
     - path: ./intermediate/destpoint/year=2024/geography=zcta/state=02/02.parquet
       hash: md5
@@ -60384,8 +60384,8 @@ stages:
       size: 13842
     - path: ./intermediate/osmclip/year=2024/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/destpoint/year=2024/geography=zcta/state=15/15.parquet
       hash: md5
@@ -61089,13 +61089,13 @@ stages:
       size: 9491174445
     - path: ./intermediate/osmclip/year=2020/geography=state/state=02/02.geojson
       hash: md5
-      md5: d543ba39f71375fd89791c027baaf3bf
-      size: 42592
+      md5: 3ca803471d6e1579044879b33270f1b2
+      size: 34258
     outs:
     - path: ./intermediate/osmextract/year=2020/geography=state/state=02/02.osm.pbf
       hash: md5
-      md5: 4180c624519451ba37b9f47ed76571a5
-      size: 143923204
+      md5: f0b2e683768a7e1fa3caaebae2307e59
+      size: 11070603
   create_osmextract_by_state@2020-04:
     cmd: ' OUT_DIR=./intermediate/osmextract/year=2020/geography=state/state=04 &&
       mkdir -p $OUT_DIR && osmium extract --strategy complete_ways -p intermediate/osmclip/year=2020/geography=state/state=04/04.geojson
@@ -61299,13 +61299,13 @@ stages:
       size: 9491174445
     - path: ./intermediate/osmclip/year=2020/geography=state/state=15/15.geojson
       hash: md5
-      md5: 531db0bbed2f36e7f7ef53fdfe09cb05
-      size: 19916
+      md5: 775eaa221897e64c2acd26ab022d1160
+      size: 16974
     outs:
     - path: ./intermediate/osmextract/year=2020/geography=state/state=15/15.osm.pbf
       hash: md5
-      md5: 33b68361fcb33e3ed0efc6fb53b0b430
-      size: 260182347
+      md5: b914af30bd24f1ac04bf7b597f1932f2
+      size: 4932939
   create_osmextract_by_state@2020-16:
     cmd: ' OUT_DIR=./intermediate/osmextract/year=2020/geography=state/state=16 &&
       mkdir -p $OUT_DIR && osmium extract --strategy complete_ways -p intermediate/osmclip/year=2020/geography=state/state=16/16.geojson
@@ -62160,13 +62160,13 @@ stages:
       size: 10718388314
     - path: ./intermediate/osmclip/year=2021/geography=state/state=02/02.geojson
       hash: md5
-      md5: e3bb40b9b8136f2d3b2734eb53dd0479
-      size: 42703
+      md5: d802573c5e74255dc7382a2d4e8aa6c9
+      size: 34369
     outs:
     - path: ./intermediate/osmextract/year=2021/geography=state/state=02/02.osm.pbf
       hash: md5
-      md5: df9cdcf42898dde49028ac901e4e236f
-      size: 154159847
+      md5: f78e5e854450262a513ab2c0a38639d8
+      size: 12216899
   create_osmextract_by_state@2021-04:
     cmd: ' OUT_DIR=./intermediate/osmextract/year=2021/geography=state/state=04 &&
       mkdir -p $OUT_DIR && osmium extract --strategy complete_ways -p intermediate/osmclip/year=2021/geography=state/state=04/04.geojson
@@ -62370,13 +62370,13 @@ stages:
       size: 10718388314
     - path: ./intermediate/osmclip/year=2021/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/osmextract/year=2021/geography=state/state=15/15.osm.pbf
       hash: md5
-      md5: b7bee705e39a084024d54495c057ccd8
-      size: 321261122
+      md5: ab2705e6d5f4af77f3672ebbea90a8bc
+      size: 5353856
   create_osmextract_by_state@2021-16:
     cmd: ' OUT_DIR=./intermediate/osmextract/year=2021/geography=state/state=16 &&
       mkdir -p $OUT_DIR && osmium extract --strategy complete_ways -p intermediate/osmclip/year=2021/geography=state/state=16/16.geojson
@@ -63231,13 +63231,13 @@ stages:
       size: 11822622823
     - path: ./intermediate/osmclip/year=2022/geography=state/state=02/02.geojson
       hash: md5
-      md5: b62a2f6a5cb6f6fbe5f1e5fa2ca4b67b
-      size: 42703
+      md5: 38fa52db180926cef8e44f9fce41f137
+      size: 34369
     outs:
     - path: ./intermediate/osmextract/year=2022/geography=state/state=02/02.osm.pbf
       hash: md5
-      md5: 372dd09ab0573aad3179bd756c005295
-      size: 165582497
+      md5: 2cd8337cda652129f82264829ea2f3ac
+      size: 13949094
   create_osmextract_by_state@2022-04:
     cmd: ' OUT_DIR=./intermediate/osmextract/year=2022/geography=state/state=04 &&
       mkdir -p $OUT_DIR && osmium extract --strategy complete_ways -p intermediate/osmclip/year=2022/geography=state/state=04/04.geojson
@@ -63441,13 +63441,13 @@ stages:
       size: 11822622823
     - path: ./intermediate/osmclip/year=2022/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/osmextract/year=2022/geography=state/state=15/15.osm.pbf
       hash: md5
-      md5: 12d6be7326092181dad9c6d106d63b0a
-      size: 349840693
+      md5: 38723427959a2a4192544653d4d13e24
+      size: 5705475
   create_osmextract_by_state@2022-16:
     cmd: ' OUT_DIR=./intermediate/osmextract/year=2022/geography=state/state=16 &&
       mkdir -p $OUT_DIR && osmium extract --strategy complete_ways -p intermediate/osmclip/year=2022/geography=state/state=16/16.geojson
@@ -64302,13 +64302,13 @@ stages:
       size: 12872528538
     - path: ./intermediate/osmclip/year=2023/geography=state/state=02/02.geojson
       hash: md5
-      md5: e2c3c8683fb81925a40d84155bac459f
-      size: 44898
+      md5: 84f2a83a16749fe7e97d972719b28fe1
+      size: 36564
     outs:
     - path: ./intermediate/osmextract/year=2023/geography=state/state=02/02.osm.pbf
       hash: md5
-      md5: bd28c8b0a23cd8a7da4068c5b3f053dc
-      size: 172746944
+      md5: 31565322195076fc09374d6764be975e
+      size: 14897490
   create_osmextract_by_state@2023-04:
     cmd: ' OUT_DIR=./intermediate/osmextract/year=2023/geography=state/state=04 &&
       mkdir -p $OUT_DIR && osmium extract --strategy complete_ways -p intermediate/osmclip/year=2023/geography=state/state=04/04.geojson
@@ -64512,13 +64512,13 @@ stages:
       size: 12872528538
     - path: ./intermediate/osmclip/year=2023/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/osmextract/year=2023/geography=state/state=15/15.osm.pbf
       hash: md5
-      md5: 072abd090975674dbbb44dcb502ac900
-      size: 364827433
+      md5: f261231aba6341bb8cad4a99b42223e0
+      size: 6019829
   create_osmextract_by_state@2023-16:
     cmd: ' OUT_DIR=./intermediate/osmextract/year=2023/geography=state/state=16 &&
       mkdir -p $OUT_DIR && osmium extract --strategy complete_ways -p intermediate/osmclip/year=2023/geography=state/state=16/16.geojson
@@ -65373,13 +65373,13 @@ stages:
       size: 14163757336
     - path: ./intermediate/osmclip/year=2024/geography=state/state=02/02.geojson
       hash: md5
-      md5: e2c3c8683fb81925a40d84155bac459f
-      size: 44898
+      md5: 84f2a83a16749fe7e97d972719b28fe1
+      size: 36564
     outs:
     - path: ./intermediate/osmextract/year=2024/geography=state/state=02/02.osm.pbf
       hash: md5
-      md5: ed3b5ee75409365c2b425f76fe8f52b3
-      size: 182931204
+      md5: 113e3c88e076447cb066d11d41b3f357
+      size: 15702287
   create_osmextract_by_state@2024-04:
     cmd: ' OUT_DIR=./intermediate/osmextract/year=2024/geography=state/state=04 &&
       mkdir -p $OUT_DIR && osmium extract --strategy complete_ways -p intermediate/osmclip/year=2024/geography=state/state=04/04.geojson
@@ -65583,13 +65583,13 @@ stages:
       size: 14163757336
     - path: ./intermediate/osmclip/year=2024/geography=state/state=15/15.geojson
       hash: md5
-      md5: 347683eea87f5819f0ce69d59b4f5c6d
-      size: 19896
+      md5: 2779498c9184eb82eed58ff7d9ae485b
+      size: 16956
     outs:
     - path: ./intermediate/osmextract/year=2024/geography=state/state=15/15.osm.pbf
       hash: md5
-      md5: c93c38de9e83b0d235fdc7973fefa7f6
-      size: 384646773
+      md5: 9d98ea629ac85299060742eae77bdfd2
+      size: 6504238
   create_osmextract_by_state@2024-16:
     cmd: ' OUT_DIR=./intermediate/osmextract/year=2024/geography=state/state=16 &&
       mkdir -p $OUT_DIR && osmium extract --strategy complete_ways -p intermediate/osmclip/year=2024/geography=state/state=16/16.geojson
@@ -66420,14 +66420,14 @@ stages:
     deps:
     - path: ./intermediate/osmextract/year=2021/geography=state/state=02/02.osm.pbf
       hash: md5
-      md5: df9cdcf42898dde49028ac901e4e236f
-      size: 154159847
+      md5: f78e5e854450262a513ab2c0a38639d8
+      size: 12216899
     outs:
     - path: 
         ./intermediate/valhalla_tiles/year=2021/geography=state/state=02/valhalla_tiles.tar.zst
       hash: md5
-      md5: 13c93cae1514aed5dc727e46fef7d360
-      size: 329645835
+      md5: 0f43ea234d802e1e5435bd5580054d81
+      size: 109035735
   create_valhalla_tiles@2024-02:
     cmd: ' BUILD_DIR=build && OUT_DIR=intermediate/valhalla_tiles/year=2024/geography=state/state=02
       && rm -rf ./"$BUILD_DIR"/* && mkdir -p $OUT_DIR && ln ./intermediate/osmextract/year=2024/geography=state/state=02/02.osm.pbf
@@ -66439,14 +66439,14 @@ stages:
     deps:
     - path: ./intermediate/osmextract/year=2024/geography=state/state=02/02.osm.pbf
       hash: md5
-      md5: ed3b5ee75409365c2b425f76fe8f52b3
-      size: 182931204
+      md5: 113e3c88e076447cb066d11d41b3f357
+      size: 15702287
     outs:
     - path: 
         ./intermediate/valhalla_tiles/year=2024/geography=state/state=02/valhalla_tiles.tar.zst
       hash: md5
-      md5: 53637b7dad98147539ad80fc361520d5
-      size: 385236268
+      md5: e8278e2354f13cb919578af93b9f8f00
+      size: 115426554
   create_valhalla_tiles@2020-01:
     cmd: ' BUILD_DIR=build && OUT_DIR=intermediate/valhalla_tiles/year=2020/geography=state/state=01
       && rm -rf ./"$BUILD_DIR"/* && mkdir -p $OUT_DIR && ln ./intermediate/osmextract/year=2020/geography=state/state=01/01.osm.pbf
@@ -66648,14 +66648,14 @@ stages:
     deps:
     - path: ./intermediate/osmextract/year=2020/geography=state/state=15/15.osm.pbf
       hash: md5
-      md5: 33b68361fcb33e3ed0efc6fb53b0b430
-      size: 260182347
+      md5: b914af30bd24f1ac04bf7b597f1932f2
+      size: 4932939
     outs:
     - path: 
         ./intermediate/valhalla_tiles/year=2020/geography=state/state=15/valhalla_tiles.tar.zst
       hash: md5
-      md5: 73b4d2bf4c131367c1c6cfce49fd4b4b
-      size: 2043091294
+      md5: 4a10e2de11a28cc5028256d29c30254f
+      size: 181460958
   create_valhalla_tiles@2020-16:
     cmd: ' BUILD_DIR=build && OUT_DIR=intermediate/valhalla_tiles/year=2020/geography=state/state=16
       && rm -rf ./"$BUILD_DIR"/* && mkdir -p $OUT_DIR && ln ./intermediate/osmextract/year=2020/geography=state/state=16/16.osm.pbf
@@ -67579,14 +67579,14 @@ stages:
     deps:
     - path: ./intermediate/osmextract/year=2021/geography=state/state=15/15.osm.pbf
       hash: md5
-      md5: b7bee705e39a084024d54495c057ccd8
-      size: 321261122
+      md5: ab2705e6d5f4af77f3672ebbea90a8bc
+      size: 5353856
     outs:
     - path: 
         ./intermediate/valhalla_tiles/year=2021/geography=state/state=15/valhalla_tiles.tar.zst
       hash: md5
-      md5: bd27f70fd0388811c177832656d470dd
-      size: 2171054996
+      md5: e916460287d9c43b401979a263628355
+      size: 182270843
   create_valhalla_tiles@2021-16:
     cmd: ' BUILD_DIR=build && OUT_DIR=intermediate/valhalla_tiles/year=2021/geography=state/state=16
       && rm -rf ./"$BUILD_DIR"/* && mkdir -p $OUT_DIR && ln ./intermediate/osmextract/year=2021/geography=state/state=16/16.osm.pbf
@@ -68529,14 +68529,14 @@ stages:
     deps:
     - path: ./intermediate/osmextract/year=2022/geography=state/state=15/15.osm.pbf
       hash: md5
-      md5: 12d6be7326092181dad9c6d106d63b0a
-      size: 349840693
+      md5: 38723427959a2a4192544653d4d13e24
+      size: 5705475
     outs:
     - path: 
         ./intermediate/valhalla_tiles/year=2022/geography=state/state=15/valhalla_tiles.tar.zst
       hash: md5
-      md5: 9767015664ef8c273069e0a926e89acd
-      size: 2238981495
+      md5: d44a17c91f1bded961ca5e25d775d84b
+      size: 182949220
   create_valhalla_tiles@2022-16:
     cmd: ' BUILD_DIR=build && OUT_DIR=intermediate/valhalla_tiles/year=2022/geography=state/state=16
       && rm -rf ./"$BUILD_DIR"/* && mkdir -p $OUT_DIR && ln ./intermediate/osmextract/year=2022/geography=state/state=16/16.osm.pbf
@@ -69479,14 +69479,14 @@ stages:
     deps:
     - path: ./intermediate/osmextract/year=2023/geography=state/state=15/15.osm.pbf
       hash: md5
-      md5: 072abd090975674dbbb44dcb502ac900
-      size: 364827433
+      md5: f261231aba6341bb8cad4a99b42223e0
+      size: 6019829
     outs:
     - path: 
         ./intermediate/valhalla_tiles/year=2023/geography=state/state=15/valhalla_tiles.tar.zst
       hash: md5
-      md5: c5ab51bb60166b3478a22048d4dd5799
-      size: 2278712334
+      md5: 792ef3b94897ad09d0208448a2af0925
+      size: 183652825
   create_valhalla_tiles@2023-16:
     cmd: ' BUILD_DIR=build && OUT_DIR=intermediate/valhalla_tiles/year=2023/geography=state/state=16
       && rm -rf ./"$BUILD_DIR"/* && mkdir -p $OUT_DIR && ln ./intermediate/osmextract/year=2023/geography=state/state=16/16.osm.pbf
@@ -70410,14 +70410,14 @@ stages:
     deps:
     - path: ./intermediate/osmextract/year=2024/geography=state/state=15/15.osm.pbf
       hash: md5
-      md5: c93c38de9e83b0d235fdc7973fefa7f6
-      size: 384646773
+      md5: 9d98ea629ac85299060742eae77bdfd2
+      size: 6504238
     outs:
     - path: 
         ./intermediate/valhalla_tiles/year=2024/geography=state/state=15/valhalla_tiles.tar.zst
       hash: md5
-      md5: 7eaf9c5ee3454d424c282d241f615717
-      size: 2339093423
+      md5: dcbdebfa10dbc03ef1946c57e263263c
+      size: 188724483
   create_valhalla_tiles@2024-16:
     cmd: ' BUILD_DIR=build && OUT_DIR=intermediate/valhalla_tiles/year=2024/geography=state/state=16
       && rm -rf ./"$BUILD_DIR"/* && mkdir -p $OUT_DIR && ln ./intermediate/osmextract/year=2024/geography=state/state=16/16.osm.pbf
@@ -71170,14 +71170,14 @@ stages:
     deps:
     - path: ./intermediate/osmextract/year=2020/geography=state/state=02/02.osm.pbf
       hash: md5
-      md5: 4180c624519451ba37b9f47ed76571a5
-      size: 143923204
+      md5: f0b2e683768a7e1fa3caaebae2307e59
+      size: 11070603
     outs:
     - path: 
         ./intermediate/valhalla_tiles/year=2020/geography=state/state=02/valhalla_tiles.tar.zst
       hash: md5
-      md5: 162d81095064227d200ee8368fd88a4d
-      size: 310443393
+      md5: c92c136967785659aa3a4a0547b7f01b
+      size: 107604292
   create_valhalla_tiles@2024-01:
     cmd: ' BUILD_DIR=build && OUT_DIR=intermediate/valhalla_tiles/year=2024/geography=state/state=01
       && rm -rf ./"$BUILD_DIR"/* && mkdir -p $OUT_DIR && ln ./intermediate/osmextract/year=2024/geography=state/state=01/01.osm.pbf
@@ -71227,14 +71227,14 @@ stages:
     deps:
     - path: ./intermediate/osmextract/year=2022/geography=state/state=02/02.osm.pbf
       hash: md5
-      md5: 372dd09ab0573aad3179bd756c005295
-      size: 165582497
+      md5: 2cd8337cda652129f82264829ea2f3ac
+      size: 13949094
     outs:
     - path: 
         ./intermediate/valhalla_tiles/year=2022/geography=state/state=02/valhalla_tiles.tar.zst
       hash: md5
-      md5: 77693eced4d3ad5e0114d47dd6e541e8
-      size: 350922989
+      md5: cac85e706557a414b340d7e866e635a6
+      size: 112196412
   create_valhalla_tiles@2023-02:
     cmd: ' BUILD_DIR=build && OUT_DIR=intermediate/valhalla_tiles/year=2023/geography=state/state=02
       && rm -rf ./"$BUILD_DIR"/* && mkdir -p $OUT_DIR && ln ./intermediate/osmextract/year=2023/geography=state/state=02/02.osm.pbf
@@ -71246,11 +71246,11 @@ stages:
     deps:
     - path: ./intermediate/osmextract/year=2023/geography=state/state=02/02.osm.pbf
       hash: md5
-      md5: bd28c8b0a23cd8a7da4068c5b3f053dc
-      size: 172746944
+      md5: 31565322195076fc09374d6764be975e
+      size: 14897490
     outs:
     - path: 
         ./intermediate/valhalla_tiles/year=2023/geography=state/state=02/valhalla_tiles.tar.zst
       hash: md5
-      md5: 416c60874ebd9f8a1ce9649687cfa9f0
-      size: 368002379
+      md5: 5c602c32660d6781913de6a25f11b913
+      size: 113644191
