@@ -9,8 +9,8 @@ on:
       # Input values match those in params.yaml
       mode:
         required: true
-        description: Mode of travel in R5
-        default: 'car'
+        description: Mode of travel
+        default: 'auto'
         type: choice
         options:
           - auto
