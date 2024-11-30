@@ -55,9 +55,10 @@ def main() -> None:
         chunk_msg,
     )
     logger.info(
-        "Routing from %s origins to %s destinations",
-        len(inputs.origins_chunk),
-        inputs.n_destinations,
+        "Routing from %s origins to %s destinations (%s pairs)",
+        f"{len(inputs.origins_chunk):,}",
+        f"{inputs.n_destinations:,}",
+        f"{len(inputs.origins_chunk) * inputs.n_destinations:,}",
     )
 
     # Initialize the default Valhalla actor bindings
@@ -73,19 +74,20 @@ def main() -> None:
     )
     logger.info(
         "Routed from %s origins to %s destinations",
-        inputs.n_origins_chunk,
-        inputs.n_destinations,
+        f"{inputs.n_origins_chunk:,}",
+        f"{inputs.n_destinations:,}",
     )
 
     # Extract missing pairs to a separate DataFrame
     missing_pairs_df = results_df[results_df["duration_sec"].isnull()]
+    n_missing_pairs = len(missing_pairs_df)
 
     # If there are missing pairs, rerun the routing for only those pairs
     # using a more aggressive (but time consuming) second pass approach
-    if len(missing_pairs_df) > 0:
+    if n_missing_pairs > 0:
         logger.info(
             "Found %s missing pairs, rerouting with a more aggressive method",
-            len(missing_pairs_df),
+            f"{n_missing_pairs:,}",
         )
         actor_sp = valhalla.Actor((Path.cwd() / "valhalla_sp.json").as_posix())
 
@@ -112,6 +114,10 @@ def main() -> None:
 
         # Extract the missing pairs again since they may have changed
         missing_pairs_df = results_df[results_df["duration_sec"].isnull()]
+        logger.info(
+            "Found %s additional pairs via second pass",
+            f"{n_missing_pairs - len(missing_pairs_df):,}",
+        )
 
     # Drop missing pairs and sort for more efficient compression
     missing_pairs_df = (
@@ -128,8 +134,8 @@ def main() -> None:
     logger.info(
         "Calculated times between %s pairs. Times missing between %s pairs. "
         "Saving outputs to: %s",
-        len(results_df),
-        len(missing_pairs_df),
+        f"{len(results_df):,}",
+        f"{len(missing_pairs_df):,}",
         ", ".join(out_locations),
     )
     for loc in out_locations:

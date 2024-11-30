@@ -484,7 +484,7 @@ class TravelTimeCalculator:
                 elapsed_time = time.time() - start_time
                 self.config.logger.info(
                     "Routed %s pairs in %s",
-                    (o_end_idx - o_start_idx) * (d_end_idx - d_start_idx),
+                    f"{(o_end_idx - o_start_idx) * (d_end_idx - d_start_idx):,}",
                     format_time(elapsed_time),
                 )
 
