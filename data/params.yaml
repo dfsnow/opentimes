@@ -7,7 +7,7 @@ s3:
   data_bucket: 'opentimes-data'
   public_bucket: 'opentimes-public'
   public_data_url: 'https://data.opentimes.org'
-  endpoint: 'https://fcb279b22cfe4c98f903ad8f9e7ccbb2.r2.cloudflarestorage.com'
+  endpoint_url: 'https://fcb279b22cfe4c98f903ad8f9e7ccbb2.r2.cloudflarestorage.com'
   account_id: 'fcb279b22cfe4c98f903ad8f9e7ccbb2'
 
 # Parameters used to control the chunking of work on GitHub Actions

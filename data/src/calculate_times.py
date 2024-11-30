@@ -34,6 +34,7 @@ def main() -> None:
     args = parser.parse_args()
     script_start_time = time.time()
 
+    # Create a travel times configuration and set of origin/destination inputs
     config = TravelTimeConfig(args, params=params, logger=logger)
     inputs = config.load_default_inputs()
 
@@ -72,7 +73,7 @@ def main() -> None:
         inputs.n_destinations,
     )
 
-    # Extract missing pairs to a separate dataframe
+    # Extract missing pairs to a separate DataFrame
     missing_pairs_df = results_df[results_df["duration_sec"].isnull()]
     missing_pairs_df = (
         pd.DataFrame(missing_pairs_df)
@@ -85,6 +86,7 @@ def main() -> None:
         by=["origin_id", "destination_id"]
     )
 
+    # Loop through files and write to both local and remote paths
     out_locations = ["local", "s3"] if args.write_to_s3 else ["local"]
     logger.info(
         "Calculated times between %s pairs. Times missing between %s pairs. "
@@ -93,8 +95,6 @@ def main() -> None:
         len(missing_pairs_df),
         ", ".join(out_locations),
     )
-
-    # Loop through files and write to both local and remote paths
     for loc in out_locations:
         config.paths.write_to_parquet(results_df, "times", loc)
         config.paths.write_to_parquet(inputs.origins_chunk, "origins", loc)

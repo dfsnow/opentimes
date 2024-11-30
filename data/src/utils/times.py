@@ -4,32 +4,13 @@ import logging
 import re
 import time
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 import pandas as pd
 import valhalla  # type: ignore
 
 from utils.constants import DOCKER_INTERNAL_PATH
 from utils.utils import format_time
-
-
-class S3Path(Path):
-    """Custom Path class that maintains 's3://' prefix."""
-
-    def __new__(cls, *args):
-        return super().__new__(cls, *args)
-
-    def __str__(self):
-        """Preserve 's3://' prefix when converting to string."""
-        return (
-            f"s3://{super().__str__()}"
-            if str(self).startswith("s3/")
-            else str(super())
-        )
-
-    def __truediv__(self, key):
-        """Maintain S3Path type when joining paths."""
-        return type(self)(super().__truediv__(key))
 
 
 class TravelTimeArgs:
@@ -85,7 +66,7 @@ class TravelTimePaths:
         self.args: TravelTimeArgs = args
         self.version: str = version
         self.docker_path: Path = docker_path
-        self.s3_bucket: S3Path = S3Path(s3_bucket)
+        self.s3_bucket: str = s3_bucket
         self.compression_type: Literal[
             "snappy", "gzip", "brotli", "lz4", "zstd"
         ] = compression_type
@@ -164,7 +145,7 @@ class TravelTimePaths:
             },
         }
 
-    def _create_output_paths(self) -> dict[str, dict[str, Path]]:
+    def _create_output_paths(self) -> dict[str, dict[str, Any]]:
         """Creates all output paths."""
         output_dirs = {
             "times": Path("times", self._output_path),
@@ -178,13 +159,15 @@ class TravelTimePaths:
 
         prefix = {
             "local": Path(self.docker_path, "output"),
-            "s3": self.s3_bucket,
+            "s3": Path(self.s3_bucket),
         }
 
         output_files = {}
         for loc in ["local", "s3"]:
             output_files[loc] = {
-                f"{key}_file": Path(prefix[loc], path, self._file_name)
+                f"{key}_file": f"s3://{Path(prefix[loc], path, self._file_name)}"
+                if loc == "s3"
+                else Path(prefix[loc], path, self._file_name)
                 for key, path in output_dirs.items()
             }
 
@@ -294,6 +277,7 @@ class TravelTimeConfig:
             s3_bucket=self.params["s3"]["data_bucket"],
             compression_type=self.params["output"]["compression"]["type"],
             compression_level=self.params["output"]["compression"]["level"],
+            endpoint_url=self.params["s3"]["endpoint_url"],
         )
         self.logger = logger
 
