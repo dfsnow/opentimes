@@ -507,9 +507,19 @@ class TravelTimeCalculator:
                     )
                 )
 
-        results_df = pd.concat(results, ignore_index=True).set_index(
-            ["origin_id", "destination_id"]
-        )
-        del results
-
-        return results_df
+        # Return empty result set if nothing is routable
+        if len(results) == 0:
+            return pd.DataFrame(
+                columns=[
+                    "origin_id",
+                    "destination_id",
+                    "duration_sec",
+                    "distance_km",
+                ]
+            )
+        else:
+            results_df = pd.concat(results, ignore_index=True).set_index(
+                ["origin_id", "destination_id"]
+            )
+            del results
+            return results_df

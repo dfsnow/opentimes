@@ -73,7 +73,7 @@ def main() -> None:
     )
     logger.info(
         "Routed from %s origins to %s destinations",
-        inputs.n_origins,
+        inputs.n_origins_chunk,
         inputs.n_destinations,
     )
 
