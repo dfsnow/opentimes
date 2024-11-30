@@ -14,6 +14,13 @@ from utils.utils import format_time
 
 
 class TravelTimeArgs:
+    """
+    Class to hold and validate arguments for travel time calculations.
+
+    Arguments are passed at runtime via the command line and validated
+    against the parameters file ('params.yaml').
+    """
+
     def __init__(self, args: argparse.Namespace, params: dict) -> None:
         self.mode: str
         self.year: str
@@ -41,18 +48,26 @@ class TravelTimeArgs:
         valid_centroid_types = ["weighted", "unweighted"]
         if centroid_type not in valid_centroid_types:
             raise ValueError(
-                f"Invalid centroid_type, must be one of: {valid_centroid_types}"
+                "Invalid centroid_type, must be one "
+                f"of: {valid_centroid_types}"
             )
 
     def _validate_chunk(self, chunk: str | None) -> None:
         if chunk and not re.match(r"^\d+-\d+$", chunk):
             raise ValueError(
-                "Invalid chunk argument. Must be two numbers"
+                "Invalid chunk argument. Must be two numbers "
                 "separated by a dash (e.g., '1-2')."
             )
 
 
 class TravelTimePaths:
+    """
+    Class to manage all input and output paths for travel time calculations.
+
+    Paths are generated based on input arguments. Also holds remote (R2)
+    paths and write settings for Parquet files.
+    """
+
     def __init__(
         self,
         args: TravelTimeArgs,
@@ -83,7 +98,7 @@ class TravelTimePaths:
 
     @property
     def _main_path(self) -> Path:
-        """Base path for state data."""
+        """Base path for all data."""
         return Path(
             f"year={self.args.year}/geography={self.args.geography}/",
             f"state={self.args.state}",
@@ -93,9 +108,9 @@ class TravelTimePaths:
     def _output_path(self) -> Path:
         """Base path for output data."""
         return Path(
-            f"version={self.version}/mode={self.args.mode}/"
-            f"year={self.args.year}/geography={self.args.geography}/"
-            f"state={self.args.state}/centroid_type={self.args.centroid_type}"
+            f"version={self.version}/mode={self.args.mode}/",
+            self._main_path,
+            f"centroid_type={self.args.centroid_type}",
         )
 
     @property
@@ -114,7 +129,7 @@ class TravelTimePaths:
         self._create_output_directories()
 
     def _create_input_paths(self) -> dict[str, dict[str, Path]]:
-        """Creates all input paths."""
+        """Creates all input paths and stores them in a dictionary."""
         return {
             "main": {"path": self._main_path},
             "dirs": {
@@ -128,7 +143,8 @@ class TravelTimePaths:
                 "valhalla_tiles_file": Path(
                     self.docker_path,
                     f"intermediate/valhalla_tiles/year={self.args.year}",
-                    f"geography=state/state={self.args.state}/valhalla_tiles.tar.zst",
+                    f"geography=state/state={self.args.state}/",
+                    "valhalla_tiles.tar.zst",
                 ),
                 "origins_file": Path(
                     self.docker_path,
@@ -146,7 +162,7 @@ class TravelTimePaths:
         }
 
     def _create_output_paths(self) -> dict[str, dict[str, Any]]:
-        """Creates all output paths."""
+        """Creates all input paths and stores them in a dictionary."""
         output_dirs = {
             "times": Path("times", self._output_path),
             "origins": Path("points", self._output_path, "point_type=origin"),
@@ -183,11 +199,12 @@ class TravelTimePaths:
         self, dataset: str, path_type: str = "output", location: str = "local"
     ) -> str | Path:
         """
-        Get a specific path by type and location.
+        Get a specific path by dataset name, type, and location.
 
         Args:
-            dataset: The type of path (e.g., 'times', 'origins', 'metadata')
-            location: Either 'local' or 's3'
+            dataset: The dataset name (e.g., 'times', 'origins', 'metadata').
+            path_type: Either 'input' or 'output'.
+            location: Either 'local' or 's3'.
         """
         if path_type == "output":
             path = self.output[location][f"{dataset}_file"]
@@ -198,6 +215,13 @@ class TravelTimePaths:
     def write_to_parquet(
         self, df: pd.DataFrame, dataset: str, location: str = "local"
     ) -> None:
+        """
+        Write a DataFrame to an output Parquet file.
+
+        Args:
+            dataset: The dataset name (e.g., 'times', 'origins', 'metadata').
+            location: Either 'local' or 's3'.
+        """
         df.to_parquet(
             self.get_path(dataset, path_type="output", location=location),
             engine="pyarrow",
@@ -209,6 +233,10 @@ class TravelTimePaths:
 
 
 class TravelTimeInputs:
+    """
+    Class to hold input data and chunk settings for travel time calculations.
+    """
+
     def __init__(
         self,
         origins: pd.DataFrame,
@@ -224,7 +252,7 @@ class TravelTimeInputs:
         self.chunk = chunk
         self.chunk_start_idx: int
         self.chunk_end_idx: int
-        self.chunk_size: int
+        self.chunk_size: int = int(10e7)
         self._set_chunk_attributes()
         self._set_origins_chunk()
 
@@ -241,6 +269,7 @@ class TravelTimeInputs:
         )
 
     def _set_chunk_attributes(self) -> None:
+        """Sets the origin chunk indices given the input chunk string."""
         if self.chunk:
             self.chunk_start_idx, self.chunk_end_idx = map(
                 int, self.chunk.split("-")
@@ -248,6 +277,7 @@ class TravelTimeInputs:
             self.chunk_size = self.chunk_end_idx - self.chunk_start_idx
 
     def _set_origins_chunk(self) -> None:
+        """Sets the origins chunk (if chunk is specified)."""
         df = self.origins
         if self.chunk:
             df = df.iloc[self.chunk_start_idx : self.chunk_end_idx]
@@ -255,7 +285,10 @@ class TravelTimeInputs:
 
 
 class TravelTimeConfig:
-    """Configuration for time calculations with validation."""
+    """
+    Utility class to hold all configuration settings for travel time
+    calculations. Also includes loaders for the default input data.
+    """
 
     OD_COLS = {
         "weighted": {"geoid": "id", "x_4326_wt": "lon", "y_4326_wt": "lat"},
@@ -282,6 +315,7 @@ class TravelTimeConfig:
         self.logger = logger
 
     def _load_od_file(self, path: str) -> pd.DataFrame:
+        """Load an origins or destinations file and prep for Valhalla."""
         df = (
             pd.read_parquet(self.paths.get_path(path, path_type="input"))
             .loc[:, list(self.OD_COLS[self.args.centroid_type].keys())]
@@ -291,6 +325,7 @@ class TravelTimeConfig:
         return df
 
     def load_default_inputs(self) -> TravelTimeInputs:
+        """Load default origins and destinations files."""
         origins = self._load_od_file("origins")
         destinations = self._load_od_file("destinations")
         return TravelTimeInputs(
@@ -303,6 +338,11 @@ class TravelTimeConfig:
 
 
 class TravelTimeCalculator:
+    """
+    Class to calculate travel times between origins and destinations.
+    Uses chunked requests to the Valhalla Matrix API for calculation.
+    """
+
     def __init__(
         self,
         actor: valhalla.Actor,
@@ -326,6 +366,8 @@ class TravelTimeCalculator:
         Args:
             o_start_idx: Starting index for the origins DataFrame.
             d_start_idx: Starting index for the destinations DataFrame.
+            o_end_idx: Ending index for the origins DataFrame.
+            d_end_idx: Ending index for the destinations DataFrame.
 
         Returns:
             DataFrame containing origin IDs, destination IDs, travel durations,
@@ -338,8 +380,8 @@ class TravelTimeCalculator:
         )
         self.config.logger.info(job_string)
 
-        # Get the subset of origin and destination points and convert them to lists
-        # then squash them into the request body
+        # Get the subset of origin and destination points and convert them to
+        # lists then squash them into the request body
         origins_list = (
             self.inputs.origins.iloc[o_start_idx:o_end_idx]
             .apply(lambda row: {"lat": row["lat"], "lon": row["lon"]}, axis=1)
@@ -359,12 +401,12 @@ class TravelTimeCalculator:
             }
         )
 
-        # Make the actual request to the matrix API
+        # Make the actual JSON request to the matrix API
         response = self.actor.matrix(request_json)
         response_data = json.loads(response)
 
-        # Parse the response data and convert it to a dataframe. Recover the
-        # origin and destination indices and append them to the dataframe
+        # Parse the response data and convert it to a DataFrame. Recover the
+        # origin and destination indices and append them to the DataFrame
         durations = response_data["sources_to_targets"]["durations"]
         distances = response_data["sources_to_targets"]["distances"]
         origin_ids = (
@@ -390,6 +432,13 @@ class TravelTimeCalculator:
         return df
 
     def _binary_search(self, o_start_idx, d_start_idx, o_end_idx, d_end_idx):
+        """
+        Recursively split the origins and destinations into smaller chunks.
+
+        Necessary because Valhalla will terminate certain unroutable requests.
+        Binary searching all origins and destinations will return all routable
+        values AROUND the unroutable ones.
+        """
         if o_start_idx + 1 >= o_end_idx and d_start_idx + 1 >= d_end_idx:
             df = pd.merge(
                 pd.DataFrame(
@@ -425,7 +474,15 @@ class TravelTimeCalculator:
                 + self._binary_search(mid_o, mid_d, o_end_idx, d_end_idx)
             )
 
-    def get_times(self):
+    def get_times(self) -> pd.DataFrame:
+        """
+        Entrypoint to calculate times for all combinations of origins and
+        destinations in inputs.
+
+        Returns:
+            DataFrame containing origin IDs, destination IDs, travel durations,
+            and distances for all inputs.
+        """
         results = []
         msso = self.inputs.max_split_size_origins
         noc = self.inputs.n_origins_chunk
