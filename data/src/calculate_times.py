@@ -37,7 +37,7 @@ def main() -> None:
     script_start_time = time.time()
 
     # Create a travel times configuration and set of origin/destination inputs
-    config = TravelTimeConfig(args, params=params, logger=logger)
+    config = TravelTimeConfig(args, params=params, logger=logger, verbose=True)
     inputs = config.load_default_inputs()
 
     chunk_msg = f", chunk: {config.args.chunk}" if config.args.chunk else ""
