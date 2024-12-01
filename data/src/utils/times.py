@@ -352,15 +352,18 @@ class TravelTimeCalculator:
     def __init__(
         self,
         actor: valhalla.Actor,
+        actor_fallback: valhalla.Actor,
         config: TravelTimeConfig,
         inputs: TravelTimeInputs,
     ) -> None:
         self.actor = actor
+        self.actor_fallback = actor_fallback
         self.config = config
         self.inputs = inputs
 
     def _calculate_times(
         self,
+        actor: valhalla.Actor,
         o_start_idx: int,
         d_start_idx: int,
         o_end_idx: int,
@@ -408,7 +411,7 @@ class TravelTimeCalculator:
 
         # Make the actual JSON request to the matrix API
         with suppress_stdout():
-            response = self.actor.matrix(request_json)
+            response = actor.matrix(request_json)
             response_data = json.loads(response)
 
         # Parse the response data and convert it to a DataFrame. Recover the
@@ -461,19 +464,24 @@ class TravelTimeCalculator:
                 d_end_idx,
             )
 
+        # If indices are out-of-bounds return an empty list
         if o_start_idx >= o_end_idx or d_start_idx >= d_end_idx:
             return []
 
-        # Stop recursion if the chunks are too small
+        # Stop recursion if the chunks are too small and use the fallback
+        # (more expensive) Valhalla configuration
         if (o_end_idx - o_start_idx <= 1) and (d_end_idx - d_start_idx <= 1):
             try:
                 df = self._calculate_times(
+                    actor=self.actor_fallback,
                     o_start_idx=o_start_idx,
                     d_start_idx=d_start_idx,
                     o_end_idx=o_end_idx,
                     d_end_idx=d_end_idx,
                 )
-            except Exception:
+            except Exception as e:
+                if print_log or self.config.verbose:
+                    self.config.logger.error(f"{e}. Returning empty DataFrame")
                 df = pd.merge(
                     self.inputs.origins["id"]
                     .iloc[o_start_idx:o_end_idx]
@@ -490,6 +498,7 @@ class TravelTimeCalculator:
 
         try:
             times = self._calculate_times(
+                actor=self.actor,
                 o_start_idx=o_start_idx,
                 d_start_idx=d_start_idx,
                 o_end_idx=o_end_idx,

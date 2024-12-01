@@ -13,7 +13,6 @@ from utils.logging import create_logger
 from utils.times import (
     TravelTimeCalculator,
     TravelTimeConfig,
-    TravelTimeInputs,
     snap_df_to_osm,
 )
 from utils.utils import format_time, get_md5_hash
@@ -38,7 +37,7 @@ def main() -> None:
     script_start_time = time.time()
 
     # Create a travel times configuration and set of origin/destination inputs
-    config = TravelTimeConfig(args, params=params, logger=logger)
+    config = TravelTimeConfig(args, params=params, logger=logger, verbose=True)
     inputs = config.load_default_inputs()
 
     chunk_msg = f", chunk: {config.args.chunk}" if config.args.chunk else ""
@@ -60,8 +59,9 @@ def main() -> None:
         len(inputs.origins) * inputs.n_destinations,
     )
 
-    # Initialize the default Valhalla actor bindings
+    # Initialize Valhalla, where _sp is a second-pass (more expensive) fallback
     actor = valhalla.Actor((Path.cwd() / "valhalla.json").as_posix())
+    actor_sp = valhalla.Actor((Path.cwd() / "valhalla_sp.json").as_posix())
 
     # Use the Vahalla Locate API to append coordinates that are snapped to OSM
     if config.params["times"]["use_snapped"]:
@@ -74,62 +74,25 @@ def main() -> None:
         )
 
     # Calculate times for each chunk and append to a list
-    tt_calc = TravelTimeCalculator(actor, config, inputs)
+    tt_calc = TravelTimeCalculator(actor, actor_sp, config, inputs)
     results_df = tt_calc.many_to_many()
 
     logger.info(
-        "Finished calculating first pass times for %s pairs in %s",
+        "Finished calculating times for %s pairs in %s",
         len(results_df),
         format_time(time.time() - script_start_time),
     )
 
-    # Extract missing pairs to a separate DataFrame
+    # Extract missing pairs to a separate DataFrame and sort all outputs
+    # for efficient compression
     missing_pairs_df = results_df[results_df["duration_sec"].isnull()]
-    n_missing_pairs = len(missing_pairs_df)
-
-    # If there are missing pairs, rerun the routing for only those pairs
-    # using a more aggressive (but time consuming) second pass approach
-    if n_missing_pairs > 0:
-        logger.info(
-            "Found %s missing pairs, rerouting with a more aggressive method",
-            n_missing_pairs,
-        )
-        actor_sp = valhalla.Actor((Path.cwd() / "valhalla_sp.json").as_posix())
-
-        # Create a new input class, keeping only pairs that were unroutable
-        inputs_sp = TravelTimeInputs(
-            origins=inputs.origins[
-                inputs.origins["id"].isin(
-                    missing_pairs_df.index.get_level_values("origin_id")
-                )
-            ].reset_index(drop=True),
-            destinations=inputs.destinations[
-                inputs.destinations["id"].isin(
-                    missing_pairs_df.index.get_level_values("destination_id")
-                )
-            ].reset_index(drop=True),
-            chunk=None,
-            max_split_size_origins=inputs.max_split_size_origins,
-            max_split_size_destinations=inputs.max_split_size_destinations,
-        )
-
-        # Route using the more aggressive settings and update the results
-        tt_calc_sp = TravelTimeCalculator(actor_sp, config, inputs_sp)
-        results_df.update(tt_calc_sp.many_to_many())
-
-        # Extract the missing pairs again since they may have changed
-        missing_pairs_df = results_df[results_df["duration_sec"].isnull()]
-        logger.info(
-            "Found %s additional pairs on second pass",
-            n_missing_pairs - len(missing_pairs_df),
-        )
-
-    # Drop missing pairs and sort for more efficient compression
     missing_pairs_df = (
         missing_pairs_df.drop(columns=["duration_sec", "distance_km"])
         .sort_index()
         .reset_index()
     )
+
+    logger.info("Found %s missing pairs", len(missing_pairs_df))
     results_df = (
         results_df.dropna(subset=["duration_sec"]).sort_index().reset_index()
     )
