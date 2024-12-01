@@ -277,7 +277,7 @@ class TravelTimeInputs:
         if self.chunk:
             chunk_start_idx, chunk_end_idx = self.chunk.split("-")
             self.chunk_start_idx = int(chunk_start_idx)
-            self.chunk_end_idx = int(chunk_end_idx) + 1
+            self.chunk_end_idx = int(chunk_end_idx)
             self.chunk_size = self.chunk_end_idx - self.chunk_start_idx
 
     def _subset_origins(self) -> None:
