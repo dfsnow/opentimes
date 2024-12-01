@@ -485,17 +485,26 @@ class TravelTimeCalculator:
 
         # Stop recursion if the chunks are too small
         if (o_end_idx - o_start_idx <= 1) and (d_end_idx - d_start_idx <= 1):
-            df = pd.merge(
-                self.inputs.origins["id"]
-                .iloc[o_start_idx:o_end_idx]
-                .rename("origin_id"),
-                self.inputs.destinations["id"]
-                .iloc[d_start_idx:d_end_idx]
-                .rename("destination_id"),
-                how="cross",
-            )
-            df["distance_km"] = pd.Series([], dtype=float)
-            df["duration_sec"] = pd.Series([], dtype=float)
+            try:
+                df = self._calculate_times(
+                    o_start_idx=o_start_idx,
+                    d_start_idx=d_start_idx,
+                    o_end_idx=o_end_idx,
+                    d_end_idx=d_end_idx,
+                )
+            except Exception:
+                df = pd.merge(
+                    self.inputs.origins["id"]
+                    .iloc[o_start_idx:o_end_idx]
+                    .rename("origin_id"),
+                    self.inputs.destinations["id"]
+                    .iloc[d_start_idx:d_end_idx]
+                    .rename("destination_id"),
+                    how="cross",
+                )
+                df["distance_km"] = pd.Series([], dtype=float)
+                df["duration_sec"] = pd.Series([], dtype=float)
+
             return [df]
 
         try:
