@@ -33,7 +33,7 @@
       "heading_tolerance": 60,
       "minimum_reachability": 20,
       "node_snap_tolerance": 5,
-      "radius": 500,
+      "radius": 0,
       "search_cutoff": 550000,
       "street_side_max_distance": 1000,
       "street_side_tolerance": 5
@@ -61,7 +61,7 @@
     ],
     "default": {
       "beta": 3,
-      "breakage_distance": 2000,
+      "breakage_distance": 500000,
       "geometry": false,
       "gps_accuracy": 5.0,
       "interpolation_distance": 10,
@@ -159,25 +159,25 @@
   "service_limits": {
     "auto": {
       "max_distance": 50000000.0,
-      "max_locations": 20,
+      "max_locations": 500,
       "max_matrix_distance": 50000000.0,
       "max_matrix_location_pairs": 1000000
     },
     "bicycle": {
       "max_distance": 50000000.0,
-      "max_locations": 50,
+      "max_locations": 500,
       "max_matrix_distance": 50000000.0,
       "max_matrix_location_pairs": 1000000
     },
     "bikeshare": {
       "max_distance": 50000000.0,
-      "max_locations": 50,
+      "max_locations": 500,
       "max_matrix_distance": 50000000.0,
       "max_matrix_location_pairs": 1000000
     },
     "bus": {
       "max_distance": 50000000.0,
-      "max_locations": 50,
+      "max_locations": 500,
       "max_matrix_distance": 50000000.0,
       "max_matrix_location_pairs": 1000000
     },
@@ -202,25 +202,25 @@
     "max_timedep_distance_matrix": 0,
     "motor_scooter": {
       "max_distance": 500000.0,
-      "max_locations": 50,
+      "max_locations": 500,
       "max_matrix_distance": 200000.0,
       "max_matrix_location_pairs": 1000000
     },
     "motorcycle": {
       "max_distance": 50000000.0,
-      "max_locations": 50,
+      "max_locations": 500,
       "max_matrix_distance": 50000000.0,
       "max_matrix_location_pairs": 1000000
     },
     "multimodal": {
       "max_distance": 50000000.0,
-      "max_locations": 50,
+      "max_locations": 500,
       "max_matrix_distance": 0.0,
       "max_matrix_location_pairs": 0
     },
     "pedestrian": {
       "max_distance": 50000000.0,
-      "max_locations": 50,
+      "max_locations": 500,
       "max_matrix_distance": 50000000.0,
       "max_matrix_location_pairs": 1000000,
       "max_transit_walking_distance": 10000,
@@ -249,13 +249,13 @@
     },
     "transit": {
       "max_distance": 50000000.0,
-      "max_locations": 50,
+      "max_locations": 500,
       "max_matrix_distance": 50000000.0,
       "max_matrix_location_pairs": 1000000
     },
     "truck": {
       "max_distance": 50000000.0,
-      "max_locations": 20,
+      "max_locations": 200,
       "max_matrix_distance": 50000000.0,
       "max_matrix_location_pairs": 1000000
     }
@@ -272,17 +272,17 @@
     "logging": {
       "color": false,
       "file_name": "path_to_some_file.log",
-      "long_request": 110.0,
+      "long_request": 500.0,
       "type": "std_out"
     },
-    "max_reserved_labels_count_astar": 2000000,
-    "max_reserved_labels_count_bidir_astar": 1000000,
-    "max_reserved_labels_count_bidir_dijkstras": 2000000,
-    "max_reserved_labels_count_dijkstras": 4000000,
-    "max_reserved_locations_costmatrix": 25,
+    "max_reserved_labels_count_astar": 20000000,
+    "max_reserved_labels_count_bidir_astar": 10000000,
+    "max_reserved_labels_count_bidir_dijkstras": 20000000,
+    "max_reserved_labels_count_dijkstras": 40000000,
+    "max_reserved_locations_costmatrix": 2500,
     "service": {
       "proxy": "ipc:///tmp/thor"
     },
-    "source_to_target_algorithm": "select_optimal"
+    "source_to_target_algorithm": "costmatrix"
   }
 }
