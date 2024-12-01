@@ -43,6 +43,12 @@ times:
   # matrix API calls
   use_snapped: true
 
+  # If Vahalla fails on the first pass, the time calculator begins a recursive
+  # binary search to try to "go around" and origin-destination pairs causing
+  # the failure. The full depth search can take a long time; this parameter
+  # trades off search time and completeness
+  max_recursion_depth: 5
+
 input:
   # Distance in meters to buffer each state boundary by when clipping the
   # national road network. Should be slightly higher than `destination_buffer_m`

@@ -37,7 +37,7 @@ def main() -> None:
     script_start_time = time.time()
 
     # Create a travel times configuration and set of origin/destination inputs
-    config = TravelTimeConfig(args, params=params, logger=logger, verbose=True)
+    config = TravelTimeConfig(args, params=params, logger=logger)
     inputs = config.load_default_inputs()
 
     chunk_msg = f", chunk: {config.args.chunk}" if config.args.chunk else ""
@@ -59,7 +59,8 @@ def main() -> None:
         len(inputs.origins) * inputs.n_destinations,
     )
 
-    # Initialize Valhalla, where _sp is a second-pass (more expensive) fallback
+    # Initialize the Valhalla router Python bindings. The _sp version is a
+    # more expensive fallback router used as a second pass
     actor = valhalla.Actor((Path.cwd() / "valhalla.json").as_posix())
     actor_sp = valhalla.Actor((Path.cwd() / "valhalla_sp.json").as_posix())
 
@@ -73,10 +74,9 @@ def main() -> None:
             inputs.destinations, config.args.mode, actor
         )
 
-    # Calculate times for each chunk and append to a list
+    # Calculate times for each chunk and return a single DataFrame
     tt_calc = TravelTimeCalculator(actor, actor_sp, config, inputs)
     results_df = tt_calc.many_to_many()
-
     logger.info(
         "Finished calculating times for %s pairs in %s",
         len(results_df),
@@ -91,8 +91,6 @@ def main() -> None:
         .sort_index()
         .reset_index()
     )
-
-    logger.info("Found %s missing pairs", len(missing_pairs_df))
     results_df = (
         results_df.dropna(subset=["duration_sec"]).sort_index().reset_index()
     )
@@ -100,7 +98,7 @@ def main() -> None:
     # Loop through files and write to both local and remote paths
     out_locations = ["local", "s3"] if args.write_to_s3 else ["local"]
     logger.info(
-        "Calculated times between %s pairs. Times missing between %s pairs. "
+        "Calculated times between %s pairs (%s missing). "
         "Saving outputs to: %s",
         len(results_df),
         len(missing_pairs_df),
@@ -112,7 +110,7 @@ def main() -> None:
         config.paths.write_to_parquet(inputs.destinations, "destinations", loc)
         config.paths.write_to_parquet(missing_pairs_df, "missing_pairs", loc)
 
-    # Construct and save a metadata DataFrame
+    # Collect metadata and git information for the metadata table
     run_id = str(uuid.uuid4().hex[:8])
     git_commit_sha = str(os.getenv("GITHUB_SHA"))
     git_commit_sha_short = str(git_commit_sha[:8] if git_commit_sha else None)
@@ -126,8 +124,8 @@ def main() -> None:
         if f != "metadata_file"
     }
 
-    # Create a metadata dataframe of all settings and data used for creating inputs
-    # and generating times
+    # Create a metadata DataFrame of all settings and data used for creating
+    # inputs and generating times
     with open(DOCKER_INTERNAL_PATH / "valhalla.json", "r") as f:
         valhalla_data = json.load(f)
     with open(DOCKER_INTERNAL_PATH / "valhalla_sp.json", "r") as f:

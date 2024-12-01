@@ -254,6 +254,8 @@ class TravelTimeInputs:
     ) -> None:
         self.origins = origins
         self.destinations = destinations
+
+        # "full" is the original (before chunk subsetting) number of origins
         self.n_origins_full: int = len(self.origins)
 
         self.chunk = chunk
@@ -383,8 +385,9 @@ class TravelTimeCalculator:
             and distances.
         """
 
-        def col_dict(x, snapped=self.config.params["times"]["use_snapped"]):
-            """Use the snapped lat/lon if set."""
+        # Helper to use the snapped lat/lon columns (if available) and
+        # enabled via a parameter
+        def _col_dict(x, snapped=self.config.params["times"]["use_snapped"]):
             col_suffix = "_snapped" if snapped else ""
             return {"lat": x[f"lat{col_suffix}"], "lon": x[f"lon{col_suffix}"]}
 
@@ -392,12 +395,12 @@ class TravelTimeCalculator:
         # lists, then squash them into the request body
         origins_list = (
             self.inputs.origins.iloc[o_start_idx:o_end_idx]
-            .apply(col_dict, axis=1)
+            .apply(_col_dict, axis=1)
             .tolist()
         )
         destinations_list = (
             self.inputs.destinations.iloc[d_start_idx:d_end_idx]
-            .apply(col_dict, axis=1)
+            .apply(_col_dict, axis=1)
             .tolist()
         )
         request_json = json.dumps(
@@ -439,6 +442,31 @@ class TravelTimeCalculator:
 
         return df
 
+    def _empty_df(
+        self,
+        o_start_idx: int,
+        d_start_idx: int,
+        o_end_idx: int,
+        d_end_idx: int,
+    ) -> pd.DataFrame:
+        """
+        Gets an empty DataFrame with the Cartesian product of the
+        origins and destinations specified by the indices. Used to return
+        when at max depth or unroutable.
+        """
+        df = pd.merge(
+            self.inputs.origins["id"]
+            .iloc[o_start_idx:o_end_idx]
+            .rename("origin_id"),
+            self.inputs.destinations["id"]
+            .iloc[d_start_idx:d_end_idx]
+            .rename("destination_id"),
+            how="cross",
+        )
+        df["distance_km"] = pd.Series([], dtype=float)
+        df["duration_sec"] = pd.Series([], dtype=float)
+        return df
+
     def _binary_search(
         self,
         o_start_idx: int,
@@ -446,6 +474,7 @@ class TravelTimeCalculator:
         o_end_idx: int,
         d_end_idx: int,
         print_log: bool = True,
+        cur_depth: int = 0,
     ) -> list[pd.DataFrame]:
         """
         Recursively split the origins and destinations into smaller chunks.
@@ -454,6 +483,7 @@ class TravelTimeCalculator:
         Binary searching all origins and destinations will return all routable
         values AROUND the unroutable ones.
         """
+
         start_time = time.time()
         if print_log or self.config.verbose:
             self.config.logger.info(
@@ -481,29 +511,38 @@ class TravelTimeCalculator:
                 )
             except Exception as e:
                 if print_log or self.config.verbose:
-                    self.config.logger.error(f"{e}. Returning empty DataFrame")
-                df = pd.merge(
-                    self.inputs.origins["id"]
-                    .iloc[o_start_idx:o_end_idx]
-                    .rename("origin_id"),
-                    self.inputs.destinations["id"]
-                    .iloc[d_start_idx:d_end_idx]
-                    .rename("destination_id"),
-                    how="cross",
-                )
-                df["distance_km"] = pd.Series([], dtype=float)
-                df["duration_sec"] = pd.Series([], dtype=float)
+                    self.config.logger.warning(
+                        f"{e}. Returning empty DataFrame"
+                    )
 
+            df = self._empty_df(o_start_idx, d_start_idx, o_end_idx, d_end_idx)
+            return [df]
+
+        max_depth = self.config.params["times"]["max_recursion_depth"]
+        if cur_depth >= max_depth:
+            if print_log or self.config.verbose:
+                self.config.logger.warning(
+                    f"Max recursion depth {max_depth} reached. "
+                    "Returning empty DataFrame"
+                )
+            df = self._empty_df(o_start_idx, d_start_idx, o_end_idx, d_end_idx)
             return [df]
 
         try:
+            # Use the fallback actor after the first pass
+            actor = self.actor_fallback if cur_depth > 0 else self.actor
             times = self._calculate_times(
-                actor=self.actor,
+                actor=actor,
                 o_start_idx=o_start_idx,
                 d_start_idx=d_start_idx,
                 o_end_idx=o_end_idx,
                 d_end_idx=d_end_idx,
             )
+
+            # Check for completeness in the output. If any times are missing
+            # after the first pass, use the fallback router
+            if times.isnull().values.any() and cur_depth == 0:
+                raise ValueError("First pass values contain missing times")
 
             if print_log or self.config.verbose:
                 elapsed_time = time.time() - start_time
@@ -515,16 +554,18 @@ class TravelTimeCalculator:
 
             return [times]
 
+        # If the request fails, split the origins and destinations into
+        # quadrants and start a binary search
         except Exception as e:
             if print_log or self.config.verbose:
-                self.config.logger.error(f"{e}. Starting binary search...")
-            mo = (o_start_idx + o_end_idx) // 2
-            md = (d_start_idx + d_end_idx) // 2
+                self.config.logger.warning(f"{e}. Starting binary search...")
+            osi, oei, dsi, dei = o_start_idx, o_end_idx, d_start_idx, d_end_idx
+            mo, md = (osi + oei) // 2, (dsi + dei) // 2
             return (
-                self._binary_search(o_start_idx, d_start_idx, mo, md, False)
-                + self._binary_search(mo, d_start_idx, o_end_idx, md, False)
-                + self._binary_search(o_start_idx, md, mo, d_end_idx, False)
-                + self._binary_search(mo, md, o_end_idx, d_end_idx, False)
+                self._binary_search(osi, dsi, mo, md, False, cur_depth + 1)
+                + self._binary_search(mo, dsi, oei, md, False, cur_depth + 1)
+                + self._binary_search(osi, md, mo, dei, False, cur_depth + 1)
+                + self._binary_search(mo, md, oei, dei, False, cur_depth + 1)
             )
 
     def many_to_many(self) -> pd.DataFrame:
@@ -602,7 +643,7 @@ def snap_df_to_osm(
 
     # Use the first element of nodes to populate the snapped lat/lon, otherwise
     # fallback to the correlated lat/lon from edges
-    def get_col(x: dict, col: str):
+    def _get_col(x: dict, col: str):
         return (
             x["nodes"][0][col]
             if x["nodes"]
@@ -612,8 +653,8 @@ def snap_df_to_osm(
     response_df = pd.DataFrame(
         [
             {
-                "lon_snapped": get_col(item, "lon"),
-                "lat_snapped": get_col(item, "lat"),
+                "lon_snapped": _get_col(item, "lon"),
+                "lat_snapped": _get_col(item, "lat"),
             }
             for item in response_data
         ]
