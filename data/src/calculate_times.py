@@ -108,7 +108,6 @@ def main() -> None:
                     missing_pairs_df.index.get_level_values("destination_id")
                 )
             ].reset_index(drop=True),
-            pairs=missing_pairs_df,
             chunk=None,
             max_split_size_origins=inputs.max_split_size_origins,
             max_split_size_destinations=inputs.max_split_size_destinations,

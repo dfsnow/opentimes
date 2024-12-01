@@ -248,14 +248,12 @@ class TravelTimeInputs:
         self,
         origins: pd.DataFrame,
         destinations: pd.DataFrame,
-        pairs: pd.DataFrame | None,
         chunk: str | None,
         max_split_size_origins: int,
         max_split_size_destinations: int,
     ) -> None:
         self.origins = origins
         self.destinations = destinations
-        self.pairs = pairs
         self.n_origins_full: int = len(self.origins)
 
         self.chunk = chunk
@@ -264,8 +262,6 @@ class TravelTimeInputs:
         self.chunk_size: int = int(10e7)
         self._set_chunk_attributes()
         self._subset_origins()
-        if pairs is None:
-            self._set_pairs()
 
         self.n_origins: int = len(self.origins)
         self.n_destinations: int = len(self.destinations)
@@ -283,20 +279,6 @@ class TravelTimeInputs:
             self.chunk_start_idx = int(chunk_start_idx)
             self.chunk_end_idx = int(chunk_end_idx) + 1
             self.chunk_size = self.chunk_end_idx - self.chunk_start_idx
-
-    def _set_pairs(self) -> None:
-        """
-        Sets the pairs attribute to the Cartesian product of origins
-        and destinations if not set during initialization.
-
-        Pairs are only used in one-to-many routing. They limit the set of
-        destinations each origin should route to.
-        """
-        self.pairs = pd.merge(
-            self.origins["id"].rename("origin_id"),
-            self.destinations["id"].rename("destination_id"),
-            how="cross",
-        ).set_index(["origin_id", "destination_id"], drop=False)
 
     def _subset_origins(self) -> None:
         """Sets the origins chunk (if chunk is specified)."""
@@ -355,7 +337,6 @@ class TravelTimeConfig:
         return TravelTimeInputs(
             origins=origins,
             destinations=destinations,
-            pairs=None,
             chunk=self.args.chunk,
             max_split_size_origins=self.params["times"]["max_split_size"],
             max_split_size_destinations=self.params["times"]["max_split_size"],
@@ -582,44 +563,6 @@ class TravelTimeCalculator:
             )
             del results
             return results_df
-
-    # def one_to_many(self) -> pd.DataFrame:
-    #     """
-    #     Fallback method to calculate times from each origin to the set of
-    #     destinations specified for that origin in self.pairs.
-    #     """
-    # results = []
-    # origins = self.inputs.pairs.origin_id.unique()
-    #
-    # for origin in origins:
-    #     results.extend(
-    #         self._binary_search(
-    #             o,
-    #             d,
-    #             min(o + max_spl_o, n_oc),
-    #             min(d + m_spl_d, n_dc),
-    #             True,
-    #         )
-    #     )
-
-    # Return empty result set if nothing is routable
-    # if len(results) == 0:
-    #     return pd.DataFrame(
-    #         columns=[
-    #             "origin_id",
-    #             "destination_id",
-    #             "duration_sec",
-    #             "distance_km",
-    #         ]
-    #     )
-    # else:
-    #     results_df = (
-    #         pd.concat(results, ignore_index=True)
-    #         .set_index(["origin_id", "destination_id"])
-    #         .sort_index()
-    #     )
-    #     del results
-    #     return results_df
 
 
 def snap_df_to_osm(
