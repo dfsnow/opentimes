@@ -75,15 +75,16 @@ def main() -> None:
 
     # Calculate times for each chunk and append to a list
     tt_calc = TravelTimeCalculator(actor, config, inputs)
-    results_df = tt_calc.get_times()
+    results_df = tt_calc.many_to_many()
+
     logger.info(
-        "Finished calculating first pass times in %s",
+        "Finished calculating first pass times for %s pairs in %s",
+        len(results_df),
         format_time(time.time() - script_start_time),
     )
 
     # Extract missing pairs to a separate DataFrame
     missing_pairs_df = results_df[results_df["duration_sec"].isnull()]
-    missing_pairs_df = missing_pairs_df.reset_index()
     n_missing_pairs = len(missing_pairs_df)
 
     # If there are missing pairs, rerun the routing for only those pairs
@@ -91,35 +92,36 @@ def main() -> None:
     if n_missing_pairs > 0:
         logger.info(
             "Found %s missing pairs, rerouting with a more aggressive method",
-            f"{n_missing_pairs:,}",
+            n_missing_pairs,
         )
         actor_sp = valhalla.Actor((Path.cwd() / "valhalla_sp.json").as_posix())
 
         # Create a new input class, keeping only pairs that were unroutable
         inputs_sp = TravelTimeInputs(
-            origins=inputs.origins,
-            destinations=inputs.destinations,
+            origins=inputs.origins[
+                inputs.origins["id"].isin(
+                    missing_pairs_df.index.get_level_values("origin_id")
+                )
+            ].reset_index(drop=True),
+            destinations=inputs.destinations[
+                inputs.destinations["id"].isin(
+                    missing_pairs_df.index.get_level_values("destination_id")
+                )
+            ].reset_index(drop=True),
             pairs=missing_pairs_df,
             chunk=None,
-            max_pairs=inputs.max_pairs,
+            max_split_size_origins=inputs.max_split_size_origins,
+            max_split_size_destinations=inputs.max_split_size_destinations,
         )
-
-        logger.info(
-            "Routing second pass from %s origins to %s destinations (%s pairs)",
-            len(inputs_sp.origins),
-            inputs_sp.n_destinations,
-            len(inputs_sp.origins) * inputs_sp.n_destinations,
-        )
-        breakpoint()
 
         # Route using the more aggressive settings and update the results
         tt_calc_sp = TravelTimeCalculator(actor_sp, config, inputs_sp)
-        results_df.update(tt_calc_sp.get_times())
+        results_df.update(tt_calc_sp.many_to_many())
 
         # Extract the missing pairs again since they may have changed
         missing_pairs_df = results_df[results_df["duration_sec"].isnull()]
         logger.info(
-            "Found %s additional pairs via second pass",
+            "Found %s additional pairs on second pass",
             n_missing_pairs - len(missing_pairs_df),
         )
 

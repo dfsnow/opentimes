@@ -34,9 +34,9 @@ times:
     - pedestrian
     #- multimodal
 
-  # Maximum number of OD pairs to process in a single matrix::CostMatrix call.
-  # Necessary because larger matrices will cause it to choke
-  max_pairs: 100
+  # Maximum size of chunk of origins AND destinations to process in a single call to
+  # Valhalla. This is necessary because larger matrices will cause it to choke
+  max_split_size: 200
 
   # Coordinates are snapped to the OSM street network before time calculation.
   # Setting this to true will use the snapped coordinates directly in the
