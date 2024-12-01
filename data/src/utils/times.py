@@ -521,9 +521,9 @@ class TravelTimeCalculator:
             if times.isnull().values.any() and cur_depth == 0:
                 missing = times[times["duration_sec"].isnull()]
                 if print_log or self.config.verbose:
-                    self.config.logger.info(
+                    self.config.logger.warning(
                         "Found %s pairs with missing times. "
-                        "Running a second pass",
+                        "Running a second pass with the fallback router",
                         len(missing),
                     )
                 times_sp = self._calculate_times(
