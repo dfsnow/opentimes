@@ -127,7 +127,7 @@
       "type": "std_out"
     },
     "lru_mem_cache_hard_control": false,
-    "max_cache_size": 5000000000,
+    "max_cache_size": 12000000000,
     "max_concurrent_reader_users": 1,
     "reclassify_links": true,
     "shortcuts": true,
@@ -279,7 +279,7 @@
     "max_reserved_labels_count_bidir_astar": 10000000,
     "max_reserved_labels_count_bidir_dijkstras": 20000000,
     "max_reserved_labels_count_dijkstras": 40000000,
-    "max_reserved_locations_costmatrix": 2500,
+    "max_reserved_locations_costmatrix": 50000,
     "service": {
       "proxy": "ipc:///tmp/thor"
     },

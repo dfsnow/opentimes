@@ -17,7 +17,7 @@ actions:
 
   # The minimum number of origins to include in a job. Higher = fewer jobs
   # that take longer. Lower = more jobs that finish quicker
-  min_chunk_size: 300
+  min_chunk_size: 1000
 
 times:
   # Travel times output version. Follows SemVer (kind of):
