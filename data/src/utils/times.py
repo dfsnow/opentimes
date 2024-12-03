@@ -516,33 +516,6 @@ class TravelTimeCalculator:
                 ],
             )
 
-            # Check for completeness in the output. If any times are missing
-            # after the first pass, run a second pass with the fallback router
-            if times.isnull().values.any() and cur_depth == 0:
-                missing = times[times["duration_sec"].isnull()]
-                if print_log or self.config.verbose:
-                    self.config.logger.info(
-                        "Found %s pairs with missing times. "
-                        "Running a second pass",
-                        len(missing),
-                    )
-                times_sp = self._calculate_times(
-                    actor=self.actor_fallback,
-                    origins=self.inputs.origins[
-                        self.inputs.origins["id"].isin(
-                            missing["origin_id"].unique()
-                        )
-                    ],
-                    destinations=self.inputs.destinations[
-                        self.inputs.destinations["id"].isin(
-                            missing["destination_id"].unique()
-                        )
-                    ],
-                ).set_index(["origin_id", "destination_id"])
-                times = times.set_index(["origin_id", "destination_id"])
-                times.update(times_sp)
-                times = times.reset_index(drop=False)
-
             if print_log or self.config.verbose:
                 elapsed_time = time.time() - start_time
                 self.config.logger.info(
