@@ -613,23 +613,25 @@ class TravelTimeCalculator:
                 self.config.logger.info("Routing missing set number %s", idx)
                 o_ids = missing_set["origin_id"].unique()
                 d_ids = missing_set["destination_id"].unique()
-                results_sp.extend(
-                    self._binary_search(
-                        o_start_idx=0,
-                        d_start_idx=0,
-                        o_end_idx=len(o_ids),
-                        d_end_idx=len(d_ids),
-                        print_log=True,
-                        cur_depth=0,
-                        origins=self.inputs.origins[
-                            self.inputs.origins["id"].isin(o_ids)
-                        ],
-                        destinations=self.inputs.destinations[
-                            self.inputs.destinations["id"].isin(d_ids)
-                        ],
-                        actor=self.actor_fallback,
-                    )
-                )
+                for o in range(0, len(o_ids), max_spl_o):
+                    for d in range(0, len(d_ids), m_spl_d):
+                        results_sp.extend(
+                            self._binary_search(
+                                o_start_idx=o,
+                                d_start_idx=d,
+                                o_end_idx=min(o + max_spl_o, len(o_ids)),
+                                d_end_idx=min(d + m_spl_d, len(d_ids)),
+                                print_log=True,
+                                cur_depth=0,
+                                origins=self.inputs.origins[
+                                    self.inputs.origins["id"].isin(o_ids)
+                                ],
+                                destinations=self.inputs.destinations[
+                                    self.inputs.destinations["id"].isin(d_ids)
+                                ],
+                                actor=self.actor_fallback,
+                            )
+                        )
 
             # Merge the results from the second pass with the first pass
             results_sp_df = (
