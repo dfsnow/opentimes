@@ -343,7 +343,7 @@ class TravelTimeConfig:
         destinations = self._load_od_file("destinations")
         return TravelTimeInputs(
             origins=origins,
-            destinations=destinations.iloc[0:1000],
+            destinations=destinations,
             chunk=self.args.chunk,
             max_split_size_origins=self.params["times"]["max_split_size"],
             max_split_size_destinations=self.params["times"]["max_split_size"],
