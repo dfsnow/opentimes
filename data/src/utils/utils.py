@@ -8,6 +8,29 @@ from pathlib import Path
 import pandas as pd
 
 
+def create_empty_df(
+    o_start_idx: int,
+    d_start_idx: int,
+    o_end_idx: int,
+    d_end_idx: int,
+    origin_id: pd.Series,
+    destination_id: pd.Series,
+) -> pd.DataFrame:
+    """
+    Gets an empty DataFrame with the Cartesian product of the origin and
+    destination IDs specified by the indices. Used to return an empty
+    DataFrame of IDs when at max depth or unroutable.
+    """
+    df = pd.merge(
+        origin_id.iloc[o_start_idx:o_end_idx].rename("origin_id"),
+        destination_id.iloc[d_start_idx:d_end_idx].rename("destination_id"),
+        how="cross",
+    )
+    df["distance_km"] = pd.Series([], dtype=float)
+    df["duration_sec"] = pd.Series([], dtype=float)
+    return df
+
+
 def format_size(size):
     """Return a human-readable size string."""
     for unit in ["B", "KB", "MB", "GB", "TB"]:
@@ -30,6 +53,20 @@ def get_md5_hash(file_path):
         for chunk in iter(lambda: f.read(4096), b""):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
+
+
+def group_by_column_sets(
+    df: pd.DataFrame, x: str, y: str
+) -> list[pd.DataFrame]:
+    """Find the unique sets of two columns and return them as a list."""
+    grouped = df.groupby(x)[y].apply(set).reset_index()
+    unique_sets = grouped[y].drop_duplicates()
+
+    result = []
+    for unique_set in unique_sets:
+        group = df[df[x].isin(grouped[grouped[y] == unique_set][x])]
+        result.append(group)
+    return result
 
 
 def split_file_to_str(file: str | Path, **kwargs) -> str:

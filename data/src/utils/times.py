@@ -10,7 +10,12 @@ import pandas as pd
 import valhalla  # type: ignore
 
 from utils.constants import DOCKER_INTERNAL_PATH
-from utils.utils import format_time, suppress_stdout
+from utils.utils import (
+    create_empty_df,
+    format_time,
+    group_by_column_sets,
+    suppress_stdout,
+)
 
 
 class TravelTimeArgs:
@@ -338,7 +343,7 @@ class TravelTimeConfig:
         destinations = self._load_od_file("destinations")
         return TravelTimeInputs(
             origins=origins,
-            destinations=destinations,
+            destinations=destinations.iloc[0:1000],
             chunk=self.args.chunk,
             max_split_size_origins=self.params["times"]["max_split_size"],
             max_split_size_destinations=self.params["times"]["max_split_size"],
@@ -365,26 +370,27 @@ class TravelTimeCalculator:
 
     def _calculate_times(
         self,
-        actor: valhalla.Actor,
         origins: pd.DataFrame,
         destinations: pd.DataFrame,
+        actor: valhalla.Actor,
     ) -> pd.DataFrame:
         """
-        Calculates travel times and distances between origins and destinations.
+        Sends the travel time calculation request to the Valhalla Matrix API.
+        Responsible for taking an origin/destination input, transforming it to
+        the required JSON format, and parsing the response.
 
         Returns:
             DataFrame containing origin IDs, destination IDs, travel durations,
             and distances.
         """
 
-        # Helper to use the snapped lat/lon columns (if available) and
-        # enabled via a parameter
+        # Helper to use the snapped lat/lon columns (if specified via parameter)
         def _col_dict(x, snapped=self.config.params["times"]["use_snapped"]):
             col_suffix = "_snapped" if snapped else ""
             return {"lat": x[f"lat{col_suffix}"], "lon": x[f"lon{col_suffix}"]}
 
-        # Get the subset of origin and destination points and convert them to
-        # lists, then squash them into the request body
+        # Convert the origin and destination points to lists, then squash them
+        # into JSON: https://valhalla.github.io/valhalla/api/matrix/api-reference/
         origins_list = origins.apply(_col_dict, axis=1).tolist()
         destinations_list = destinations.apply(_col_dict, axis=1).tolist()
         request_json = json.dumps(
@@ -396,7 +402,8 @@ class TravelTimeCalculator:
             }
         )
 
-        # Make the actual JSON request to the matrix API
+        # Get the actual JSON response from the API. Suppressing stdout here
+        # since Valhalla prints a bunch of useless output
         with suppress_stdout():
             response = actor.matrix(request_json)
             response_data = json.loads(response)
@@ -419,48 +426,28 @@ class TravelTimeCalculator:
 
         return df
 
-    def _empty_df(
-        self,
-        o_start_idx: int,
-        d_start_idx: int,
-        o_end_idx: int,
-        d_end_idx: int,
-    ) -> pd.DataFrame:
-        """
-        Gets an empty DataFrame with the Cartesian product of the
-        origins and destinations specified by the indices. Used to return
-        when at max depth or unroutable.
-        """
-        df = pd.merge(
-            self.inputs.origins["id"]
-            .iloc[o_start_idx:o_end_idx]
-            .rename("origin_id"),
-            self.inputs.destinations["id"]
-            .iloc[d_start_idx:d_end_idx]
-            .rename("destination_id"),
-            how="cross",
-        )
-        df["distance_km"] = pd.Series([], dtype=float)
-        df["duration_sec"] = pd.Series([], dtype=float)
-        return df
-
     def _binary_search(
         self,
         o_start_idx: int,
         d_start_idx: int,
         o_end_idx: int,
         d_end_idx: int,
-        print_log: bool = True,
-        cur_depth: int = 0,
+        print_log: bool,
+        cur_depth: int,
+        origins: pd.DataFrame,
+        destinations: pd.DataFrame,
+        actor: valhalla.Actor,
     ) -> list[pd.DataFrame]:
         """
         Recursively split the origins and destinations into smaller chunks.
 
         Necessary because Valhalla will terminate certain unroutable requests.
-        Binary searching all origins and destinations will return all routable
-        values AROUND the unroutable ones.
-        """
+        Binary searching all origins and destinations will return the routable
+        values around the unroutable ones.
 
+        Higher depth levels will use a fallback router to ensure we're not
+        simply querying the same unroutable values over and over.
+        """
         start_time = time.time()
         if print_log or self.config.verbose:
             self.config.logger.info(
@@ -475,24 +462,28 @@ class TravelTimeCalculator:
         if o_start_idx >= o_end_idx or d_start_idx >= d_end_idx:
             return []
 
-        # Stop recursion if the chunks are too small and use the fallback
-        # (more expensive) Valhalla configuration
+        # Stop recursion if the chunks are too small (i.e. equal to 1)
         if (o_end_idx - o_start_idx <= 1) and (d_end_idx - d_start_idx <= 1):
             try:
                 df = self._calculate_times(
-                    actor=self.actor_fallback,
-                    origins=self.inputs.origins.iloc[o_start_idx:o_end_idx],
-                    destinations=self.inputs.destinations.iloc[
-                        d_start_idx:d_end_idx
-                    ],
+                    origins=origins.iloc[o_start_idx:o_end_idx],
+                    destinations=destinations.iloc[d_start_idx:d_end_idx],
+                    actor=actor,
                 )
             except Exception as e:
+                df = create_empty_df(
+                    o_start_idx,
+                    d_start_idx,
+                    o_end_idx,
+                    d_end_idx,
+                    origins["id"],
+                    destinations["id"],
+                )
                 if print_log or self.config.verbose:
                     self.config.logger.warning(
                         f"{e}. Returning empty DataFrame"
                     )
 
-            df = self._empty_df(o_start_idx, d_start_idx, o_end_idx, d_end_idx)
             return [df]
 
         max_depth = self.config.params["times"]["max_recursion_depth"]
@@ -502,46 +493,23 @@ class TravelTimeCalculator:
                     f"Max recursion depth {max_depth} reached. "
                     "Returning empty DataFrame"
                 )
-            df = self._empty_df(o_start_idx, d_start_idx, o_end_idx, d_end_idx)
-            return [df]
+            empty_df = create_empty_df(
+                o_start_idx,
+                d_start_idx,
+                o_end_idx,
+                d_end_idx,
+                origins["id"],
+                destinations["id"],
+            )
+            return [empty_df]
 
         try:
-            # Use the fallback actor after the first pass
-            actor = self.actor_fallback if cur_depth > 0 else self.actor
+            # Do time calculation if none of the minimal conditioners were met
             times = self._calculate_times(
+                origins=origins.iloc[o_start_idx:o_end_idx],
+                destinations=destinations.iloc[d_start_idx:d_end_idx],
                 actor=actor,
-                origins=self.inputs.origins.iloc[o_start_idx:o_end_idx],
-                destinations=self.inputs.destinations.iloc[
-                    d_start_idx:d_end_idx
-                ],
             )
-
-            # Check for completeness in the output. If any times are missing
-            # after the first pass, run a second pass with the fallback router
-            if times.isnull().values.any() and cur_depth == 0:
-                missing = times[times["duration_sec"].isnull()]
-                if print_log or self.config.verbose:
-                    self.config.logger.info(
-                        "Found %s pairs with missing times. "
-                        "Running a second pass",
-                        len(missing),
-                    )
-                times_sp = self._calculate_times(
-                    actor=self.actor_fallback,
-                    origins=self.inputs.origins[
-                        self.inputs.origins["id"].isin(
-                            missing["origin_id"].unique()
-                        )
-                    ],
-                    destinations=self.inputs.destinations[
-                        self.inputs.destinations["id"].isin(
-                            missing["destination_id"].unique()
-                        )
-                    ],
-                ).set_index(["origin_id", "destination_id"])
-                times = times.set_index(["origin_id", "destination_id"])
-                times.update(times_sp)
-                times = times.reset_index(drop=False)
 
             if print_log or self.config.verbose:
                 elapsed_time = time.time() - start_time
@@ -561,17 +529,21 @@ class TravelTimeCalculator:
                 self.config.logger.warning(f"{e}. Starting binary search...")
             osi, oei, dsi, dei = o_start_idx, o_end_idx, d_start_idx, d_end_idx
             mo, md = (osi + oei) // 2, (dsi + dei) // 2
+            # fmt: off
             return (
-                self._binary_search(osi, dsi, mo, md, False, cur_depth + 1)
-                + self._binary_search(mo, dsi, oei, md, False, cur_depth + 1)
-                + self._binary_search(osi, md, mo, dei, False, cur_depth + 1)
-                + self._binary_search(mo, md, oei, dei, False, cur_depth + 1)
+                self._binary_search(osi, dsi, mo, md, False, cur_depth + 1, origins, destinations, actor)
+                + self._binary_search(mo, dsi, oei, md, False, cur_depth + 1, origins, destinations, actor)
+                + self._binary_search(osi, md, mo, dei, False, cur_depth + 1, origins, destinations, actor)
+                + self._binary_search(mo, md, oei, dei, False, cur_depth + 1, origins, destinations, actor)
             )
+            # fmt: on
 
-    def many_to_many(self) -> pd.DataFrame:
+    def many_to_many(self, second_pass: bool = True) -> pd.DataFrame:
         """
         Entrypoint to calculate times for all combinations of origins and
-        destinations in inputs. Preferred method since it's the fastest.
+        destinations in inputs. Includes an optional second pass which performs
+        a more intensive (time-consuming) search for missing pairs from the
+        first pass.
 
         Returns:
             DataFrame containing origin IDs, destination IDs, travel durations,
@@ -587,11 +559,15 @@ class TravelTimeCalculator:
             for d in range(0, n_dc, m_spl_d):
                 results.extend(
                     self._binary_search(
-                        o,
-                        d,
-                        min(o + max_spl_o, n_oc),
-                        min(d + m_spl_d, n_dc),
-                        True,
+                        o_start_idx=o,
+                        d_start_idx=d,
+                        o_end_idx=min(o + max_spl_o, n_oc),
+                        d_end_idx=min(d + m_spl_d, n_dc),
+                        print_log=True,
+                        cur_depth=0,
+                        origins=self.inputs.origins,
+                        destinations=self.inputs.destinations,
+                        actor=self.actor,
                     )
                 )
 
@@ -612,7 +588,59 @@ class TravelTimeCalculator:
                 .sort_index()
             )
             del results
-            return results_df
+
+        # Check for completeness in the output. If any times are missing
+        # after the first pass, run a second pass with the fallback router
+        if results_df.isnull().values.any() and second_pass:
+            missing = results_df[results_df["duration_sec"].isnull()]
+            self.config.logger.info(
+                "Starting second pass for %s missing pairs (%s total)",
+                len(missing),
+                len(results_df),
+            )
+
+            # Find the unique set of destinations, then use it to create groups
+            # of origins, such that all origins in a DataFrame share the same
+            # set of destinations. This greatly increases second pass speed
+            results_sp = []
+            missing_sets = group_by_column_sets(
+                missing.reset_index(), "origin_id", "destination_id"
+            )
+            self.config.logger.info(
+                "Found %s unique missing sets", len(missing_sets)
+            )
+            for idx, missing_set in enumerate(missing_sets):
+                self.config.logger.info("Routing missing set number %s", idx)
+                o_ids = missing_set["origin_id"].unique()
+                d_ids = missing_set["destination_id"].unique()
+                results_sp.extend(
+                    self._binary_search(
+                        o_start_idx=0,
+                        d_start_idx=0,
+                        o_end_idx=len(o_ids),
+                        d_end_idx=len(d_ids),
+                        print_log=True,
+                        cur_depth=0,
+                        origins=self.inputs.origins[
+                            self.inputs.origins["id"].isin(o_ids)
+                        ],
+                        destinations=self.inputs.destinations[
+                            self.inputs.destinations["id"].isin(d_ids)
+                        ],
+                        actor=self.actor_fallback,
+                    )
+                )
+
+            # Merge the results from the second pass with the first pass
+            results_sp_df = (
+                pd.concat(results_sp, ignore_index=True)
+                .set_index(["origin_id", "destination_id"])
+                .sort_index()
+            )
+            del results_sp
+            results_df.update(results_sp_df)
+
+        return results_df
 
 
 def snap_df_to_osm(
