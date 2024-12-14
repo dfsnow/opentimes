@@ -1,9 +1,9 @@
-import * as duckdb from "https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.29.0/+esm";
+import { asyncBufferFromUrl, byteLengthFromUrl, parquetMetadataAsync, parquetRead } from "hyparquet";
+import { compressors } from "hyparquet-compressors"
 
 const baseUrl = "https://data.opentimes.org/times/version=0.0.1/mode=auto/year=2024/geography=tract"
 const bigStates = ["06", "36"];
 const zoomThresholds = [6, 8];
-
 const protocol = new pmtiles.Protocol();
 maplibregl.addProtocol("pmtiles", protocol.tile);
 
@@ -108,20 +108,6 @@ class Spinner {
     document.querySelector(".content").removeChild(this.spinner);
     document.querySelector(".content").removeChild(this.overlay);
   }
-}
-
-async function instantiateDB() {
-  const bundles = duckdb.getJsDelivrBundles();
-  const bundle = await duckdb.selectBundle(bundles);
-  const workerUrl = URL.createObjectURL(
-    new Blob([`importScripts("${bundle.mainWorker}");`], { type: "text/javascript" })
-  );
-
-  const db = new duckdb.AsyncDuckDB(new duckdb.ConsoleLogger("DEBUG"), new Worker(workerUrl));
-  await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
-  URL.revokeObjectURL(workerUrl);
-
-  return db;
 }
 
 async function instantiateMap() {
@@ -257,46 +243,122 @@ function getThresholdsForZoom(zoom) {
   }
 }
 
-async function runQuery(map, db, state, id, previousStates) {
+async function runQuery(map, state, id, previousStates, byteLengthCache, metadataCache) {
   const queryUrl = `${baseUrl}/state=${state}/times-0.0.1-auto-2024-tract-${state}`;
   const urlsArray = bigStates.includes(state)
     ? [`${queryUrl}-0.parquet`, `${queryUrl}-1.parquet`]
     : [`${queryUrl}-0.parquet`];
-  const joinedUrls = urlsArray.map(url => `'${url}'`).join(',');
 
-  let result;
-  try {
-    result = await db.query(`
-      SELECT destination_id, duration_sec
-      FROM read_parquet([${joinedUrls}])
-      WHERE version = '0.0.1'
-          AND mode = 'auto'
-          AND year = '2024'
-          AND geography = 'tract'
-          AND centroid_type = 'weighted'
-          AND state = '${state}'
-          AND origin_id = '${id}'
-    `);
-  } catch (error) {
-    console.error("Error executing query:", error);
-    return previousStates;
+  async function fetchAndCacheMetadata(url, byteLengthCache, metadataCache) {
+    let contentLength = null;
+    if (!byteLengthCache[url]) {
+      contentLength = await byteLengthFromUrl(url);
+      byteLengthCache[url] = contentLength;
+    } else {
+      contentLength = byteLengthCache[url];
+    }
+
+    let metadata = null;
+    if (!metadataCache[url]) {
+      const buffer = await asyncBufferFromUrl({
+        url,
+        byteLength: parseInt(contentLength)
+      });
+      metadata = await parquetMetadataAsync(buffer);
+      metadataCache[url] = metadata;
+    } else {
+      metadata = metadataCache[url];
+    }
+
+    return metadata;
   }
 
-  if (result.length === 0) {
-    console.error("No results found for the query.");
-    return previousStates;
+  async function fetchDataFromRowGroups(urls, id, byteLengthCache, metadataCache) {
+    let dataArray = [];
+    for (const url of urls) {
+      let metadata = await fetchAndCacheMetadata(url, byteLengthCache, metadataCache);
+      let rowStart = 0;
+      for (const rowGroup of metadata.row_groups) {
+        for (const column of rowGroup.columns) {
+          if (column.meta_data.path_in_schema.includes("origin_id")) {
+            const minValue = column.meta_data.statistics.min_value;
+            const maxValue = column.meta_data.statistics.max_value;
+            if (id >= minValue && id <= maxValue) {
+              const contentLength = byteLengthCache[url];
+              const buffer = await asyncBufferFromUrl({
+                url,
+                byteLength: parseInt(contentLength)
+              });
+              await parquetRead(
+                {
+                  file: buffer,
+                  compressors: compressors,
+                  metadata: metadata,
+                  rowStart: rowStart,
+                  rowEnd: rowStart + parseInt(rowGroup.num_rows),
+                  columns: ["destination_id", "duration_sec"],
+                  onComplete: data => dataArray.push(data)
+                }
+              )
+            }
+          }
+        }
+        rowStart += parseInt(rowGroup.num_rows)
+      }
+    }
+    const mergedDataArray = [].concat(...dataArray);
+    console.log(mergedDataArray);
   }
 
-  wipeMapPreviousState(map, previousStates)
-  const returnStates = result.toArray().map(row => {
-    map.setFeatureState(
-      { source: "protomap", sourceLayer: "tracts", id: row.destination_id },
-      { tract_color: getColorScale(row.duration_sec, map.getZoom()) }
-    );
-    return { id: row.destination_id, duration: row.duration_sec };
-  });
+  for (const url of urlsArray) {
+    const metadata = await fetchAndCacheMetadata(url, byteLengthCache, metadataCache);
+    console.log(metadata);
+  }
 
-  return returnStates;
+  fetchDataFromRowGroups(urlsArray, id, byteLengthCache, metadataCache);
+
+  //await parquetRead({
+  //  file: await asyncBufferFromUrl({ url: fullUrl, byteLength: parseInt(contentLength) }),
+  //  columns: ['origin_id', 'duration_sec'],
+  //  compressors: compressors,
+  //  rowStart: 10,
+  //  rowEnd: 20,
+  //  onComplete: data => console.log(data)
+  //})
+  //
+  //let result;
+  //try {
+  //  result = await db.query(`
+  //    SELECT *
+  //    FROM read_parquet([${joinedUrls}])
+  //    WHERE version = '0.0.1'
+  //        AND mode = 'auto'
+  //        AND year = '2024'
+  //        AND geography = 'tract'
+  //        AND centroid_type = 'weighted'
+  //        AND state = '${state}'
+  //        AND origin_id = '${id}'
+  //  `);
+  //} catch (error) {
+  //  console.error("Error executing query:", error);
+  //  return previousStates;
+  //}
+  //
+  //if (result.length === 0) {
+  //  console.error("No results found for the query.");
+  //  return previousStates;
+  //}
+  //
+  //wipeMapPreviousState(map, previousStates)
+  //const returnStates = result.toArray().map(row => {
+  //  map.setFeatureState(
+  //    { source: "protomap", sourceLayer: "tracts", id: row.destination_id },
+  //    { tract_color: getColorScale(row.duration_sec, map.getZoom()) }
+  //  );
+  //  return { id: row.destination_id, duration: row.duration_sec };
+  //});
+  //
+  //return returnStates;
 }
 
 function debounce(func, wait) {
@@ -311,27 +373,27 @@ function debounce(func, wait) {
   let hoveredPolygonId = null;
   let previousStates = [];
   let previousZoomLevel = null;
+  const byteLengthCache = {};
+  const metadataCache = {};
 
   const spinner = new Spinner();
   spinner.show();
 
-  const [DuckDB, map, tractIdDisplay] = await Promise.all([
-    instantiateDB(),
+  const [map, tractIdDisplay] = await Promise.all([
     instantiateMap(),
     (async () => createTractIdDisplay())()
   ]);
-
   const colorScale = new ColorScale(map);
-  const db = await DuckDB.connect();
-  db.query("LOAD parquet");
 
   // Load the previous map click if there was one
   let idParam = new URLSearchParams(window.location.search).get("id");
   if (idParam) {
     previousStates = await runQuery(
-      map, db,
+      map,
       idParam.substring(0, 2), idParam,
-      previousStates
+      previousStates,
+      byteLengthCache,
+      metadataCache
     );
   }
 
@@ -384,7 +446,7 @@ function debounce(func, wait) {
     if (features.length > 0) {
       spinner.show();
       const feature = features[0];
-      previousStates = await runQuery(map, db, feature.properties.state, feature.properties.id, previousStates);
+      previousStates = await runQuery(map, feature.properties.state, feature.properties.id, previousStates, byteLengthCache, metadataCache);
 
       // Update the URL with ID
       window.history.replaceState({}, "", `?id=${feature.properties.id}${window.location.hash}`);
