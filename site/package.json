@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "hyparquet": "^1.6.4",
+    "hyparquet-compressors": "^1.0.0"
+  }
+}
