@@ -86,7 +86,6 @@ class Spinner {
   constructor() {
     this.spinner = this.createSpinner();
     this.overlay = this.createOverlay();
-    this.timeoutId = null;
   }
 
   createSpinner() {
@@ -102,20 +101,12 @@ class Spinner {
   }
 
   show() {
-    this.timeoutId = setTimeout(() => {
-      document.querySelector(".content").append(this.overlay, this.spinner);
-    }, 200);
+    document.querySelector(".content").append(this.overlay, this.spinner);
   }
 
   hide() {
-    if (this.timeoutId) {
-      clearTimeout(this.timeoutId);
-      this.timeoutId = null;
-    }
-    if (document.querySelector("#map-spinner")) {
-      document.querySelector(".content").removeChild(this.spinner);
-      document.querySelector(".content").removeChild(this.overlay);
-    }
+    document.querySelector(".content").removeChild(this.spinner);
+    document.querySelector(".content").removeChild(this.overlay);
   }
 }
 
