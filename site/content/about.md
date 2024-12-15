@@ -170,9 +170,8 @@ cartographic boundaries converted to [PMTiles](https://github.com/protomaps/PMTi
 using [Tippecanoe](https://github.com/felt/tippecanoe) and hosted on R2.
 
 When you click the map, your browser queries the Parquet files on the public
-bucket using [DuckDB compiled to WebAssembly](https://duckdb.org/docs/api/wasm/overview.html).
-It then updates the map fill using the returned destination IDs
-and times.
+bucket using [hyparquet](https://github.com/hyparam/hyparquet). It then updates
+the map fill using the returned destination IDs and times.
 
 #### Why is the homepage slow sometimes?
 
