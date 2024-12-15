@@ -142,20 +142,28 @@ class Spinner {
   show() {
     document.querySelector(".content").append(this.spinner);
     this.spinner.style.transform = "scaleX(0.05)";
+    this.spinner.classList.remove("spinner-fade-out");
   }
 
   hide() {
-    setTimeout(() => {
-      const contentNode = document.querySelector(".content");
-      if (contentNode.contains(this.spinner)) {
-        contentNode.removeChild(this.spinner);
-      }
-    }, 700);
+    const contentNode = document.querySelector(".content");
+    if (contentNode.contains(this.spinner)) {
+      this.spinner.addEventListener("transitionend", (event) => {
+        if (event.propertyName === "transform") {
+          this.spinner.classList.add("spinner-fade-out");
+        }
+      }, { once: true });
+      this.spinner.addEventListener("transitionend", (event) => {
+        if (event.propertyName === "opacity") {
+          contentNode.removeChild(this.spinner);
+        }
+      }, { once: true });
+    }
   }
 
   updateProgress(percentage) {
     const minProgress = 5,
-      progress = Math.max(percentage / 1, minProgress);
+      progress = Math.max(percentage, minProgress);
     this.spinner.style.transform = `scaleX(${progress / 100})`;
   }
 }
@@ -462,6 +470,10 @@ class ParquetProcessor {
       return results;
     }
 
+    // Initialize progress bar
+    let completedGroups = 0,
+      totalGroups = 0;
+
     // Process the metadata for each URL
     // eslint-disable-next-line one-var
     const rowGroupResults = urls.map(async (url) => {
@@ -470,6 +482,8 @@ class ParquetProcessor {
       // eslint-disable-next-line one-var
       const buffer = await asyncBufferFromUrl({ byteLength: contentLength, url }),
         metadata = await this.fetchAndCacheMetadata(url);
+
+      totalGroups += metadata.row_groups.length;
 
       let rowStart = 0;
       for (const rowGroup of metadata.row_groups) {
@@ -491,26 +505,27 @@ class ParquetProcessor {
             }
           }
         }
+        completedGroups += 1;
+        const progress = Math.ceil((completedGroups / totalGroups) * 10);
+        map.spinner.updateProgress(progress);
         rowStart += Number(rowGroup.num_rows);
       }
 
       return rowGroupMetadata;
     });
 
-    // Initialize progress bar
-    let completedGroups = 0;
 
     // Async query the rowgroups relevant to the input ID
     // eslint-disable-next-line one-var
     let rowGroupItems = await Promise.all(rowGroupResults);
     rowGroupItems = rowGroupItems.flat().filter(item => item.length !== 0);
+    completedGroups = 0;
 
-    // eslint-disable-next-line one-var
-    const totalGroups = rowGroupItems.length;
+    totalGroups = rowGroupItems.length;
     await Promise.all(rowGroupItems.map(async (rg) => {
       await this.readAndUpdateMap(map, rg.id, rg.file, rg.metadata, rg.rowGroup, results);
       completedGroups += 1;
-      const progress = (completedGroups / totalGroups) * 100;
+      const progress = Math.ceil((completedGroups / totalGroups) * 90) + 10;
       map.spinner.updateProgress(progress);
     }));
     return results;

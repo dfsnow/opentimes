@@ -340,11 +340,16 @@ blockquote,
   left: 0;
   width: 100%;
   height: 4px;
+  opacity: 1;
   background: #3498db;
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 0.4s ease;
+  transition: transform 0.4s ease, opacity 0.4s ease-out;
   z-index: 1001;
+}
+
+.spinner-fade-out {
+  opacity: 0 !important;
 }
 
 #map-color-scale {
@@ -410,9 +415,11 @@ blockquote,
   0% {
     transform: translateX(-100%);
   }
+
   50% {
     transform: translateX(100%);
   }
+
   100% {
     transform: translateX(-100%);
   }
