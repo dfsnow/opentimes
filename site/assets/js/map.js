@@ -86,6 +86,7 @@ class Spinner {
   constructor() {
     this.spinner = this.createSpinner();
     this.overlay = this.createOverlay();
+    this.timeoutId = null;
   }
 
   createSpinner() {
@@ -101,12 +102,20 @@ class Spinner {
   }
 
   show() {
-    document.querySelector(".content").append(this.overlay, this.spinner);
+    this.timeoutId = setTimeout(() => {
+      document.querySelector(".content").append(this.overlay, this.spinner);
+    }, 200);
   }
 
   hide() {
-    document.querySelector(".content").removeChild(this.spinner);
-    document.querySelector(".content").removeChild(this.overlay);
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId);
+      this.timeoutId = null;
+    }
+    if (document.querySelector("#map-spinner")) {
+      document.querySelector(".content").removeChild(this.spinner);
+      document.querySelector(".content").removeChild(this.overlay);
+    }
   }
 }
 
@@ -196,19 +205,19 @@ function addMapLayers(map) {
   }, firstSymbolId);
 }
 
-function updateMapFill(map, previousStates) {
-  previousStates.forEach(state =>
+function updateMapFill(map, previousResults) {
+  previousResults.forEach(row =>
     map.setFeatureState(
-      { source: "protomap", sourceLayer: "tracts", id: state.id },
-      { tract_color: getColorScale(state.duration, map.getZoom()) }
+      { source: "protomap", sourceLayer: "tracts", id: row.id },
+      { tract_color: getColorScale(row.duration, map.getZoom()) }
     )
   );
 }
 
-function wipeMapPreviousState(map, previousStates) {
-  previousStates.forEach(state =>
+function wipeMapPreviousState(map, previousResults) {
+  previousResults.forEach(row =>
     map.setFeatureState(
-      { source: "protomap", sourceLayer: "tracts", id: state.id },
+      { source: "protomap", sourceLayer: "tracts", id: row.id },
       { tract_color: "none" }
     )
   );
@@ -243,7 +252,7 @@ function getThresholdsForZoom(zoom) {
   }
 }
 
-async function runQuery(map, state, id, previousStates, byteLengthCache, metadataCache) {
+async function runQuery(map, state, id, previousResults, byteLengthCache, metadataCache) {
   const queryUrl = `${baseUrl}/state=${state}/times-0.0.1-auto-2024-tract-${state}`;
   const urlsArray = bigStates.includes(state)
     ? [`${queryUrl}-0.parquet`, `${queryUrl}-1.parquet`]
@@ -273,92 +282,66 @@ async function runQuery(map, state, id, previousStates, byteLengthCache, metadat
     return metadata;
   }
 
-  async function fetchDataFromRowGroups(urls, id, byteLengthCache, metadataCache) {
-    let dataArray = [];
-    for (const url of urls) {
-      let metadata = await fetchAndCacheMetadata(url, byteLengthCache, metadataCache);
+  async function updateMapFromParquet(map, urls, id, byteLengthCache, metadataCache) {
+    const results = [];
+
+    const dataPromises = urls.map(async (url) => {
+      const metadata = await fetchAndCacheMetadata(url, byteLengthCache, metadataCache);
+      const contentLength = byteLengthCache[url];
+      const buffer = await asyncBufferFromUrl({ url, byteLength: contentLength });
+
+      const rowGroupPromises = [];
       let rowStart = 0;
+
       for (const rowGroup of metadata.row_groups) {
         for (const column of rowGroup.columns) {
           if (column.meta_data.path_in_schema.includes("origin_id")) {
             const minValue = column.meta_data.statistics.min_value;
             const maxValue = column.meta_data.statistics.max_value;
+            const startRow = rowStart;
+            const endRow = rowStart + Number(rowGroup.num_rows) - 1;
             if (id >= minValue && id <= maxValue) {
-              const contentLength = byteLengthCache[url];
-              const buffer = await asyncBufferFromUrl({
-                url,
-                byteLength: parseInt(contentLength)
-              });
-              await parquetRead(
-                {
-                  file: buffer,
-                  compressors: compressors,
-                  metadata: metadata,
-                  rowStart: rowStart,
-                  rowEnd: rowStart + parseInt(rowGroup.num_rows),
-                  columns: ["destination_id", "duration_sec"],
-                  onComplete: data => dataArray.push(data)
-                }
-              )
+              rowGroupPromises.push(
+                parquetRead(
+                  {
+                    file: buffer,
+                    compressors: compressors,
+                    metadata: metadata,
+                    rowStart: startRow,
+                    rowEnd: endRow,
+                    columns: ["origin_id", "destination_id", "duration_sec"],
+                    onComplete: data => {
+                      data.forEach(row => {
+                        if (row[0] === id) {
+                          map.setFeatureState(
+                            { source: "protomap", sourceLayer: "tracts", id: row[1] },
+                            { tract_color: getColorScale(row[2], map.getZoom()) }
+                          );
+                        }
+                        results.push({ id: row[1], duration: row[2] });
+                      });
+                    }
+                  }
+                )
+              );
             }
           }
         }
-        rowStart += parseInt(rowGroup.num_rows)
+        rowStart += Number(rowGroup.num_rows);
       }
-    }
-    const mergedDataArray = [].concat(...dataArray);
-    console.log(mergedDataArray);
+      await Promise.all(rowGroupPromises);
+    });
+
+    await Promise.all(dataPromises);
+    return results;
   }
 
-  for (const url of urlsArray) {
-    const metadata = await fetchAndCacheMetadata(url, byteLengthCache, metadataCache);
-    console.log(metadata);
-  }
+  wipeMapPreviousState(map, previousResults)
+  const results = await updateMapFromParquet(
+    map, urlsArray, id, byteLengthCache, metadataCache
+  );
 
-  fetchDataFromRowGroups(urlsArray, id, byteLengthCache, metadataCache);
-
-  //await parquetRead({
-  //  file: await asyncBufferFromUrl({ url: fullUrl, byteLength: parseInt(contentLength) }),
-  //  columns: ['origin_id', 'duration_sec'],
-  //  compressors: compressors,
-  //  rowStart: 10,
-  //  rowEnd: 20,
-  //  onComplete: data => console.log(data)
-  //})
-  //
-  //let result;
-  //try {
-  //  result = await db.query(`
-  //    SELECT *
-  //    FROM read_parquet([${joinedUrls}])
-  //    WHERE version = '0.0.1'
-  //        AND mode = 'auto'
-  //        AND year = '2024'
-  //        AND geography = 'tract'
-  //        AND centroid_type = 'weighted'
-  //        AND state = '${state}'
-  //        AND origin_id = '${id}'
-  //  `);
-  //} catch (error) {
-  //  console.error("Error executing query:", error);
-  //  return previousStates;
-  //}
-  //
-  //if (result.length === 0) {
-  //  console.error("No results found for the query.");
-  //  return previousStates;
-  //}
-  //
-  //wipeMapPreviousState(map, previousStates)
-  //const returnStates = result.toArray().map(row => {
-  //  map.setFeatureState(
-  //    { source: "protomap", sourceLayer: "tracts", id: row.destination_id },
-  //    { tract_color: getColorScale(row.duration_sec, map.getZoom()) }
-  //  );
-  //  return { id: row.destination_id, duration: row.duration_sec };
-  //});
-  //
-  //return returnStates;
+  return results;
 }
 
 function debounce(func, wait) {
@@ -371,7 +354,7 @@ function debounce(func, wait) {
 
 (async () => {
   let hoveredPolygonId = null;
-  let previousStates = [];
+  let previousResults = [];
   let previousZoomLevel = null;
   const byteLengthCache = {};
   const metadataCache = {};
@@ -388,10 +371,10 @@ function debounce(func, wait) {
   // Load the previous map click if there was one
   let idParam = new URLSearchParams(window.location.search).get("id");
   if (idParam) {
-    previousStates = await runQuery(
+    previousResults = await runQuery(
       map,
       idParam.substring(0, 2), idParam,
-      previousStates,
+      previousResults,
       byteLengthCache,
       metadataCache
     );
@@ -446,7 +429,13 @@ function debounce(func, wait) {
     if (features.length > 0) {
       spinner.show();
       const feature = features[0];
-      previousStates = await runQuery(map, feature.properties.state, feature.properties.id, previousStates, byteLengthCache, metadataCache);
+      previousResults = await runQuery(
+        map,
+        feature.properties.state, feature.properties.id,
+        previousResults,
+        byteLengthCache,
+        metadataCache
+      );
 
       // Update the URL with ID
       window.history.replaceState({}, "", `?id=${feature.properties.id}${window.location.hash}`);
@@ -469,7 +458,7 @@ function debounce(func, wait) {
       );
 
       if (crossedThreshold) {
-        updateMapFill(map, previousStates);
+        updateMapFill(map, previousResults);
         colorScale.updateLabels(currentZoomLevel);
       }
     }
