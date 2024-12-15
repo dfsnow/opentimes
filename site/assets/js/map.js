@@ -119,55 +119,6 @@ class Spinner {
   }
 }
 
-class MapCache {
-  constructor() {
-    this.dbName = "mapCache";
-    this.storeName = "rowGroups";
-    this.db = null;
-  }
-
-  async init() {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open(this.dbName, 1);
-
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => {
-        this.db = request.result;
-        resolve();
-      };
-
-      request.onupgradeneeded = (event) => {
-        const db = event.target.result;
-        if (!db.objectStoreNames.contains(this.storeName)) {
-          db.createObjectStore(this.storeName);
-        }
-      };
-    });
-  }
-
-  async get(key) {
-    return new Promise((resolve, reject) => {
-      const transaction = this.db.transaction([this.storeName], "readonly");
-      const store = transaction.objectStore(this.storeName);
-      const request = store.get(key);
-
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => resolve(request.result);
-    });
-  }
-
-  async set(key, value) {
-    return new Promise((resolve, reject) => {
-      const transaction = this.db.transaction([this.storeName], "readwrite");
-      const store = transaction.objectStore(this.storeName);
-      const request = store.put(value, key);
-
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => resolve();
-    });
-  }
-}
-
 async function instantiateMap() {
   const map = new maplibregl.Map({
     style: "https://tiles.openfreemap.org/styles/positron",
@@ -301,7 +252,7 @@ function getThresholdsForZoom(zoom) {
   }
 }
 
-async function processParquetData(map, id, data, results, mapCache, cacheKey) {
+async function processParquetData(map, id, data, results) {
   data.forEach(row => {
     if (row[0] === id) {
       map.setFeatureState(
@@ -311,11 +262,6 @@ async function processParquetData(map, id, data, results, mapCache, cacheKey) {
       results.push({ id: row[1], duration: row[2] });
     }
   });
-  try {
-    await mapCache.set(cacheKey, data);
-  } catch (e) {
-    console.warn("Failed to cache results:", e);
-  }
 }
 
 async function fetchAndCacheMetadata(url, byteLengthCache, metadataCache) {
@@ -342,7 +288,7 @@ async function fetchAndCacheMetadata(url, byteLengthCache, metadataCache) {
   return metadata;
 }
 
-async function updateMapFromParquet(map, urls, id, byteLengthCache, metadataCache, mapCache) {
+async function updateMapFromParquet(map, urls, id, byteLengthCache, metadataCache) {
   const results = [];
 
   const dataPromises = urls.map(async (url) => {
@@ -362,31 +308,19 @@ async function updateMapFromParquet(map, urls, id, byteLengthCache, metadataCach
           const endRow = rowStart + Number(rowGroup.num_rows) - 1;
 
           if (id >= minValue && id <= maxValue) {
-            // Use cached rowGroup results if available
-            const cacheKey = `${url.split('/').pop()}-${startRow}-${endRow}`;
-            const cachedResults = await mapCache.get(cacheKey);
-
-            if (cachedResults) {
-              rowGroupPromises.push(
-                processParquetData(map, id, cachedResults, results, mapCache, cacheKey)
-              );
-            } else {
-              rowGroupPromises.push(
-                parquetRead(
-                  {
-                    file: buffer,
-                    compressors: compressors,
-                    metadata: metadata,
-                    rowStart: startRow,
-                    rowEnd: endRow,
-                    columns: ["origin_id", "destination_id", "duration_sec"],
-                    onComplete: data => processParquetData(
-                      map, id, data, results, mapCache, cacheKey
-                    )
-                  }
-                )
-              );
-            }
+            rowGroupPromises.push(
+              parquetRead(
+                {
+                  file: buffer,
+                  compressors: compressors,
+                  metadata: metadata,
+                  rowStart: startRow,
+                  rowEnd: endRow,
+                  columns: ["origin_id", "destination_id", "duration_sec"],
+                  onComplete: data => processParquetData(map, id, data, results)
+                }
+              )
+            );
           }
         }
       }
@@ -399,7 +333,7 @@ async function updateMapFromParquet(map, urls, id, byteLengthCache, metadataCach
   return results;
 }
 
-async function runQuery(map, state, id, previousResults, byteLengthCache, metadataCache, mapCache) {
+async function runQuery(map, state, id, previousResults, byteLengthCache, metadataCache) {
   const queryUrl = `${baseUrl}/state=${state}/times-0.0.1-auto-2024-tract-${state}`;
   const urlsArray = bigStates.includes(state)
     ? [`${queryUrl}-0.parquet`, `${queryUrl}-1.parquet`]
@@ -407,7 +341,7 @@ async function runQuery(map, state, id, previousResults, byteLengthCache, metada
 
   wipeMapPreviousState(map, previousResults)
   const results = await updateMapFromParquet(
-    map, urlsArray, id, byteLengthCache, metadataCache, mapCache
+    map, urlsArray, id, byteLengthCache, metadataCache
   );
 
   return results;
@@ -436,8 +370,6 @@ function debounce(func, wait) {
     (async () => createTractIdDisplay())()
   ]);
   const colorScale = new ColorScale(map);
-  const mapCache = new MapCache();
-  await mapCache.init();
 
   // Load the previous map click if there was one
   let idParam = new URLSearchParams(window.location.search).get("id");
@@ -447,8 +379,7 @@ function debounce(func, wait) {
       idParam.substring(0, 2), idParam,
       previousResults,
       byteLengthCache,
-      metadataCache,
-      mapCache
+      metadataCache
     );
   }
 
@@ -506,8 +437,7 @@ function debounce(func, wait) {
         feature.properties.state, feature.properties.id,
         previousResults,
         byteLengthCache,
-        metadataCache,
-        mapCache
+        metadataCache
       );
 
       // Update the URL with ID
