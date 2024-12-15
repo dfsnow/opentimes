@@ -148,11 +148,20 @@ class Spinner {
 
   show() {
     document.querySelector(".content").append(this.overlay, this.spinner);
+    document.body.classList.add("loading");
+    this.spinner.style.transform = "scaleX(0)";
   }
 
   hide() {
-    document.querySelector(".content").removeChild(this.spinner);
     document.querySelector(".content").removeChild(this.overlay);
+    document.body.classList.remove("loading");
+    setTimeout(() => {
+      document.querySelector(".content").removeChild(this.spinner);
+    }, 500);
+  }
+
+  updateProgress(percentage) {
+    this.spinner.style.transform = `scaleX(${percentage / 100})`;
   }
 }
 
@@ -431,19 +440,34 @@ class ParquetProcessor {
     this.previousResults = await this.updateMapOnQuery(map, urlsArray, id);
   }
 
+  async readAndUpdateMap(map, id, file, metadata, rowGroup, results) {
+    await parquetRead(
+      {
+        columns: ["origin_id", "destination_id", "duration_sec"],
+        compressors,
+        file,
+        metadata,
+        onComplete: data => this.processParquetRowGroup(map, id, data, results),
+        rowEnd: rowGroup.endRow,
+        rowStart: rowGroup.startRow
+      }
+    );
+  }
+
   async updateMapOnQuery(map, urls, id) {
     const results = [];
     if (!this.validIdInput(id)) {
       return results;
     }
 
+    // Process the metadata for each URL
     // eslint-disable-next-line one-var
-    const dataPromises = urls.map(async (url) => {
-      const contentLength = this.byteLengthCache[url];
+    const rowGroupResults = urls.map(async (url) => {
+      const contentLength = this.byteLengthCache[url],
+        rowGroupMetadata = [];
       // eslint-disable-next-line one-var
       const buffer = await asyncBufferFromUrl({ byteLength: contentLength, url }),
-        metadata = await this.fetchAndCacheMetadata(url),
-        rowGroupPromises = [];
+        metadata = await this.fetchAndCacheMetadata(url);
 
       let rowStart = 0;
       for (const rowGroup of metadata.row_groups) {
@@ -456,28 +480,37 @@ class ParquetProcessor {
               startRow = rowStart;
 
             if (id >= minValue && id <= maxValue) {
-              rowGroupPromises.push(
-                parquetRead(
-                  {
-                    columns: ["origin_id", "destination_id", "duration_sec"],
-                    compressors,
-                    file: buffer,
-                    metadata,
-                    onComplete: data => this.processParquetRowGroup(map, id, data, results),
-                    rowEnd: endRow,
-                    rowStart: startRow
-                  }
-                )
-              );
+              rowGroupMetadata.push({
+                file: buffer,
+                id,
+                metadata,
+                rowGroup: { endRow, startRow }
+              });
             }
           }
         }
         rowStart += Number(rowGroup.num_rows);
       }
-      await Promise.all(rowGroupPromises);
+
+      return rowGroupMetadata;
     });
 
-    await Promise.all(dataPromises);
+    // Initialize progress bar
+    let completedGroups = 0;
+
+    // Async query the rowgroups relevant to the input ID
+    // eslint-disable-next-line one-var
+    let rowGroupItems = await Promise.all(rowGroupResults);
+    rowGroupItems = rowGroupItems.flat().filter(item => item.length !== 0);
+
+    // eslint-disable-next-line one-var
+    const totalGroups = rowGroupItems.length;
+    await Promise.all(rowGroupItems.map(async (rg) => {
+      await this.readAndUpdateMap(map, rg.id, rg.file, rg.metadata, rg.rowGroup, results);
+      completedGroups += 1;
+      const progress = (completedGroups / totalGroups) * 100;
+      map.spinner.updateProgress(progress);
+    }));
     return results;
   }
 

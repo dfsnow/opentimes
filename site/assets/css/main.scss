@@ -39,6 +39,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+body.loading {
+  cursor: not-allowed;
+}
+
 a {
   color: var(--link-color);
   text-underline-offset: 0.15em;
@@ -336,14 +340,14 @@ blockquote,
 
 #map-spinner {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  border: 16px solid #cccccc;
-  border-top: 16px solid #3498db;
-  border-radius: 50%;
-  width: 6em;
-  height: 6em;
-  animation: spinner 1s linear infinite;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: #3498db;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
   z-index: 1001;
 }
 
@@ -353,7 +357,7 @@ blockquote,
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.0);
   z-index: 1000;
 }
 
@@ -416,13 +420,15 @@ blockquote,
 }
 
 
-@keyframes spinner {
+@keyframes loading-bar-animation {
   0% {
-    transform: translate(-50%, -50%) rotate(0deg);
+    transform: translateX(-100%);
   }
-
+  50% {
+    transform: translateX(100%);
+  }
   100% {
-    transform: translate(-50%, -50%) rotate(360deg);
+    transform: translateX(-100%);
   }
 }
 
