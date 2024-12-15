@@ -255,13 +255,13 @@ class Map {
       if (this.isProcessing) {
         return;
       }
-      this.isProcessing = true;
-      this.spinner.show();
       const features = this.map.queryRenderedFeatures(
         feat.point,
         { layers: ["tracts_fill"] }
       );
       if (features.length > 0) {
+        this.spinner.show();
+        this.isProcessing = true;
         const [feature] = features;
         await this.processor.runQuery(
           this,
