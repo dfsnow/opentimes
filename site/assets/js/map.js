@@ -5,9 +5,6 @@ const BASE_URL = "https://data.opentimes.org/times/version=0.0.1/mode=auto/year=
 const BIG_STATES = ["06", "36"];
 const ZOOM_THRESHOLDS = [6, 8];
 
-const protocol = new pmtiles.Protocol();
-maplibregl.addProtocol("pmtiles", protocol.tile);
-
 class ColorScale {
   constructor(zoomLower, zoomUpper) {
     this.scaleContainer = this.createScaleContainer();
@@ -143,6 +140,9 @@ class Map {
   }
 
   async init() {
+    const protocol = new pmtiles.Protocol();
+    maplibregl.addProtocol("pmtiles", protocol.tile);
+
     this.map = new maplibregl.Map({
       style: "https://tiles.openfreemap.org/styles/positron",
       center: [-74.0, 40.75],
@@ -396,6 +396,9 @@ class ParquetProcessor {
 
   async updateMapOnQuery(map, urls, id) {
     const results = [];
+    if (!this.validIdInput(id)) {
+      return results;
+    }
 
     const dataPromises = urls.map(async (url) => {
       const metadata = await this.fetchAndCacheMetadata(url);
@@ -438,6 +441,15 @@ class ParquetProcessor {
     await Promise.all(dataPromises);
     return results;
   }
+
+  validIdInput(id) {
+    if (id && /^\d{11}$/.test(id)) {
+      return true;
+    } else {
+      console.warn("Invalid ID input. Please enter a valid 11-digit tract ID.")
+      return false;
+    }
+  }
 }
 
 function debounce(func, wait) {
@@ -449,26 +461,28 @@ function debounce(func, wait) {
 }
 
 (async () => {
-  let idParam = new URLSearchParams(window.location.search).get("id");
   const spinner = new Spinner();
-  const colorScale = new ColorScale(ZOOM_THRESHOLDS[0], ZOOM_THRESHOLDS[1]);
-  const processor = new ParquetProcessor(BASE_URL);
-
   spinner.show();
 
+  const colorScale = new ColorScale(ZOOM_THRESHOLDS[0], ZOOM_THRESHOLDS[1]);
+  const processor = new ParquetProcessor(BASE_URL);
   const map = new Map(colorScale, spinner, processor);
   colorScale.draw(map.map);
 
-  // Load the previous map click if there was one
-  if (idParam) {
-    await processor.runQuery(map, idParam.substring(0, 2), idParam);
-  }
+  // Wait for the map to fully load before running a query
+  map.map.on("load", async () => {
+    // Load the previous map click if there was one
+    const idParam = new URLSearchParams(window.location.search).get("id");
+    if (idParam) {
+      await processor.runQuery(map, idParam.substring(0, 2), idParam);
+    }
 
-  // Remove the hash if map is at starting location
-  if (window.location.hash === "#10/40.75/-74") {
-    console.log(window.location.hash);
-    window.history.replaceState({}, "", window.location.pathname + window.location.search);
-  }
+    // Remove the hash if map is at starting location
+    if (window.location.hash === "#10/40.75/-74") {
+      console.log(window.location.hash);
+      window.history.replaceState({}, "", window.location.pathname + window.location.search);
+    }
 
-  spinner.hide();
+    spinner.hide();
+  });
 })();
