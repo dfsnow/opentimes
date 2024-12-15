@@ -532,7 +532,6 @@ class ParquetProcessor {
     // eslint-disable-next-line sort-vars
     map = new Map(colorScale, spinner, processor);
 
-  spinner.show();
   colorScale.draw(map.map);
 
   // Wait for the map to fully load before running a query
@@ -540,6 +539,7 @@ class ParquetProcessor {
     // Load the previous map click if there was one
     const idParam = new URLSearchParams(window.location.search).get("id");
     if (idParam) {
+      spinner.show();
       await processor.runQuery(map, idParam.substring(0, 2), idParam);
     }
 
