@@ -149,7 +149,7 @@ class Spinner {
   show() {
     document.querySelector(".content").append(this.overlay, this.spinner);
     document.body.classList.add("loading");
-    this.spinner.style.transform = "scaleX(0)";
+    this.spinner.style.transform = "scaleX(0.05)";
   }
 
   hide() {
@@ -157,11 +157,13 @@ class Spinner {
     document.body.classList.remove("loading");
     setTimeout(() => {
       document.querySelector(".content").removeChild(this.spinner);
-    }, 500);
+    }, 700);
   }
 
   updateProgress(percentage) {
-    this.spinner.style.transform = `scaleX(${percentage / 100})`;
+    const minProgress = 5,
+      progress = Math.max(percentage / 1, minProgress);
+    this.spinner.style.transform = `scaleX(${progress / 100})`;
   }
 }
 
