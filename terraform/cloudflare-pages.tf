@@ -12,7 +12,7 @@ resource "cloudflare_pages_project" "opentimes-org" {
       pr_comments_enabled           = true
       deployments_enabled           = true
       production_deployment_enabled = true
-      preview_deployment_setting    = "custom"
+      preview_deployment_setting    = "all"
       preview_branch_includes       = ["dev", "preview"]
       preview_branch_excludes       = ["main"]
     }
@@ -28,11 +28,13 @@ resource "cloudflare_pages_project" "opentimes-org" {
     preview {
       environment_variables = {
         ENVIRONMENT = "preview"
+        HUGO_VERSION = var.hugo_version
       }
     }
     production {
       environment_variables = {
         ENVIRONMENT = "production"
+        HUGO_VERSION = var.hugo_version
       }
     }
   }

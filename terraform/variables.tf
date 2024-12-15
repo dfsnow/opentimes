@@ -6,3 +6,8 @@ variable "cloudflare_account_id" {
 variable "cloudflare_api_token" {
   type = string
 }
+
+variable "hugo_version" {
+  type    = string
+  default = "0.139.2"
+}

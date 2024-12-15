@@ -13,7 +13,8 @@ resource "cloudflare_ruleset" "cache_data_subdomain" {
         default = 1209600
       }
       browser_ttl {
-        mode = "bypass"
+        mode    = "override_origin"
+        default = 7200
       }
       serve_stale {
         disable_stale_while_updating = true
