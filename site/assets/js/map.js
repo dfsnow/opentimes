@@ -145,6 +145,13 @@ class Spinner {
     this.spinner.classList.remove("spinner-fade-out");
   }
 
+  remove() {
+    const contentNode = document.querySelector(".content");
+    if (contentNode.contains(this.spinner)) {
+      contentNode.removeChild(this.spinner);
+    }
+  }
+
   hide() {
     const contentNode = document.querySelector(".content");
     if (contentNode.contains(this.spinner)) {
@@ -279,8 +286,8 @@ class Map {
 
         // Update the URL with ID
         window.history.replaceState({}, "", `?id=${feature.properties.id}${window.location.hash}`);
-        this.spinner.hide();
         this.isProcessing = false;
+        this.spinner.hide();
       }
     });
 
@@ -522,6 +529,12 @@ class ParquetProcessor {
     completedGroups = 0;
 
     totalGroups = rowGroupItems.length;
+    if (totalGroups === 0) {
+      console.warn("No data found for the given ID.");
+      map.spinner.remove();
+      return results;
+    }
+
     await Promise.all(rowGroupItems.map(async (rg) => {
       await this.readAndUpdateMap(map, rg.id, rg.file, rg.metadata, rg.rowGroup, results);
       completedGroups += 1;
