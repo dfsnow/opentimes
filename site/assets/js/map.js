@@ -1,9 +1,30 @@
+/* eslint-disable no-useless-assignment */
+/* eslint-disable no-console */
+/* eslint-disable max-params */
+/* eslint-disable max-lines */
+/* eslint-disable max-statements */
+/* eslint-disable max-lines-per-function */
+/* eslint-disable max-classes-per-file */
+/* eslint-disable no-magic-numbers */
+/* eslint-disable no-undef */
+/* eslint-disable class-methods-use-this */
 import { asyncBufferFromUrl, byteLengthFromUrl, parquetMetadataAsync, parquetRead } from "hyparquet";
-import { compressors } from "hyparquet-compressors"
+import { compressors } from "hyparquet-compressors";
 
-const BASE_URL = "https://data.opentimes.org/times/version=0.0.1/mode=auto/year=2024/geography=tract"
-const BIG_STATES = ["06", "36"];
-const ZOOM_THRESHOLDS = [6, 8];
+const BASE_URL = "https://data.opentimes.org/times/version=0.0.1/mode=auto/year=2024/geography=tract",
+  BIG_STATES = ["06", "36"],
+  ZOOM_THRESHOLDS = [6, 8];
+
+// eslint-disable-next-line one-var
+const debounce = function debounce(func, wait) {
+  let timeout = null;
+  return function debouncedFunction(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      func(...args);
+    }, wait);
+  };
+};
 
 class ColorScale {
   constructor(zoomLower, zoomUpper) {
@@ -26,7 +47,11 @@ class ColorScale {
     button.innerHTML = "&#x2212;";
     button.onclick = () => {
       const isCollapsed = this.scaleContainer.classList.toggle("collapsed");
-      button.innerHTML = isCollapsed ? "&#x2b;" : "&#x2212;";
+      if (isCollapsed) {
+        button.innerHTML = "&#x2b;";
+      } else {
+        button.innerHTML = "&#x2212;";
+      }
     };
     return button;
   }
@@ -37,9 +62,9 @@ class ColorScale {
     this.scaleContainer.append(legendTitle);
 
     this.colors.forEach(({ color, label }) => {
-      const item = document.createElement("div");
-      const colorBox = document.createElement("div");
-      const text = document.createElement("span");
+      const colorBox = document.createElement("div"),
+        item = document.createElement("div"),
+        text = document.createElement("span");
       text.textContent = label;
       colorBox.style.backgroundColor = color;
       item.append(colorBox, text);
@@ -61,14 +86,16 @@ class ColorScale {
     ];
   }
 
+
   getColorScale(duration, zoom) {
-    const thresholds = this.getThresholdsForZoom(zoom);
-    if (duration < thresholds[0]) return "color_1";
-    if (duration < thresholds[1]) return "color_2";
-    if (duration < thresholds[2]) return "color_3";
-    if (duration < thresholds[3]) return "color_4";
-    if (duration < thresholds[4]) return "color_5";
-    if (duration < thresholds[5]) return "color_6";
+    const colors = ["color_1", "color_2", "color_3", "color_4", "color_5", "color_6"],
+      thresholds = this.getThresholdsForZoom(zoom);
+    for (let index = 0; index < thresholds.length; index += 1) {
+      if (duration < thresholds[index]) {
+        return colors[index];
+      }
+    }
+
     return "none";
   }
 
@@ -77,9 +104,9 @@ class ColorScale {
       return ["< 1 hr", "1-2 hrs", "2-3 hrs", "3-4 hrs", "4-5 hrs", "5-6 hrs"];
     } else if (zoom < this.zoomUpper) {
       return ["< 30 min", "30-60 min", "1.0-1.5 hrs", "1.5-2.0 hrs", "2.5-3.0 hrs", "3.0-3.5 hrs"];
-    } else {
-      return ["< 15 min", "15-30 min", "30-45 min", "45-60 min", "60-75 min", "75-90 min"];
     }
+    return ["< 15 min", "15-30 min", "30-45 min", "45-60 min", "60-75 min", "75-90 min"];
+
   }
 
   getThresholdsForZoom(zoom) {
@@ -87,14 +114,14 @@ class ColorScale {
       return [3600, 7200, 10800, 14400, 21600, 28800];
     } else if (zoom < this.zoomUpper) {
       return [1800, 3600, 5400, 7200, 10800, 14400];
-    } else {
-      return [900, 1800, 2700, 3600, 5400, 7200];
     }
+    return [900, 1800, 2700, 3600, 5400, 7200];
+
   }
 
   updateLabels(zoom) {
-    const labels = this.getLabelsForZoom(zoom);
-    const items = this.scaleContainer.querySelectorAll("div > span");
+    const items = this.scaleContainer.querySelectorAll("div > span"),
+      labels = this.getLabelsForZoom(zoom);
     items.forEach((item, index) => {
       item.textContent = labels[index];
     });
@@ -139,32 +166,32 @@ class Map {
     this.previousZoomLevel = null;
   }
 
-  async init() {
+  init() {
     const protocol = new pmtiles.Protocol();
     maplibregl.addProtocol("pmtiles", protocol.tile);
 
     this.map = new maplibregl.Map({
-      style: "https://tiles.openfreemap.org/styles/positron",
       center: [-74.0, 40.75],
-      zoom: 10,
-      pitchWithRotate: false,
-      doubleClickZoom: false,
       container: "map",
-      maxZoom: 12,
-      minZoom: 2,
+      doubleClickZoom: false,
       hash: true,
       maxBounds: [
         [-175.0, -9.0],
         [-20.0, 72.1],
       ],
+      maxZoom: 12,
+      minZoom: 2,
+      pitchWithRotate: false,
+      style: "https://tiles.openfreemap.org/styles/positron",
+      zoom: 10,
     });
 
     return new Promise((resolve) => {
       this.map.on("load", () => {
         this.map.addSource("protomap", {
+          promoteId: "id",
           type: "vector",
           url: "pmtiles://https://data.opentimes.org/tiles/tracts_2024.pmtiles",
-          promoteId: "id",
         });
 
         this.map.addControl(new maplibregl.NavigationControl(), "bottom-right");
@@ -172,31 +199,32 @@ class Map {
         resolve(this.map);
 
         this.tractIdDisplay = this.createTractIdDisplay();
-        this.addHandlers()
+        this.addHandlers();
       });
     });
   }
 
   addHandlers() {
-    this.map.on("mousemove", (e) => {
+    this.map.on("mousemove", (feat) => {
       const features = this.map.queryRenderedFeatures(
-        e.point,
+        feat.point,
         { layers: ["tracts_fill"] }
       );
-      const feature = features[0];
+      // eslint-disable-next-line one-var
+      const [feature] = features;
       if (feature) {
         this.map.getCanvas().style.cursor = "pointer";
         this.tractIdDisplay.style.display = "block";
         this.tractIdDisplay.textContent = `Tract ID: ${feature.properties.id}`;
         if (this.hoveredPolygonId !== null) {
           this.map.setFeatureState(
-            { source: "protomap", sourceLayer: "tracts", id: this.hoveredPolygonId },
+            { id: this.hoveredPolygonId, source: "protomap", sourceLayer: "tracts" },
             { hover: false }
           );
         }
         this.hoveredPolygonId = feature.properties.id;
         this.map.setFeatureState(
-          { source: "protomap", sourceLayer: "tracts", id: this.hoveredPolygonId },
+          { id: this.hoveredPolygonId, source: "protomap", sourceLayer: "tracts" },
           { hover: true }
         );
       } else {
@@ -210,20 +238,20 @@ class Map {
     this.map.on("mouseleave", () => {
       if (this.hoveredPolygonId !== null) {
         this.map.setFeatureState(
-          { source: "protomap", sourceLayer: "tracts", id: this.hoveredPolygonId },
+          { id: this.hoveredPolygonId, source: "protomap", sourceLayer: "tracts" },
           { hover: false }
         );
       }
       this.hoveredPolygonId = null;
     });
 
-    this.map.on("click", async (e) => {
+    this.map.on("click", async (feat) => {
       const features = this.map.queryRenderedFeatures(
-        e.point,
+        feat.point,
         { layers: ["tracts_fill"] }
       );
       if (features.length > 0) {
-        const feature = features[0];
+        const [feature] = features;
         this.spinner.show();
         await this.processor.runQuery(
           this,
@@ -239,7 +267,11 @@ class Map {
 
     this.map.on("moveend", () => {
       const idParam = new URLSearchParams(window.location.search).get("id");
-      window.history.replaceState({}, "", `${idParam ? `?id=${idParam}` : ""}${window.location.hash}`);
+      if (idParam) {
+        window.history.replaceState({}, "", `?id=${idParam}${window.location.hash}`);
+      } else {
+        window.history.replaceState({}, "", `${window.location.hash}`);
+      }
     });
 
     this.map.on("zoom", debounce(() => {
@@ -261,9 +293,9 @@ class Map {
   }
 
   addMapLayers() {
-    const layers = this.map.getStyle().layers;
+    const { layers } = this.map.getStyle();
     // Find the index of the first symbol layer in the map style
-    let firstSymbolId;
+    let firstSymbolId = null;
     for (const layer of layers) {
       if (layer.type === "symbol") {
         firstSymbolId = layer.id;
@@ -271,39 +303,36 @@ class Map {
       }
     }
     this.map.addLayer({
-      id: "tracts_fill",
-      type: "fill",
-      source: "protomap",
-      "source-layer": "tracts",
       filter: ["==", ["geometry-type"], "Polygon"],
+      id: "tracts_fill",
       paint: {
         "fill-color": [
           "case",
-          ["==", ["feature-state", "tract_color"], "color_1"], "rgba(253, 231, 37, 0.4)",
-          ["==", ["feature-state", "tract_color"], "color_2"], "rgba(122, 209, 81, 0.4)",
-          ["==", ["feature-state", "tract_color"], "color_3"], "rgba(34, 168, 132, 0.4)",
-          ["==", ["feature-state", "tract_color"], "color_4"], "rgba(42, 120, 142, 0.4)",
-          ["==", ["feature-state", "tract_color"], "color_5"], "rgba(65, 68, 135, 0.4)",
-          ["==", ["feature-state", "tract_color"], "color_6"], "rgba(68, 1, 84, 0.4)",
+          ["==", ["feature-state", "tractColor"], "color_1"], "rgba(253, 231, 37, 0.4)",
+          ["==", ["feature-state", "tractColor"], "color_2"], "rgba(122, 209, 81, 0.4)",
+          ["==", ["feature-state", "tractColor"], "color_3"], "rgba(34, 168, 132, 0.4)",
+          ["==", ["feature-state", "tractColor"], "color_4"], "rgba(42, 120, 142, 0.4)",
+          ["==", ["feature-state", "tractColor"], "color_5"], "rgba(65, 68, 135, 0.4)",
+          ["==", ["feature-state", "tractColor"], "color_6"], "rgba(68, 1, 84, 0.4)",
           "rgba(255, 255, 255, 0.0)"
         ],
       },
+      source: "protomap",
+      "source-layer": "tracts",
+      type: "fill",
     }, firstSymbolId);
 
     this.map.addLayer({
-      id: "tracts_line",
-      type: "line",
-      source: "protomap",
-      "source-layer": "tracts",
       filter: ["==", ["geometry-type"], "Polygon"],
+      id: "tracts_line",
       paint: {
+        "line-color": "#333",
         "line-opacity": [
           "case",
           ["boolean", ["feature-state", "hover"], false],
           0.5,
           0.0
         ],
-        "line-color": "#333",
         "line-width": [
           "case",
           ["boolean", ["feature-state", "hover"], false],
@@ -311,13 +340,17 @@ class Map {
           1
         ]
       },
+      source: "protomap",
+      "source-layer": "tracts",
+      type: "line",
     }, firstSymbolId);
   }
 
   createTractIdDisplay() {
     const display = document.createElement("div");
     display.id = "map-info";
-    display.style.display = "none"; // Initially hidden
+    // Initially hidden
+    display.style.display = "none";
     document.body.append(display);
     return display;
   }
@@ -325,8 +358,8 @@ class Map {
   updateMapFill(previousResults) {
     previousResults.forEach(row =>
       this.map.setFeatureState(
-        { source: "protomap", sourceLayer: "tracts", id: row.id },
-        { tract_color: this.colorScale.getColorScale(row.duration, this.map.getZoom()) }
+        { id: row.id, source: "protomap", sourceLayer: "tracts" },
+        { tractColor: this.colorScale.getColorScale(row.duration, this.map.getZoom()) }
       )
     );
   }
@@ -334,8 +367,8 @@ class Map {
   wipeMapPreviousState(previousResults) {
     previousResults.forEach(row =>
       this.map.setFeatureState(
-        { source: "protomap", sourceLayer: "tracts", id: row.id },
-        { tract_color: "none" }
+        { id: row.id, source: "protomap", sourceLayer: "tracts" },
+        { tractColor: "none" }
       )
     );
   }
@@ -350,47 +383,51 @@ class ParquetProcessor {
   }
 
   async fetchAndCacheMetadata(url) {
-    let contentLength = null;
-    if (!this.byteLengthCache[url]) {
+    let contentLength = null,
+      metadata = null;
+    if (this.byteLengthCache[url]) {
+      contentLength = this.byteLengthCache[url];
+    } else {
       contentLength = await byteLengthFromUrl(url);
       this.byteLengthCache[url] = contentLength;
-    } else {
-      contentLength = this.byteLengthCache[url];
     }
 
-    let metadata = null;
-    if (!this.metadataCache[url]) {
+    if (this.metadataCache[url]) {
+      metadata = this.metadataCache[url];
+    } else {
       const buffer = await asyncBufferFromUrl({
+        byteLength: Number(contentLength),
         url,
-        byteLength: parseInt(contentLength)
       });
       metadata = await parquetMetadataAsync(buffer);
       this.metadataCache[url] = metadata;
-    } else {
-      metadata = this.metadataCache[url];
     }
     return metadata;
   }
 
-  async processParquetRowGroup(map, id, data, results) {
+  processParquetRowGroup(map, id, data, results) {
     data.forEach(row => {
       if (row[0] === id) {
         map.map.setFeatureState(
-          { source: "protomap", sourceLayer: "tracts", id: row[1] },
-          { tract_color: map.colorScale.getColorScale(row[2], map.map.getZoom()) }
+          { id: row[1], source: "protomap", sourceLayer: "tracts" },
+          { tractColor: map.colorScale.getColorScale(row[2], map.map.getZoom()) }
         );
-        results.push({ id: row[1], duration: row[2] });
+        results.push({ duration: row[2], id: row[1] });
       }
     });
   }
 
   async runQuery(map, state, id) {
     const queryUrl = `${this.baseUrl}/state=${state}/times-0.0.1-auto-2024-tract-${state}`;
-    const urlsArray = BIG_STATES.includes(state)
-      ? [`${queryUrl}-0.parquet`, `${queryUrl}-1.parquet`]
-      : [`${queryUrl}-0.parquet`];
 
-    map.wipeMapPreviousState(this.previousResults)
+    let urlsArray = [];
+    if (BIG_STATES.includes(state)) {
+      urlsArray = [`${queryUrl}-0.parquet`, `${queryUrl}-1.parquet`];
+    } else {
+      urlsArray = [`${queryUrl}-0.parquet`];
+    }
+
+    map.wipeMapPreviousState(this.previousResults);
     this.previousResults = await this.updateMapOnQuery(map, urlsArray, id);
   }
 
@@ -400,33 +437,35 @@ class ParquetProcessor {
       return results;
     }
 
+    // eslint-disable-next-line one-var
     const dataPromises = urls.map(async (url) => {
-      const metadata = await this.fetchAndCacheMetadata(url);
       const contentLength = this.byteLengthCache[url];
-      const buffer = await asyncBufferFromUrl({ url, byteLength: contentLength });
+      // eslint-disable-next-line one-var
+      const buffer = await asyncBufferFromUrl({ byteLength: contentLength, url }),
+        metadata = await this.fetchAndCacheMetadata(url),
+        rowGroupPromises = [];
 
-      const rowGroupPromises = [];
       let rowStart = 0;
-
       for (const rowGroup of metadata.row_groups) {
         for (const column of rowGroup.columns) {
           if (column.meta_data.path_in_schema.includes("origin_id")) {
-            const minValue = column.meta_data.statistics.min_value;
-            const maxValue = column.meta_data.statistics.max_value;
-            const startRow = rowStart;
-            const endRow = rowStart + Number(rowGroup.num_rows) - 1;
+            const
+              endRow = rowStart + Number(rowGroup.num_rows) - 1,
+              maxValue = column.meta_data.statistics.max_value,
+              minValue = column.meta_data.statistics.min_value,
+              startRow = rowStart;
 
             if (id >= minValue && id <= maxValue) {
               rowGroupPromises.push(
                 parquetRead(
                   {
-                    file: buffer,
-                    compressors: compressors,
-                    metadata: metadata,
-                    rowStart: startRow,
-                    rowEnd: endRow,
                     columns: ["origin_id", "destination_id", "duration_sec"],
-                    onComplete: data => this.processParquetRowGroup(map, id, data, results)
+                    compressors,
+                    file: buffer,
+                    metadata,
+                    onComplete: data => this.processParquetRowGroup(map, id, data, results),
+                    rowEnd: endRow,
+                    rowStart: startRow
                   }
                 )
               );
@@ -443,30 +482,22 @@ class ParquetProcessor {
   }
 
   validIdInput(id) {
-    if (id && /^\d{11}$/.test(id)) {
+    if (id && /^\d{11}$/u.test(id)) {
       return true;
-    } else {
-      console.warn("Invalid ID input. Please enter a valid 11-digit tract ID.")
-      return false;
     }
+    console.warn("Invalid ID input. Please enter a valid 11-digit tract ID.");
+    return false;
   }
 }
 
-function debounce(func, wait) {
-  let timeout;
-  return function(...args) {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func.apply(this, args), wait);
-  };
-}
+(() => {
+  const colorScale = new ColorScale(ZOOM_THRESHOLDS[0], ZOOM_THRESHOLDS[1]),
+    processor = new ParquetProcessor(BASE_URL),
+    spinner = new Spinner(),
+    // eslint-disable-next-line sort-vars
+    map = new Map(colorScale, spinner, processor);
 
-(async () => {
-  const spinner = new Spinner();
   spinner.show();
-
-  const colorScale = new ColorScale(ZOOM_THRESHOLDS[0], ZOOM_THRESHOLDS[1]);
-  const processor = new ParquetProcessor(BASE_URL);
-  const map = new Map(colorScale, spinner, processor);
   colorScale.draw(map.map);
 
   // Wait for the map to fully load before running a query
