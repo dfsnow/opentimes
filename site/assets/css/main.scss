@@ -39,10 +39,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-body.loading {
-  cursor: not-allowed;
-}
-
 a {
   color: var(--link-color);
   text-underline-offset: 0.15em;
@@ -349,16 +345,6 @@ blockquote,
   transform-origin: left;
   transition: transform 0.4s ease;
   z-index: 1001;
-}
-
-#map-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 255, 255, 0.0);
-  z-index: 1000;
 }
 
 #map-color-scale {

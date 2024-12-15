@@ -131,7 +131,6 @@ class ColorScale {
 class Spinner {
   constructor() {
     this.spinner = this.createSpinner();
-    this.overlay = this.createOverlay();
   }
 
   createSpinner() {
@@ -140,23 +139,17 @@ class Spinner {
     return spinner;
   }
 
-  createOverlay() {
-    const overlay = document.createElement("div");
-    overlay.id = "map-overlay";
-    return overlay;
-  }
-
   show() {
-    document.querySelector(".content").append(this.overlay, this.spinner);
-    document.body.classList.add("loading");
+    document.querySelector(".content").append(this.spinner);
     this.spinner.style.transform = "scaleX(0.05)";
   }
 
   hide() {
-    document.querySelector(".content").removeChild(this.overlay);
-    document.body.classList.remove("loading");
     setTimeout(() => {
-      document.querySelector(".content").removeChild(this.spinner);
+      const contentNode = document.querySelector(".content");
+      if (contentNode.contains(this.spinner)) {
+        contentNode.removeChild(this.spinner);
+      }
     }, 700);
   }
 
@@ -175,6 +168,7 @@ class Map {
     this.processor = processor;
     this.hoveredPolygonId = null;
     this.previousZoomLevel = null;
+    this.isProcessing = false;
   }
 
   init() {
@@ -257,13 +251,18 @@ class Map {
     });
 
     this.map.on("click", async (feat) => {
+      // Do nothing if already querying
+      if (this.isProcessing) {
+        return;
+      }
+      this.isProcessing = true;
+      this.spinner.show();
       const features = this.map.queryRenderedFeatures(
         feat.point,
         { layers: ["tracts_fill"] }
       );
       if (features.length > 0) {
         const [feature] = features;
-        this.spinner.show();
         await this.processor.runQuery(
           this,
           feature.properties.state,
@@ -273,6 +272,7 @@ class Map {
         // Update the URL with ID
         window.history.replaceState({}, "", `?id=${feature.properties.id}${window.location.hash}`);
         this.spinner.hide();
+        this.isProcessing = false;
       }
     });
 
