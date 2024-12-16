@@ -608,8 +608,11 @@ class TravelTimeCalculator:
                 missing.reset_index(), "origin_id", "destination_id"
             )
 
-            # Merge missing sets that overlap significantly (think two origins
-            # that share 1000 destinations but not the 1001st)
+            # Merge missing sets of OD pairs that overlap significantly (think
+            # two origins that share 1000 destinations but not the 1001st)
+            missing_sets = [
+                df[["origin_id", "destination_id"]] for df in missing_sets
+            ]
             merged_sets = merge_overlapping_df_list(missing_sets, 0.8)
 
             # Gut check that both sets contain the same number of rows
@@ -622,12 +625,12 @@ class TravelTimeCalculator:
                     "The total number of rows in missing_sets does not"
                     "match the total number of rows in merged_sets"
                 )
+
             self.config.logger.info(
                 "Found %s unique missing sets. Merged to %s sets",
                 len(missing_sets),
                 len(merged_sets),
             )
-
             for idx, missing_set in enumerate(merged_sets):
                 self.config.logger.info("Routing missing set number %s", idx)
                 o_ids = missing_set["origin_id"].unique()
