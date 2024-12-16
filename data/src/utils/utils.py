@@ -76,6 +76,12 @@ def merge_overlapping_df_list(
     df_list: list[pd.DataFrame],
     overlap_threshold: float = 0.5,
 ) -> list[pd.DataFrame]:
+    """
+    Merge a list of DataFrames that have overlapping values in their columns.
+    Merges "up into" the largest DataFrame first. This is used to reduce the
+    number of perfectly unique sets produced by group_by_column_sets().
+    """
+
     def overlap_percentage(df1, df2, col):
         overlap = pd.merge(df1[[col]], df2[[col]], how="inner", on=col)
         return len(set(overlap[col])) / min(len(df1[col]), len(df2[col]))
