@@ -3,6 +3,7 @@ import math
 import os
 import sys
 from contextlib import contextmanager
+from copy import deepcopy
 from pathlib import Path
 
 import pandas as pd
@@ -65,8 +66,48 @@ def group_by_column_sets(
     result = []
     for unique_set in unique_sets:
         group = df[df[x].isin(grouped[grouped[y] == unique_set][x])]
+        group = group.drop_duplicates()
+        group = group.reset_index(drop=True)
         result.append(group)
     return result
+
+
+def merge_overlapping_df_list(
+    df_list: list[pd.DataFrame],
+    overlap_threshold: float = 0.5,
+) -> list[pd.DataFrame]:
+    def overlap_percentage(df1, df2, col):
+        overlap = pd.merge(df1[[col]], df2[[col]], how="inner", on=col)
+        return len(set(overlap[col])) / min(len(df1[col]), len(df2[col]))
+
+    # Copy the input so we don't modify it
+    df_list_c = deepcopy(df_list)
+
+    # Merge into largest dataframes first
+    df_list_c.sort(key=len, reverse=True)
+
+    merged_dfs = []
+    while df_list_c:
+        base_df = df_list_c.pop(0)
+        merged = base_df
+        to_merge = []
+        for df in df_list_c:
+            for col in df.columns:
+                if overlap_percentage(base_df, df, col) >= overlap_threshold:
+                    to_merge.append((df, col))
+                    break
+        for df, col in to_merge:
+            # Remove the dataframe from the main list if it's been merged
+            for i in range(len(df_list_c) - 1, -1, -1):
+                if df_list_c[i][df_list_c[i].columns].equals(df[df.columns]):
+                    df_list_c.pop(i)
+            merged = (
+                pd.concat([merged, df])
+                .drop_duplicates()
+                .reset_index(drop=True)
+            )
+        merged_dfs.append(merged)
+    return merged_dfs
 
 
 def split_file_to_str(file: str | Path, **kwargs) -> str:
