@@ -14,6 +14,7 @@ from utils.utils import (
     create_empty_df,
     format_time,
     group_by_column_sets,
+    merge_overlapping_df_list,
     suppress_stdout,
 )
 
@@ -606,10 +607,28 @@ class TravelTimeCalculator:
             missing_sets = group_by_column_sets(
                 missing.reset_index(), "origin_id", "destination_id"
             )
+
+            # Merge missing sets that overlap significantly (think two origins
+            # that share 1000 destinations but not the 1001st)
+            merged_sets = merge_overlapping_df_list(missing_sets, 0.8)
+
+            # Gut check that both sets contain the same number of rows
+            try:
+                assert sum(len(df) for df in missing_sets) == sum(
+                    len(df) for df in merged_sets
+                )
+            except AssertionError:
+                raise ValueError(
+                    "The total number of rows in missing_sets does not"
+                    "match the total number of rows in merged_sets"
+                )
             self.config.logger.info(
-                "Found %s unique missing sets", len(missing_sets)
+                "Found %s unique missing sets. Merged to %s sets",
+                len(missing_sets),
+                len(merged_sets),
             )
-            for idx, missing_set in enumerate(missing_sets):
+
+            for idx, missing_set in enumerate(merged_sets):
                 self.config.logger.info("Routing missing set number %s", idx)
                 o_ids = missing_set["origin_id"].unique()
                 d_ids = missing_set["destination_id"].unique()
