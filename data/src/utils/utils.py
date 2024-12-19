@@ -1,4 +1,5 @@
 import hashlib
+import itertools
 import math
 import os
 import sys
@@ -116,11 +117,11 @@ def merge_overlapping_df_list(
     return merged_dfs
 
 
-def split_file_to_str(file: str | Path, **kwargs) -> str:
+def split_file_to_str(file: str | Path, **kwargs) -> list[str]:
     """
     Splits the contents of a Parquet file into chunks and return the chunk
-    boundaries as JSON. This is used to split a file of origins into smaller
-    chunks for parallelization.
+    boundaries as a hyphen-separated string. This is used to split a file
+    into smaller chunks for parallelization.
 
     Args:
         file: The path to the Parquet file.
@@ -128,17 +129,45 @@ def split_file_to_str(file: str | Path, **kwargs) -> str:
             split_range function.
 
     Returns:
-        A JSON string representing the chunked ranges in
-        the format '["start-end", ...]'.
+        A list of hyphen-separated strings representing the chunked ranges in
+        the format "start-end".
     """
-    origins_df = pd.read_parquet(file)
-    chunk_idx = split_range(len(origins_df), **kwargs)
+    df = pd.read_parquet(file)
+    chunk_idx = split_range(len(df), **kwargs)
     zfill_size = len(str(chunk_idx[-1][1]))
     chunk_str = [
         f"{str(start).zfill(zfill_size)}-{str(end).zfill(zfill_size)}"
         for start, end in chunk_idx
     ]
-    return '["' + '", "'.join(chunk_str) + '"]'
+    return chunk_str
+
+
+def split_od_files_to_json(
+    origin_file: str | Path,
+    origin_n_chunks: int,
+    origin_min_chunk_size: int,
+    destination_n_chunks: int,
+    destination_min_chunk_size: int,
+    destination_file: str | Path,
+) -> str:
+    origin_chunks = split_file_to_str(
+        file=origin_file,
+        n_chunks=origin_n_chunks,
+        min_chunk_size=origin_min_chunk_size,
+    )
+    destination_chunks = split_file_to_str(
+        file=destination_file,
+        n_chunks=destination_n_chunks,
+        min_chunk_size=destination_min_chunk_size,
+    )
+    zipped_chunks = [
+        f"{origin}_{destination}"
+        for origin, destination in list(
+            itertools.product(origin_chunks, destination_chunks)
+        )
+    ]
+
+    return '["' + '", "'.join(zipped_chunks) + '"]'
 
 
 def split_range(
