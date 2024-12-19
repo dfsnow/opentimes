@@ -59,18 +59,19 @@ class TravelTimeArgs:
             )
 
     def _validate_chunk(self, chunk: str | None) -> None:
-        if chunk and not re.match(r"^\d+-\d+$", chunk):
+        if chunk and not re.match(r"^\d+-\d+_\d+-\d+$", chunk):
             raise ValueError(
-                "Invalid chunk argument. Must be two numbers "
-                "separated by a dash (e.g., '1-2')."
+                "Invalid chunk argument. Must be four numbers "
+                "separated by dashes and an underscore (e.g., '01-02_00-10')."
             )
         if chunk:
-            parts = chunk.split("-")
-            if len(parts[0]) != len(parts[1]):
-                raise ValueError(
-                    "Invalid chunk argument. Both numbers must have "
-                    "the same number of digits (including zero-padding)."
-                )
+            for part in chunk.split("_"):
+                sub = part.split("-")
+                if len(sub[0]) != len(sub[1]):
+                    raise ValueError(
+                        "Invalid chunk argument. Both numbers must have "
+                        "the same number of digits (including zero-padding)."
+                    )
 
 
 class TravelTimePaths:
@@ -265,34 +266,50 @@ class TravelTimeInputs:
         self.n_origins_full: int = len(self.origins)
 
         self.chunk = chunk
-        self.chunk_start_idx: int
-        self.chunk_end_idx: int
-        self.chunk_size: int = int(10e7)
+        self.o_chunk_start_idx: int
+        self.o_chunk_end_idx: int
+        self.d_chunk_start_idx: int
+        self.d_chunk_end_idx: int
+        self.o_chunk_size: int = int(10e7)
+        self.d_chunk_size: int = int(10e7)
         self._set_chunk_attributes()
         self._subset_origins()
+        self._subset_destinations()
 
         self.n_origins: int = len(self.origins)
         self.n_destinations: int = len(self.destinations)
         self.max_split_size_origins = min(
-            max_split_size_origins, self.chunk_size
+            max_split_size_origins, self.o_chunk_size
         )
         self.max_split_size_destinations = min(
-            max_split_size_destinations, self.n_destinations
+            max_split_size_destinations, self.d_chunk_size
         )
 
     def _set_chunk_attributes(self) -> None:
         """Sets the origin chunk indices given the input chunk string."""
         if self.chunk:
-            chunk_start_idx, chunk_end_idx = self.chunk.split("-")
-            self.chunk_start_idx = int(chunk_start_idx)
-            self.chunk_end_idx = int(chunk_end_idx)
-            self.chunk_size = self.chunk_end_idx - self.chunk_start_idx
+            o_chunk, d_chunk = self.chunk.split("_")
+            o_chunk_start_idx, o_chunk_end_idx = o_chunk.split("-")
+            d_chunk_start_idx, d_chunk_end_idx = d_chunk.split("-")
+            self.o_chunk_start_idx = int(o_chunk_start_idx)
+            self.o_chunk_end_idx = int(o_chunk_end_idx)
+            self.o_chunk_size = int(o_chunk_end_idx) - int(o_chunk_start_idx)
+            self.d_chunk_start_idx = int(d_chunk_start_idx)
+            self.d_chunk_end_idx = int(d_chunk_end_idx)
+            self.d_chunk_size = int(d_chunk_end_idx) - int(d_chunk_start_idx)
 
     def _subset_origins(self) -> None:
         """Sets the origins chunk (if chunk is specified)."""
         if self.chunk:
             self.origins = self.origins.iloc[
-                self.chunk_start_idx : self.chunk_end_idx
+                self.o_chunk_start_idx : self.o_chunk_end_idx
+            ]
+
+    def _subset_destinations(self) -> None:
+        """Sets the destinations chunk (if chunk is specified)."""
+        if self.chunk:
+            self.destinations = self.destinations.iloc[
+                self.d_chunk_start_idx : self.d_chunk_end_idx
             ]
 
 

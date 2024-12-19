@@ -112,7 +112,7 @@ on:
       override_chunks:
         required: false
         description: |
-          Comma-separated chunks to run e.g. 0-5,6-11.
+          Comma-separated chunks to run e.g. 0-5_000-100,6-11_000-100.
           Will run all chunks if null
         type: string
 
@@ -166,7 +166,7 @@ jobs:
           export USER_ID=${{ env.USER_ID }}
           export GROUP_ID=${{ env.GROUP_ID }}
           chunks=$(docker compose run --rm --quiet-pull \
-            --entrypoint=python valhalla-run /data/src/split_origin.py \
+            --entrypoint=python valhalla-run /data/src/split_chunks.py \
             --year ${{ inputs.year }} --geography ${{ inputs.geography }} \
             --state ${{ inputs.state }})
           echo "chunks=$chunks" >> $GITHUB_OUTPUT

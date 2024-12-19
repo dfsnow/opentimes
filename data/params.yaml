@@ -12,12 +12,22 @@ s3:
 
 # Parameters used to control the chunking of work on GitHub Actions
 actions:
-  # The max number of jobs to create for a workflow. GitHub allows up to 256
-  n_chunks: 256
+  # The max number of origin splits to create for a workflow. This multiplied
+  # by destination_n_chunks is the maximum total number of jobs for a workflow.
+  # GitHub allows up to 256, so the two n_chunks params should always equal
+  # that number when multiplied
+  origin_n_chunks: 64
 
   # The minimum number of origins to include in a job. Higher = fewer jobs
   # that take longer. Lower = more jobs that finish quicker
-  min_chunk_size: 500
+  origin_min_chunk_size: 500
+
+  # The max number of destination splits to create for a workflow
+  destination_n_chunks: 4
+
+  # The minimum number of destinations included in each job. For reference,
+  # most states have around 10K Census tract destinations
+  destination_min_chunk_size: 10000
 
 times:
   # Travel times output version. Follows SemVer (kind of):
