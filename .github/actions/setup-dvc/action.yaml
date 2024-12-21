@@ -17,4 +17,5 @@ runs:
       shell: bash
       run: |
         uv python install
+        uv venv
         uv pip install "dvc[s3]"

@@ -37,6 +37,7 @@ jobs:
         shell: bash
         run: |
           uv python install
+          uv venv
           uv pip install ".[site,data]"
 
       - name: Setup Cloudflare credentials
