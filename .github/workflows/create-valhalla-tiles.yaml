@@ -30,7 +30,6 @@ env:
   # See: https://github.com/aws/aws-cli/issues/5262#issuecomment-705832151
   AWS_EC2_METADATA_DISABLED: true
   PYTHONUNBUFFERED: "1"
-  UV_SYSTEM_PYTHON: 1
 
 jobs:
   setup-jobs:
@@ -110,7 +109,7 @@ jobs:
         shell: bash
         working-directory: 'data'
         run: |
-          dvc pull --no-run-cache \
+          uv run dvc pull --no-run-cache \
             ./intermediate/osmextract/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/${{ matrix.state }}.osm.pbf
 
       - name: Run job chunk
@@ -120,7 +119,7 @@ jobs:
           # Disable elevation for Alaska (which requires 22GB of tiles)
           BUILD_ELEVATION: ${{ matrix.state == '02' && 'False' || 'True' }}
         run: |
-          dvc repro -s create_valhalla_tiles@${{ inputs.year }}-${{ matrix.state }}
+          uv dvc repro -s create_valhalla_tiles@${{ inputs.year }}-${{ matrix.state }}
 
       - name: Write tile files to S3
         shell: bash

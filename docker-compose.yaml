@@ -49,7 +49,6 @@ services:
     ports:
       - 8002:8002
     volumes:
-      - $HOME/.aws/credentials:/home/valhalla/.aws/credentials:ro
       - ./data/build:/custom_files:rw
       - ./data/output:/data/output:rw
       - ./data/input:/data/input:ro
@@ -63,7 +62,6 @@ services:
     ports:
       - 8003:8002
     volumes:
-      - $HOME/.aws/credentials:/home/valhalla/.aws/credentials:ro
       - ./data/build:/custom_files:rw
       - ./data/output:/data/output:rw
       - ./data/input:/data/input:ro

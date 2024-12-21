@@ -31,7 +31,7 @@ runs:
       working-directory: 'data'
       run: |
         tile_path=year=${{ inputs.year }}/geography=state/state=${{ inputs.state }}
-        dvc pull --no-run-cache \
+        uv run dvc pull --no-run-cache \
           ./intermediate/valhalla_tiles/"$tile_path"/valhalla_tiles.tar.zst
 
     - name: Cache save tile input data
