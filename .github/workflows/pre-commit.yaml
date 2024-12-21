@@ -24,7 +24,7 @@ jobs:
       - name: Install pre-commit
         shell: bash
         run: |
-          uv python
+          uv python install
           uv pip install pre-commit
 
       - name: Cache pre-commit environment
