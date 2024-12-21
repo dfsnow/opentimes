@@ -16,7 +16,6 @@ from utils.utils import (
     format_time,
     group_by_column_sets,
     merge_overlapping_df_list,
-    suppress_stdout,
 )
 
 
@@ -423,9 +422,8 @@ class TravelTimeCalculator:
 
         # Get the actual JSON response from the API. Suppressing stdout here
         # since Valhalla prints a bunch of useless output
-        with suppress_stdout():
-            response = actor.matrix(request_json)
-            response_data = json.loads(response)
+        response = actor.matrix(request_json)
+        response_data = json.loads(response)
 
         # Parse the response data and convert it to a DataFrame. Recover the
         # origin and destination indices and append them to the DataFrame
@@ -574,7 +572,7 @@ class TravelTimeCalculator:
         m_spl_d = self.inputs.max_split_size_destinations
         n_dc = self.inputs.n_destinations
 
-        with ThreadPoolExecutor() as executor:
+        with ThreadPoolExecutor(max_workers=6) as executor:
             futures = []
             for o in range(0, n_oc, max_spl_o):
                 for d in range(0, n_dc, m_spl_d):
