@@ -1,8 +1,7 @@
-import os
-from pathlib import Path
-
-# Path relative to the mounts within the Valhalla Docker container
-DOCKER_INTERNAL_PATH = Path(os.environ.get("DOCKER_INTERNAL_PATH", Path.cwd()))
+# Local endpoints for Docker containers running Valhalla service. See the
+# Compose file for endpoint setup
+DOCKER_ENDPOINT_FIRST_PASS = "http://127.0.0.1:8002"
+DOCKER_ENDPOINT_SECOND_PASS = "http://127.0.0.1:8003"
 
 # This is a dictionary that determines the construction of the public
 # OpenTimes files. partition_levels is the number of directories present in

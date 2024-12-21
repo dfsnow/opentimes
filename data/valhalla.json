@@ -108,7 +108,7 @@
       "use_rest_area": false,
       "use_urban_tag": false
     },
-    "global_synchronized_cache": true,
+    "global_synchronized_cache": false,
     "hierarchy": true,
     "id_table_size": 1300000000,
     "import_bike_share_stations": false,

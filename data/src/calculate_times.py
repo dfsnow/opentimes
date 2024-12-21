@@ -3,10 +3,10 @@ import json
 import os
 import time
 import uuid
+from pathlib import Path
 
 import pandas as pd
 import yaml
-from utils.constants import DOCKER_INTERNAL_PATH
 from utils.logging import create_logger
 from utils.times import (
     TravelTimeCalculator,
@@ -17,7 +17,7 @@ from utils.utils import format_time, get_md5_hash
 
 logger = create_logger(__name__)
 
-with open(DOCKER_INTERNAL_PATH / "params.yaml") as file:
+with open(Path.cwd() / "params.yaml") as file:
     params = yaml.safe_load(file)
 os.environ["AWS_PROFILE"] = params["s3"]["profile"]
 
@@ -35,7 +35,7 @@ def main() -> None:
     script_start_time = time.time()
 
     # Create a travel times configuration and set of origin/destination inputs
-    config = TravelTimeConfig(args, params=params, logger=logger, verbose=True)
+    config = TravelTimeConfig(args, params=params, logger=logger)
     inputs = config.load_default_inputs()
 
     chunk_msg = f", chunk: {config.args.chunk}" if config.args.chunk else ""
@@ -117,9 +117,9 @@ def main() -> None:
 
     # Create a metadata DataFrame of all settings and data used for creating
     # inputs and generating times
-    with open(DOCKER_INTERNAL_PATH / "valhalla.json", "r") as f:
+    with open(Path.cwd() / "valhalla.json", "r") as f:
         valhalla_data = json.load(f)
-    with open(DOCKER_INTERNAL_PATH / "valhalla_sp.json", "r") as f:
+    with open(Path.cwd() / "valhalla_sp.json", "r") as f:
         valhalla_data_sp = json.load(f)
     metadata_df = pd.DataFrame(
         {
