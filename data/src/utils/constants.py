@@ -13,7 +13,14 @@ DOCKER_INTERNAL_PATH = Path(os.environ.get("DOCKER_INTERNAL_PATH", Path.cwd()))
 DATASET_DICT: dict = {
     "0.0.1": {
         "times": {
-            "partition_levels": 6,
+            "partition_columns": [
+                "version",
+                "mode",
+                "year",
+                "geography",
+                "state",
+                "centroid_type",
+            ],
             "public_file_columns": [
                 "centroid_type",
                 "origin_id",
@@ -25,9 +32,18 @@ DATASET_DICT: dict = {
                 "origin_id",
                 "destination_id",
             ],
+            "sorting_columns": [1, 2],
         },
         "points": {
-            "partition_levels": 7,
+            "partition_columns": [
+                "version",
+                "mode",
+                "year",
+                "geography",
+                "state",
+                "centroid_type",
+                "point_type",
+            ],
             "public_file_columns": [
                 "centroid_type",
                 "point_type",
@@ -38,9 +54,17 @@ DATASET_DICT: dict = {
             "order_by_columns": [
                 "id",
             ],
+            "sorting_columns": [2],
         },
         "missing_pairs": {
-            "partition_levels": 6,
+            "partition_columns": [
+                "version",
+                "mode",
+                "year",
+                "geography",
+                "state",
+                "centroid_type",
+            ],
             "public_file_columns": [
                 "centroid_type",
                 "origin_id",
@@ -50,9 +74,17 @@ DATASET_DICT: dict = {
                 "origin_id",
                 "destination_id",
             ],
+            "sorting_columns": [1, 2],
         },
         "metadata": {
-            "partition_levels": 6,
+            "partition_columns": [
+                "version",
+                "mode",
+                "year",
+                "geography",
+                "state",
+                "centroid_type",
+            ],
             "public_file_columns": [
                 "centroid_type",
                 "run_id",
@@ -79,6 +111,7 @@ DATASET_DICT: dict = {
             "order_by_columns": [
                 "calc_chunk_id",
             ],
+            "sorting_columns": [4],
         },
     }
 }

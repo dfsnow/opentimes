@@ -158,7 +158,10 @@ input:
         - block  # only used to fetch TIGER files (not used for routing)
 
 output:
+  # Maximum file size in bytes for public Parquet files
+  max_file_size: 475000000
+
   # Compression type and level to use for final output Parquet files
   compression:
-    type: zstd
+    type: ZSTD
     level: 12
