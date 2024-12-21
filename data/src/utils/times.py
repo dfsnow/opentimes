@@ -418,8 +418,9 @@ class TravelTimeCalculator:
 
         # Get the actual JSON response from the API
         response = r.post(endpoint + "/sources_to_targets", data=request_json)
-        response.raise_for_status()
         response_data = response.json()
+        if response.status_code != 200:
+            raise ValueError(response_data["error"])
 
         # Parse the response data and convert it to a DataFrame. Recover the
         # origin and destination indices and append them to the DataFrame
@@ -712,9 +713,10 @@ def snap_df_to_osm(df: pd.DataFrame, mode: str) -> pd.DataFrame:
         }
     )
 
-    response_data = r.post(
-        "http://127.0.0.1:8002/locate", data=request_json
-    ).json()
+    response = r.post("http://127.0.0.1:8002/locate", data=request_json)
+    response_data = response.json()
+    if response.status_code != 200:
+        raise ValueError(response_data["error"])
 
     # Use the first element of nodes to populate the snapped lat/lon, otherwise
     # fallback to the correlated lat/lon from edges
