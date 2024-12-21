@@ -3,6 +3,7 @@ import json
 import logging
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, Literal
 
@@ -573,21 +574,26 @@ class TravelTimeCalculator:
         m_spl_d = self.inputs.max_split_size_destinations
         n_dc = self.inputs.n_destinations
 
-        for o in range(0, n_oc, max_spl_o):
-            for d in range(0, n_dc, m_spl_d):
-                results.extend(
-                    self._binary_search(
-                        o_start_idx=o,
-                        d_start_idx=d,
-                        o_end_idx=min(o + max_spl_o, n_oc),
-                        d_end_idx=min(d + m_spl_d, n_dc),
-                        print_log=True,
-                        cur_depth=0,
-                        origins=self.inputs.origins,
-                        destinations=self.inputs.destinations,
-                        actor=self.actor,
+        with ThreadPoolExecutor() as executor:
+            futures = []
+            for o in range(0, n_oc, max_spl_o):
+                for d in range(0, n_dc, m_spl_d):
+                    futures.append(
+                        executor.submit(
+                            self._binary_search,
+                            o_start_idx=o,
+                            d_start_idx=d,
+                            o_end_idx=min(o + max_spl_o, n_oc),
+                            d_end_idx=min(d + m_spl_d, n_dc),
+                            print_log=True,
+                            cur_depth=0,
+                            origins=self.inputs.origins,
+                            destinations=self.inputs.destinations,
+                            actor=self.actor,
+                        )
                     )
-                )
+            for future in futures:
+                results.extend(future.result())
 
         # Return empty result set if nothing is routable
         if len(results) == 0:
