@@ -1,10 +1,10 @@
 import argparse
+from pathlib import Path
 
 import yaml
-from utils.constants import DOCKER_INTERNAL_PATH
 from utils.utils import split_od_files_to_json
 
-with open(DOCKER_INTERNAL_PATH / "params.yaml") as file:
+with open(Path.cwd() / "params.yaml") as file:
     params = yaml.safe_load(file)
 
 
@@ -40,7 +40,7 @@ def split_chunks(
             Defaults to 10000.
     """
     origin_file = (
-        DOCKER_INTERNAL_PATH
+        Path.cwd()
         / "intermediate"
         / "cenloc"
         / f"year={year}"
@@ -49,7 +49,7 @@ def split_chunks(
         / f"{state}.parquet"
     )
     destination_file = (
-        DOCKER_INTERNAL_PATH
+        Path.cwd()
         / "intermediate"
         / "destpoint"
         / f"year={year}"
