@@ -247,6 +247,11 @@ jobs:
           tar -xf ./build/valhalla_tiles.tar.zst -C ./build
           rm -f ./build/valhalla_tiles.tar.zst
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+
       - name: Run job chunk
         shell: bash
         working-directory: 'data'
