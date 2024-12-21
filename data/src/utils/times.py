@@ -1,6 +1,7 @@
 import argparse
 import json
 import logging
+import random
 import re
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -8,7 +9,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 import pandas as pd
-import valhalla  # type: ignore
+import requests as r
 
 from utils.constants import DOCKER_INTERNAL_PATH
 from utils.utils import (
@@ -376,13 +377,9 @@ class TravelTimeCalculator:
 
     def __init__(
         self,
-        actor: valhalla.Actor,
-        actor_fallback: valhalla.Actor,
         config: TravelTimeConfig,
         inputs: TravelTimeInputs,
     ) -> None:
-        self.actor = actor
-        self.actor_fallback = actor_fallback
         self.config = config
         self.inputs = inputs
 
@@ -390,7 +387,6 @@ class TravelTimeCalculator:
         self,
         origins: pd.DataFrame,
         destinations: pd.DataFrame,
-        actor: valhalla.Actor,
     ) -> pd.DataFrame:
         """
         Sends the travel time calculation request to the Valhalla Matrix API.
@@ -422,8 +418,11 @@ class TravelTimeCalculator:
 
         # Get the actual JSON response from the API. Suppressing stdout here
         # since Valhalla prints a bunch of useless output
-        response = actor.matrix(request_json)
-        response_data = json.loads(response)
+        response = r.post(
+            "http://127.0.0.1:8002/sources_to_targets", data=request_json
+        )
+        response.raise_for_status()
+        response_data = response.json()
 
         # Parse the response data and convert it to a DataFrame. Recover the
         # origin and destination indices and append them to the DataFrame
@@ -453,7 +452,6 @@ class TravelTimeCalculator:
         cur_depth: int,
         origins: pd.DataFrame,
         destinations: pd.DataFrame,
-        actor: valhalla.Actor,
     ) -> list[pd.DataFrame]:
         """
         Recursively split the origins and destinations into smaller chunks.
@@ -466,6 +464,7 @@ class TravelTimeCalculator:
         simply querying the same unroutable values over and over.
         """
         start_time = time.time()
+        time.sleep(0.1 * random.uniform(0, 0.5))
         if print_log or self.config.verbose:
             self.config.logger.info(
                 "Routing origin indices %s-%s to destination indices %s-%s",
@@ -485,7 +484,6 @@ class TravelTimeCalculator:
                 df = self._calculate_times(
                     origins=origins.iloc[o_start_idx:o_end_idx],
                     destinations=destinations.iloc[d_start_idx:d_end_idx],
-                    actor=actor,
                 )
             except Exception as e:
                 df = create_empty_df(
@@ -525,7 +523,6 @@ class TravelTimeCalculator:
             times = self._calculate_times(
                 origins=origins.iloc[o_start_idx:o_end_idx],
                 destinations=destinations.iloc[d_start_idx:d_end_idx],
-                actor=actor,
             )
 
             if print_log or self.config.verbose:
@@ -548,10 +545,10 @@ class TravelTimeCalculator:
             mo, md = (osi + oei) // 2, (dsi + dei) // 2
             # fmt: off
             return (
-                self._binary_search(osi, dsi, mo, md, False, cur_depth + 1, origins, destinations, actor)
-                + self._binary_search(mo, dsi, oei, md, False, cur_depth + 1, origins, destinations, actor)
-                + self._binary_search(osi, md, mo, dei, False, cur_depth + 1, origins, destinations, actor)
-                + self._binary_search(mo, md, oei, dei, False, cur_depth + 1, origins, destinations, actor)
+                self._binary_search(osi, dsi, mo, md, False, cur_depth + 1, origins, destinations)
+                + self._binary_search(mo, dsi, oei, md, False, cur_depth + 1, origins, destinations)
+                + self._binary_search(osi, md, mo, dei, False, cur_depth + 1, origins, destinations)
+                + self._binary_search(mo, md, oei, dei, False, cur_depth + 1, origins, destinations)
             )
             # fmt: on
 
@@ -572,7 +569,7 @@ class TravelTimeCalculator:
         m_spl_d = self.inputs.max_split_size_destinations
         n_dc = self.inputs.n_destinations
 
-        with ThreadPoolExecutor(max_workers=6) as executor:
+        with ThreadPoolExecutor(max_workers=2) as executor:
             futures = []
             for o in range(0, n_oc, max_spl_o):
                 for d in range(0, n_dc, m_spl_d):
@@ -587,7 +584,6 @@ class TravelTimeCalculator:
                             cur_depth=0,
                             origins=self.inputs.origins,
                             destinations=self.inputs.destinations,
-                            actor=self.actor,
                         )
                     )
             for future in futures:
@@ -672,7 +668,6 @@ class TravelTimeCalculator:
                                 destinations=self.inputs.destinations[
                                     self.inputs.destinations["id"].isin(d_ids)
                                 ],
-                                actor=self.actor_fallback,
                             )
                         )
 
@@ -688,9 +683,7 @@ class TravelTimeCalculator:
         return results_df
 
 
-def snap_df_to_osm(
-    df: pd.DataFrame, mode: str, actor: valhalla.Actor
-) -> pd.DataFrame:
+def snap_df_to_osm(df: pd.DataFrame, mode: str) -> pd.DataFrame:
     """
     Snap a DataFrame of lat/lon points to the OpenStreetMap network using
     the Valhalla Locate API.
@@ -698,7 +691,6 @@ def snap_df_to_osm(
     Args:
         df: DataFrame containing the columns 'id', 'lat', and 'lon'.
         mode: Travel mode to use for snapping.
-        actor: Valhalla Actor object for making API requests.
     """
     df_list = df.apply(
         lambda x: {"lat": x["lat"], "lon": x["lon"]}, axis=1
@@ -711,8 +703,9 @@ def snap_df_to_osm(
         }
     )
 
-    response = actor.locate(request_json)
-    response_data = json.loads(response)
+    response_data = r.post(
+        "http://127.0.0.1:8002/locate", data=request_json
+    ).json()
 
     # Use the first element of nodes to populate the snapped lat/lon, otherwise
     # fallback to the correlated lat/lon from edges

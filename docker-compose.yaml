@@ -28,11 +28,11 @@ services:
       - update_existing_config=False
       - use_default_speeds_config=True
       - traffic_name=traffic
+      - server_threads=8
 
   valhalla-run:
     image: opentimes:latest
-    container_name: valhalla-build
-    user: ${USER_ID}:${GROUP_ID}
+    container_name: valhalla-run
     build:
       context: .
       dockerfile: data/Dockerfile
@@ -44,9 +44,6 @@ services:
     volumes:
       - ./data/build/:/custom_files:rw
       - ./data/valhalla.json:/custom_files/valhalla.json:rw
-      - ./data/valhalla.json:/data/valhalla.json:rw
-      - ./data/valhalla_sp.json:/data/valhalla_sp.json:rw
-      - ./data/valhalla_sp.json:/custom_files/valhalla_sp.json:rw
       - ./data/output:/data/output:rw
       # Read only volumes to serve data to the container
       - $HOME/.aws/credentials:/home/valhalla/.aws/credentials:ro
@@ -63,3 +60,4 @@ services:
       - force_rebuild=False
       - tileset_name=tiles
       - traffic_name=traffic
+      - server_threads=8

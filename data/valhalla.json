@@ -15,8 +15,6 @@
   "loki": {
     "actions": [
       "locate",
-      "route",
-      "height",
       "sources_to_targets",
       "status"
     ],
@@ -128,7 +126,7 @@
     },
     "lru_mem_cache_hard_control": false,
     "max_cache_size": 12000000000,
-    "max_concurrent_reader_users": 1,
+    "max_concurrent_reader_users": 200000,
     "reclassify_links": true,
     "shortcuts": true,
     "tile_dir": "/custom_files/tiles",

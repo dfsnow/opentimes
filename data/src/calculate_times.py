@@ -3,10 +3,8 @@ import json
 import os
 import time
 import uuid
-from pathlib import Path
 
 import pandas as pd
-import valhalla  # type: ignore
 import yaml
 from utils.constants import DOCKER_INTERNAL_PATH
 from utils.logging import create_logger
@@ -37,7 +35,7 @@ def main() -> None:
     script_start_time = time.time()
 
     # Create a travel times configuration and set of origin/destination inputs
-    config = TravelTimeConfig(args, params=params, logger=logger)
+    config = TravelTimeConfig(args, params=params, logger=logger, verbose=True)
     inputs = config.load_default_inputs()
 
     chunk_msg = f", chunk: {config.args.chunk}" if config.args.chunk else ""
@@ -59,23 +57,16 @@ def main() -> None:
         len(inputs.origins) * inputs.n_destinations,
     )
 
-    # Initialize the Valhalla router Python bindings. The _sp version is a
-    # more expensive fallback router used as a second pass
-    actor = valhalla.Actor((Path.cwd() / "valhalla.json").as_posix())
-    actor_sp = valhalla.Actor((Path.cwd() / "valhalla_sp.json").as_posix())
-
     # Use the Vahalla Locate API to append coordinates that are snapped to OSM
     if config.params["times"]["use_snapped"]:
         logger.info("Snapping coordinates to OSM network")
-        inputs.origins = snap_df_to_osm(
-            inputs.origins, config.args.mode, actor
-        )
+        inputs.origins = snap_df_to_osm(inputs.origins, config.args.mode)
         inputs.destinations = snap_df_to_osm(
-            inputs.destinations, config.args.mode, actor
+            inputs.destinations, config.args.mode
         )
 
     # Calculate times for each chunk and return a single DataFrame
-    tt_calc = TravelTimeCalculator(actor, actor_sp, config, inputs)
+    tt_calc = TravelTimeCalculator(config, inputs)
     results_df = tt_calc.many_to_many()
     logger.info(
         "Finished calculating times for %s pairs in %s",
