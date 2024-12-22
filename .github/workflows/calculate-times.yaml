@@ -182,7 +182,7 @@ jobs:
         run: |
           export USER_ID=${{ env.USER_ID }}
           export GROUP_ID=${{ env.GROUP_ID }}
-          uv run python ./src/split_chunks.py \
+          uv run ./src/split_chunks.py \
             --year ${{ inputs.year }} --geography ${{ inputs.geography }} \
             --state ${{ inputs.state }} > chunks.txt
           echo "chunks=$(cat chunks.txt)" >> $GITHUB_OUTPUT
@@ -287,7 +287,7 @@ jobs:
           export USER_ID=${{ env.USER_ID }}
           export GROUP_ID=${{ env.GROUP_ID }}
           docker compose up --quiet-pull valhalla-run-fp valhalla-run-sp -d
-          uv run python ./src/calculate_times.py \
+          uv run ./src/calculate_times.py \
             --mode ${{ inputs.mode }} --year ${{ inputs.year }} \
             --geography ${{ inputs.geography }} --state ${{ inputs.state }} \
             --centroid-type ${{ inputs.centroid_type }} \

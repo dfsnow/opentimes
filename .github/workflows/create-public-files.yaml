@@ -106,7 +106,7 @@ jobs:
         run: |
           datasets_parsed=($(echo "${{ inputs.dataset }}" | tr -d ' ' | tr ',' ' '))
           for dataset in "${datasets_parsed[@]}"; do
-            uv run python ./src/create_public_files.py \
+            uv run ./src/create_public_files.py \
               --dataset "$dataset" --version ${{ inputs.version }} \
               --mode ${{ matrix.mode }} --year ${{ matrix.year }} \
               --geography ${{ matrix.geography }}

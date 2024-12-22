@@ -54,7 +54,7 @@ jobs:
           echo "::add-mask::${{ secrets.CLOUDFLARE_CACHE_API_TOKEN }}"
           echo "::add-mask::${{ secrets.CLOUDFLARE_CACHE_ZONE_ID }}"
           bucket=$(yq e '.s3.public_bucket' params.yaml)
-          uv run python ./src/create_public_site.py
+          uv run ./src/create_public_site.py
         env:
           CLOUDFLARE_CACHE_API_TOKEN: ${{ secrets.CLOUDFLARE_CACHE_API_TOKEN }}
           CLOUDFLARE_CACHE_ZONE_ID: ${{ secrets.CLOUDFLARE_CACHE_ZONE_ID }}
