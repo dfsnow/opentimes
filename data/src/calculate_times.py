@@ -51,7 +51,7 @@ def main() -> None:
         chunk_msg,
     )
     logger.info(
-        "Routing from %s origins to %s destinations (%s pairs)",
+        "Starting with %s origins to %s destinations (%s pairs)",
         len(inputs.origins),
         inputs.n_destinations,
         len(inputs.origins) * inputs.n_destinations,
@@ -66,6 +66,7 @@ def main() -> None:
         )
 
     # Calculate times for each chunk and return a single DataFrame
+    logger.info("Tiles loaded and coodinates ready, starting routing")
     tt_calc = TravelTimeCalculator(config, inputs)
     results_df = tt_calc.many_to_many()
     logger.info(

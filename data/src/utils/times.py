@@ -464,14 +464,6 @@ class TravelTimeCalculator:
         simply querying the same unroutable values over and over.
         """
         start_time = time.time()
-        if print_log or self.config.verbose:
-            self.config.logger.info(
-                "Routing origin indices %s-%s to destination indices %s-%s",
-                o_start_idx,
-                o_end_idx,
-                d_start_idx,
-                d_end_idx,
-            )
 
         # If indices are out-of-bounds return an empty list
         if o_start_idx >= o_end_idx or d_start_idx >= d_end_idx:
@@ -529,7 +521,11 @@ class TravelTimeCalculator:
             if print_log or self.config.verbose:
                 elapsed_time = time.time() - start_time
                 self.config.logger.info(
-                    "Routed %s pairs (%s missing) in %s",
+                    "From origins %s-%s to destinations %s-%s, routed %s pairs (%s missing) in %s",
+                    o_start_idx,
+                    o_end_idx,
+                    d_start_idx,
+                    d_end_idx,
                     (o_end_idx - o_start_idx) * (d_end_idx - d_start_idx),
                     len(times[times["duration_sec"].isnull()]),
                     format_time(elapsed_time),
