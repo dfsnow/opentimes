@@ -20,14 +20,14 @@ actions:
 
   # The minimum number of origins to include in a job. Higher = fewer jobs
   # that take longer. Lower = more jobs that finish quicker
-  origin_min_chunk_size: 500
+  origin_min_chunk_size: 1000
 
   # The max number of destination splits to create for a workflow
   destination_n_chunks: 4
 
   # The minimum number of destinations included in each job. For reference,
   # most states have around 10K Census tract destinations
-  destination_min_chunk_size: 10000
+  destination_min_chunk_size: 20000
 
 times:
   # Travel times output version. Follows SemVer (kind of):
