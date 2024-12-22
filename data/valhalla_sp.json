@@ -127,7 +127,7 @@
       "type": "std_out"
     },
     "lru_mem_cache_hard_control": false,
-    "max_cache_size": 12000000000,
+    "max_cache_size": 3000000000,
     "max_concurrent_reader_users": 1,
     "reclassify_links": true,
     "shortcuts": true,
@@ -138,7 +138,7 @@
     "transit_dir": "/custom_files/transit_tiles",
     "transit_feeds_dir": "/gtfs_feeds",
     "transit_pbf_limit": 200000,
-    "use_lru_mem_cache": true,
+    "use_lru_mem_cache": false,
     "use_simple_mem_cache": false,
     "default_speeds_config": "/custom_files/default_speeds.json"
   },
@@ -279,7 +279,7 @@
     "max_reserved_labels_count_bidir_astar": 10000000,
     "max_reserved_labels_count_bidir_dijkstras": 20000000,
     "max_reserved_labels_count_dijkstras": 40000000,
-    "max_reserved_locations_costmatrix": 100000,
+    "max_reserved_locations_costmatrix": 50000,
     "service": {
       "proxy": "ipc:///tmp/thor"
     },
