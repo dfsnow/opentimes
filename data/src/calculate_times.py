@@ -40,8 +40,8 @@ def main() -> None:
 
     chunk_msg = f", chunk: {config.args.chunk}" if config.args.chunk else ""
     logger.info(
-        "Starting routing for version: %s, mode: %s, year: %s, "
-        "geography: %s, state: %s, centroid type: %s%s",
+        "Starting times calculation with parameters: version=%s, "
+        "mode=%s, year=%s, geography=%s, state=%s, centroid_type=%s%s",
         config.params["times"]["version"],
         config.args.mode,
         config.args.year,

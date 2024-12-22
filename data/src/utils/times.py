@@ -610,7 +610,7 @@ class TravelTimeCalculator:
         if results_df.isnull().values.any() and second_pass:
             missing = results_df[results_df["duration_sec"].isnull()]
             self.config.logger.info(
-                "Starting second pass for %s missing pairs (%s total)",
+                "Starting second pass for %s missing pairs (out of %s total)",
                 len(missing),
                 len(results_df),
             )
@@ -650,9 +650,12 @@ class TravelTimeCalculator:
                 self.config.logger.info("Routing missing set number %s", idx)
                 o_ids = missing_set["origin_id"].unique()
                 d_ids = missing_set["destination_id"].unique()
-                with ThreadPoolExecutor(
-                    max_workers=os.cpu_count()
-                ) as executor:
+
+                # Don't use the all cores here as it tends to choke
+                ncpu = os.cpu_count()
+                ncpu = ncpu - 1 if ncpu is not None and ncpu > 1 else 1
+
+                with ThreadPoolExecutor(max_workers=ncpu) as executor:
                     futures = []
                     for o in range(0, len(o_ids), max_spl_o):
                         for d in range(0, len(d_ids), m_spl_d):
@@ -712,7 +715,9 @@ def snap_df_to_osm(df: pd.DataFrame, mode: str) -> pd.DataFrame:
         }
     )
 
-    response = r.post("http://127.0.0.1:8002/locate", data=request_json)
+    response = r.post(
+        DOCKER_ENDPOINT_FIRST_PASS + "/locate", data=request_json
+    )
     response_data = response.json()
     if response.status_code != 200:
         raise ValueError(response_data["error"])
