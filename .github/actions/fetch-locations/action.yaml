@@ -25,7 +25,7 @@ runs:
       shell: bash
       working-directory: 'data'
       run: |
-        dvc pull --no-run-cache create_destpoint_by_state \
+        uv run dvc pull --no-run-cache create_destpoint_by_state \
           create_cenloc_national create_cenloc_by_state
 
     - name: Cache save location input data

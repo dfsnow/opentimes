@@ -1,3 +1,18 @@
+x-valhalla-run: &valhalla-run
+  image: opentimes:latest
+  user: ${USER_ID}:${GROUP_ID}
+  build:
+    context: .
+    dockerfile: data/Dockerfile
+    args:
+      - USER_ID=${USER_ID}
+      - GROUP_ID=${GROUP_ID}
+  environment:
+    - use_tiles_ignore_pbf=True
+    - update_existing_config=False
+    - force_rebuild=False
+    - tileset_name=tiles
+    - traffic_name=traffic
 
 services:
   # https://github.com/nilsnolde/docker-valhalla/blob/master/docker-compose.yml
@@ -15,7 +30,6 @@ services:
       - ./data/build/:/custom_files:rw
       - ./data/valhalla.json:/custom_files/valhalla.json:rw
     environment:
-      - PYTHONUNBUFFERED="1"
       - serve_tiles=False
       - tileset_name=tiles
       # Optional so we can exclude Alaska (which requires 22GB of tiles)
@@ -29,37 +43,27 @@ services:
       - use_default_speeds_config=True
       - traffic_name=traffic
 
-  valhalla-run:
-    image: opentimes:latest
-    container_name: valhalla-build
-    user: ${USER_ID}:${GROUP_ID}
-    build:
-      context: .
-      dockerfile: data/Dockerfile
-      args:
-        - USER_ID=59999
-        - GROUP_ID=59999
+  valhalla-run-fp:
+    <<: *valhalla-run
+    container_name: valhalla-run-fp
     ports:
       - 8002:8002
     volumes:
-      - ./data/build/:/custom_files:rw
-      - ./data/valhalla.json:/custom_files/valhalla.json:rw
-      - ./data/valhalla.json:/data/valhalla.json:rw
-      - ./data/valhalla_sp.json:/data/valhalla_sp.json:rw
-      - ./data/valhalla_sp.json:/custom_files/valhalla_sp.json:rw
+      - ./data/build:/custom_files:rw
       - ./data/output:/data/output:rw
-      # Read only volumes to serve data to the container
-      - $HOME/.aws/credentials:/home/valhalla/.aws/credentials:ro
-      - ./data/src:/data/src:ro
       - ./data/input:/data/input:ro
       - ./data/intermediate:/data/intermediate:ro
-      - ./data/params.yaml:/data/params.yaml:ro
-    environment:
-      - GITHUB_SHA # For passing to the metadata output dataframe
-      - PYTHONUNBUFFERED="1" # For proper printing in GitHub Actions
-      - DOCKER_INTERNAL_PATH=/data # Used to set wd within Python scripts
-      - use_tiles_ignore_pbf=True
-      - update_existing_config=False
-      - force_rebuild=False
-      - tileset_name=tiles
-      - traffic_name=traffic
+      # All volumes are identical for first/second pass except the config file
+      - ./data/valhalla.json:/custom_files/valhalla.json:ro
+
+  valhalla-run-sp:
+    <<: *valhalla-run
+    container_name: valhalla-run-sp
+    ports:
+      - 8003:8002
+    volumes:
+      - ./data/build:/custom_files:rw
+      - ./data/output:/data/output:rw
+      - ./data/input:/data/input:ro
+      - ./data/intermediate:/data/intermediate:ro
+      - ./data/valhalla_sp.json:/custom_files/valhalla.json:ro

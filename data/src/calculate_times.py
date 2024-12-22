@@ -6,9 +6,7 @@ import uuid
 from pathlib import Path
 
 import pandas as pd
-import valhalla  # type: ignore
 import yaml
-from utils.constants import DOCKER_INTERNAL_PATH
 from utils.logging import create_logger
 from utils.times import (
     TravelTimeCalculator,
@@ -19,7 +17,7 @@ from utils.utils import format_time, get_md5_hash
 
 logger = create_logger(__name__)
 
-with open(DOCKER_INTERNAL_PATH / "params.yaml") as file:
+with open(Path.cwd() / "params.yaml") as file:
     params = yaml.safe_load(file)
 os.environ["AWS_PROFILE"] = params["s3"]["profile"]
 
@@ -53,29 +51,23 @@ def main() -> None:
         chunk_msg,
     )
     logger.info(
-        "Routing from %s origins to %s destinations (%s pairs)",
+        "Starting with %s origins to %s destinations (%s pairs)",
         len(inputs.origins),
         inputs.n_destinations,
         len(inputs.origins) * inputs.n_destinations,
     )
 
-    # Initialize the Valhalla router Python bindings. The _sp version is a
-    # more expensive fallback router used as a second pass
-    actor = valhalla.Actor((Path.cwd() / "valhalla.json").as_posix())
-    actor_sp = valhalla.Actor((Path.cwd() / "valhalla_sp.json").as_posix())
-
     # Use the Vahalla Locate API to append coordinates that are snapped to OSM
     if config.params["times"]["use_snapped"]:
         logger.info("Snapping coordinates to OSM network")
-        inputs.origins = snap_df_to_osm(
-            inputs.origins, config.args.mode, actor
-        )
+        inputs.origins = snap_df_to_osm(inputs.origins, config.args.mode)
         inputs.destinations = snap_df_to_osm(
-            inputs.destinations, config.args.mode, actor
+            inputs.destinations, config.args.mode
         )
 
     # Calculate times for each chunk and return a single DataFrame
-    tt_calc = TravelTimeCalculator(actor, actor_sp, config, inputs)
+    logger.info("Tiles loaded and coodinates ready, starting routing")
+    tt_calc = TravelTimeCalculator(config, inputs)
     results_df = tt_calc.many_to_many()
     logger.info(
         "Finished calculating times for %s pairs in %s",
@@ -126,9 +118,9 @@ def main() -> None:
 
     # Create a metadata DataFrame of all settings and data used for creating
     # inputs and generating times
-    with open(DOCKER_INTERNAL_PATH / "valhalla.json", "r") as f:
+    with open(Path.cwd() / "valhalla.json", "r") as f:
         valhalla_data = json.load(f)
-    with open(DOCKER_INTERNAL_PATH / "valhalla_sp.json", "r") as f:
+    with open(Path.cwd() / "valhalla_sp.json", "r") as f:
         valhalla_data_sp = json.load(f)
     metadata_df = pd.DataFrame(
         {

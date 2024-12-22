@@ -7,19 +7,15 @@ runs:
   using: composite
   steps:
     - name: Install uv
-      uses: astral-sh/setup-uv@v3
+      uses: astral-sh/setup-uv@v5
       with:
         enable-cache: true
         cache-suffix: "dvc"
 
-    - name: Install Python
-      uses: actions/setup-python@v5
-      with:
-        python-version-file: .python-version
-
     - name: Install DVC
       id: install_python_deps
       shell: bash
-      run: uv pip install "dvc[s3]"
-      env:
-        UV_SYSTEM_PYTHON: 1
+      run: |
+        uv python install
+        uv venv
+        uv pip install "dvc[s3]"
