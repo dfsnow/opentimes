@@ -1,6 +1,7 @@
 import argparse
 import json
 import logging
+import os
 import re
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -569,7 +570,7 @@ class TravelTimeCalculator:
         m_spl_d = self.inputs.max_split_size_destinations
         n_dc = self.inputs.n_destinations
 
-        with ThreadPoolExecutor() as executor:
+        with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
             futures = []
             for o in range(0, n_oc, max_spl_o):
                 for d in range(0, n_dc, m_spl_d):
@@ -653,7 +654,9 @@ class TravelTimeCalculator:
                 self.config.logger.info("Routing missing set number %s", idx)
                 o_ids = missing_set["origin_id"].unique()
                 d_ids = missing_set["destination_id"].unique()
-                with ThreadPoolExecutor() as executor:
+                with ThreadPoolExecutor(
+                    max_workers=os.cpu_count()
+                ) as executor:
                     futures = []
                     for o in range(0, len(o_ids), max_spl_o):
                         for d in range(0, len(d_ids), m_spl_d):
