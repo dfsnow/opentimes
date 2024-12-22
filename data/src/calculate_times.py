@@ -65,7 +65,9 @@ def main() -> None:
             inputs.destinations, config.args.mode
         )
 
-    # Calculate times for each chunk and return a single DataFrame
+    # Calculate times for each chunk and return a single DataFrame. Assumes
+    # there are Valhalla services running locally at localhost:8002 (and :8003
+    # if second-pass is enabled)
     logger.info("Tiles loaded and coodinates ready, starting routing")
     tt_calc = TravelTimeCalculator(config, inputs)
     results_df = tt_calc.many_to_many()
