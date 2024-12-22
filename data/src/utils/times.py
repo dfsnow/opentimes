@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import re
+import subprocess
 import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -608,6 +609,13 @@ class TravelTimeCalculator:
         # Check for completeness in the output. If any times are missing
         # after the first pass, run a second pass with the fallback router
         if results_df.isnull().values.any() and second_pass:
+            # Stop the first-pass Docker container with the goal of freeing
+            # the memory used by Valhalla caching
+            subprocess.run(
+                ["docker", "compose", "down", "valhalla-run-fp"],
+                check=True,
+                text=True,
+            )
             missing = results_df[results_df["duration_sec"].isnull()]
             self.config.logger.info(
                 "Starting second pass for %s missing pairs (out of %s total)",
