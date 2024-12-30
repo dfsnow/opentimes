@@ -106,7 +106,11 @@ class TravelTimePaths:
         self.compression_level: int = compression_level
         self.endpoint_url: str | None = endpoint_url
         self.storage_options = {
-            "s3": {"client_kwargs": {"endpoint_url": endpoint_url}},
+            "s3": {
+                # https://github.com/fsspec/s3fs/pull/888
+                "client_kwargs": {"endpoint_url": endpoint_url},
+                "fixed_upload_size": True,
+            },
             "local": {},
         }
 
