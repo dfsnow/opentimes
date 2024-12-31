@@ -188,7 +188,7 @@ jobs:
           echo "chunks=$(cat chunks.txt)" >> $GITHUB_OUTPUT
 
           # If override chunks are set, use those instead
-          chunks_parsed=($(echo "$chunks" | jq -r '.[]'))
+          chunks_parsed=($(cat chunks.txt | jq -r '.[]'))
           if [ -n "${{ inputs.override_chunks }}" ]; then
             override_chunks_parsed=($(echo "${{ inputs.override_chunks }}" | tr -d ' ' | tr ',' ' '))
             for chunk in "${override_chunks_parsed[@]}"; do
@@ -279,6 +279,21 @@ jobs:
           ln ./intermediate/valhalla_tiles/"$tile_path"/valhalla_tiles.tar.zst ./build/
           tar -xf ./build/valhalla_tiles.tar.zst -C ./build
           rm -f ./build/valhalla_tiles.tar.zst
+
+      # In rare cases the runner gets killed due to OoM errors. This bumps swap
+      # to 90% of the space remaining on disk
+      - name: Increase swapfile
+        run: |
+          space_left=$(df /dev/root -B 1 --output=avail | grep -v Avail)
+          space_mult=0.9
+          space_alloc=$(echo "${space_left}*${space_mult}" | bc)
+          space_alloc_rnd=$(printf %.0f $(echo ${space_alloc}))
+          sudo swapoff -a
+          sudo fallocate -l ${space_alloc_rnd} /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          sudo swapon --show
 
       - name: Run job chunk
         shell: bash

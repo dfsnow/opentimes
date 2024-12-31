@@ -128,7 +128,7 @@
     "max_cache_size": 3000000000,
     "max_concurrent_reader_users": 1,
     "reclassify_links": true,
-    "shortcuts": true,
+    "shortcuts": false,
     "tile_dir": "/custom_files/tiles",
     "tile_extract": "/custom_files/tiles.tar",
     "timezone": "/custom_files/timezone_data/timezones.sqlite",

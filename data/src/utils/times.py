@@ -3,6 +3,8 @@ import json
 import logging
 import os
 import re
+import shutil
+import subprocess
 import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -104,7 +106,11 @@ class TravelTimePaths:
         self.compression_level: int = compression_level
         self.endpoint_url: str | None = endpoint_url
         self.storage_options = {
-            "s3": {"client_kwargs": {"endpoint_url": endpoint_url}},
+            "s3": {
+                # https://github.com/fsspec/s3fs/pull/888
+                "client_kwargs": {"endpoint_url": endpoint_url},
+                "fixed_upload_size": True,
+            },
             "local": {},
         }
 
@@ -331,6 +337,7 @@ class TravelTimeConfig:
         args: argparse.Namespace,
         params: dict,
         logger: logging.Logger,
+        ncpu: int | None = None,
         verbose: bool = False,
     ) -> None:
         self.args = TravelTimeArgs(args, params)
@@ -344,6 +351,7 @@ class TravelTimeConfig:
             endpoint_url=self.params["s3"]["endpoint_url"],
         )
         self.logger = logger
+        self.ncpu = ncpu if ncpu else os.cpu_count()
         self.verbose = verbose
 
     def _load_od_file(self, path: str) -> pd.DataFrame:
@@ -566,7 +574,7 @@ class TravelTimeCalculator:
         m_spl_d = self.inputs.max_split_size_destinations
         n_dc = self.inputs.n_destinations
 
-        with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
+        with ThreadPoolExecutor(self.config.ncpu) as executor:
             futures = []
             for o in range(0, n_oc, max_spl_o):
                 for d in range(0, n_dc, m_spl_d):
@@ -608,6 +616,22 @@ class TravelTimeCalculator:
         # Check for completeness in the output. If any times are missing
         # after the first pass, run a second pass with the fallback router
         if results_df.isnull().values.any() and second_pass:
+            # Stop the first-pass Docker container with the goal of freeing
+            # the memory used by Valhalla caching
+            if shutil.which("docker"):
+                self.config.logger.info(
+                    "Stopping first-pass Valhalla Docker container"
+                )
+                subprocess.run(
+                    ["docker", "compose", "down", "valhalla-run-fp"],
+                    check=True,
+                    text=True,
+                )
+            else:
+                self.config.logger.warning(
+                    "Tried to stop the first-pass Valhalla Docker container, "
+                    "but Docker is not installed on this machine"
+                )
             missing = results_df[results_df["duration_sec"].isnull()]
             self.config.logger.info(
                 "Starting second pass for %s missing pairs (out of %s total)",
@@ -651,11 +675,7 @@ class TravelTimeCalculator:
                 o_ids = missing_set["origin_id"].unique()
                 d_ids = missing_set["destination_id"].unique()
 
-                # Don't use the all cores here as it tends to choke
-                ncpu = os.cpu_count()
-                ncpu = ncpu - 1 if ncpu is not None and ncpu > 1 else 1
-
-                with ThreadPoolExecutor(max_workers=ncpu) as executor:
+                with ThreadPoolExecutor(self.config.ncpu) as executor:
                     futures = []
                     for o in range(0, len(o_ids), max_spl_o):
                         for d in range(0, len(d_ids), m_spl_d):
