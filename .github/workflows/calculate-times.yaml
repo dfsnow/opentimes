@@ -155,6 +155,9 @@ jobs:
           docker load --input /tmp/opentimes.tar
           docker image ls -a
 
+      - name: Fetch locations data
+        uses: ./.github/actions/fetch-locations
+
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
@@ -171,9 +174,6 @@ jobs:
           uv python install
           uv venv
           uv pip install ".[site,data]"
-
-      - name: Fetch locations data
-        uses: ./.github/actions/fetch-locations
 
       - name: Create job chunks
         id: create-job-chunks
