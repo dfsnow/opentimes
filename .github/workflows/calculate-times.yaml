@@ -39,7 +39,6 @@ on:
           - county
           - county_subdivision
           - tract
-          - block_group
           - zcta
 
       state:
