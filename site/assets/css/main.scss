@@ -51,20 +51,17 @@ a {
 
 table {
   border-collapse: collapse;
-  margin: 0 auto;
-
-  &:not(.rating-table) {
-    display: block;
-    max-width: fit-content;
-    overflow-x: auto;
-    white-space: nowrap;
-  }
+  margin: 1.5em auto;
+  table-layout: fixed;
+  overflow-x: auto;
+  white-space: nowrap;
 
   td,
   th {
     border: 1.5px solid var(--gray-accent-1);
     text-align: center;
     padding: 10px;
+    width: 98px;
   }
 }
 

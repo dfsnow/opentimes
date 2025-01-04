@@ -4,22 +4,23 @@ title = "About"
 
 # What is OpenTimes?
 
-OpenTimes lets you download bulk travel data for free and with no limits.
-It is a database of around 20 billion point-to-point travel times and
-distances between United States Census geographies.
+OpenTimes is a database of pre-computed, point-to-point travel times and
+distances between United States Census geographies. It lets you download
+bulk travel data for free and with no limits.
 
 All times are calculated using open-source software from publicly available
 data. The OpenTimes data pipelines, infrastructure, packages, and website
 are all open-source and available on [GitHub](https://github.com/dfsnow/opentimes).
+See the [Data]({{< ref "data" >}}) section to learn how to download the data.
 
 ### Goals
 
-The primary goal of OpenTimes is to enable research by providing an
-accessible and free source of bulk travel data. The target audience
-is academics, urban planners, or really anyone who needs to quantify spatial
-access to resources (i.e. how many grocery stores someone can reach in an hour).
+The primary goal of OpenTimes is to enable research by providing easily
+accessible and free bulk travel data. The target audience is academics, urban
+planners, or really anyone who needs to quantify spatial access to resources
+(i.e. how many grocery stores someone can reach in an hour).
 
-The secondary goal is to provide a free alternative to paid
+The secondary goal of OpenTimes is to provide a free alternative to paid
 travel time/distance matrix products such as
 [Google's Distance Matrix API](https://developers.google.com/maps/documentation/distance-matrix/overview),
 [Esri's Network Analyst](https://www.esri.com/en-us/arcgis/products/arcgis-network-analyst/overview) tool,
@@ -32,7 +33,7 @@ performing live routing, etc.).
 
 ## FAQs
 
-This section focuses on the what, why, and how of the overall project. For
+This section focuses on the what, why, and how of the OpenTimes project. For
 more specific questions about the data (i.e. its coverage, construction, and
 limitations), see the [Data]({{< ref "data" >}}) section.
 
@@ -42,11 +43,11 @@ limitations), see the [Data]({{< ref "data" >}}) section.
 #### What is a travel time?
 
 In this case, a travel time is just how long it takes to get from location A
-to location B when following a road or path network. Think the Google Maps or
+to location B while following a road or path network. Think Google Maps or
 your favorite smartphone mapping service. OpenTimes provides billions of these
 times, all pre-calculated from public data. It also provides the distance
-traveled for each time, though unlike a smartphone map, it does not provide
-the route itself.
+traveled for each time. However, unlike a smartphone map, OpenTimes does not
+provide the route itself.
 
 #### What are the times between?
 
@@ -142,7 +143,7 @@ where each state runs in a
 [parameterized workflow](https://github.com/dfsnow/opentimes/actions/workflows/calculate-times.yaml)
 that splits the work into many smaller jobs that run in parallel. This works
 surprisingly well and lets me calculate tract-level times for the entire U.S.
-in about a day.
+in about 12 hours.
 
 #### How is the data served?
 
@@ -175,9 +176,9 @@ the map fill using the returned destination IDs and times.
 
 #### Why is the homepage slow sometimes?
 
-The Parquet files that it queries are supposed to be cached by Cloudflare's
-CDN. However, Cloudflare really doesn't seem to like very large files sitting
-in its caches, so they're constantly evicting them.
+The big Parquet files that it queries are supposed to be cached by Cloudflare's
+CDN. However, Cloudflare doesn't seem to like large files sitting in its caches,
+so the files are constantly getting evicted.
 
 If you click the map and it's slow, it's likely that you're hitting a cold cache.
 Click again and it should be much faster. Also, each state has its own file, so
@@ -237,7 +238,7 @@ I spent some time during graduate school as an RA at the
 calculate lots of travel times. OpenTimes is sort of the spiritual successor to
 that work.
 
-I built OpenTimes during a 6-week programming retreat at the
+I built most of OpenTimes during a 6-week programming retreat at the
 [Recurse Center](https://www.recurse.com/scout/click?t=e5f3c6558aa58965ec2efe48b1b486af),
 which I highly recommend.
 
@@ -256,5 +257,5 @@ A few reasons:
   routing engines, spatial analysis tools, and web mapping libraries has exploded
   in the last decade, but bulk travel times are still difficult to get and/or expensive.
 - It's a fun technical challenge to calculate and serve billions of records.
-- I was inspired by the [OpenFreeMap](https://openfreemap.org) project and wanted to use
-  my own domain knowledge to do something similar.
+- I was inspired by the [OpenFreeMap](https://openfreemap.org) project and
+  wanted to use my own domain knowledge to do something similar.
