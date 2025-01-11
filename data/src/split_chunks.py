@@ -61,7 +61,7 @@ def split_chunks(
     file_chunks = split_od_files_to_json(
         origin_file=origin_file,
         origin_n_chunks=int(
-            params["actions"]["origin_n_chunks"][mode]
+            params["actions"]["origin_n_chunks"]
             if not origin_n_chunks
             else origin_n_chunks
         ),
@@ -72,7 +72,7 @@ def split_chunks(
         ),
         destination_file=destination_file,
         destination_n_chunks=int(
-            params["actions"]["destination_n_chunks"][mode]
+            params["actions"]["destination_n_chunks"]
             if not destination_n_chunks
             else destination_n_chunks
         ),
