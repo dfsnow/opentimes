@@ -669,9 +669,16 @@ class TravelTimeCalculator:
                 len(merged_sets),
             )
             for idx, missing_set in enumerate(merged_sets):
-                self.config.logger.info("Routing missing set number %s", idx)
                 o_ids = missing_set["origin_id"].unique()
                 d_ids = missing_set["destination_id"].unique()
+                self.config.logger.info(
+                    "Routing missing set number %s with "
+                    "%s origins to %s destinations (%s pairs)",
+                    idx,
+                    len(o_ids),
+                    len(d_ids),
+                    len(o_ids) * len(d_ids),
+                )
 
                 with ThreadPoolExecutor(self.config.ncpu) as executor:
                     futures = []
