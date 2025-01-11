@@ -281,6 +281,6 @@
     "service": {
       "proxy": "ipc:///tmp/thor"
     },
-    "source_to_target_algorithm": "costmatrix"
+    "source_to_target_algorithm": "select_optimal"
   }
 }

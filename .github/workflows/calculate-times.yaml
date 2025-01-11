@@ -39,7 +39,6 @@ on:
           - county
           - county_subdivision
           - tract
-          - block_group
           - zcta
 
       state:
@@ -183,7 +182,8 @@ jobs:
           export USER_ID=${{ env.USER_ID }}
           export GROUP_ID=${{ env.GROUP_ID }}
           uv run ./src/split_chunks.py \
-            --year ${{ inputs.year }} --geography ${{ inputs.geography }} \
+            --mode ${{ inputs.mode }} --year ${{ inputs.year }} \
+            --geography ${{ inputs.geography }} \
             --state ${{ inputs.state }} > chunks.txt
           echo "chunks=$(cat chunks.txt)" >> $GITHUB_OUTPUT
 

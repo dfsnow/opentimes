@@ -477,6 +477,16 @@ class TravelTimeCalculator:
         if o_start_idx >= o_end_idx or d_start_idx >= d_end_idx:
             return []
 
+        # Create an empty DataFrame to return in case of exceptions
+        empty_df = create_empty_df(
+            o_start_idx,
+            d_start_idx,
+            o_end_idx,
+            d_end_idx,
+            origins["id"],
+            destinations["id"],
+        )
+
         # Stop recursion if the chunks are too small (i.e. equal to 1)
         if (o_end_idx - o_start_idx <= 1) and (d_end_idx - d_start_idx <= 1):
             try:
@@ -485,21 +495,13 @@ class TravelTimeCalculator:
                     destinations=destinations.iloc[d_start_idx:d_end_idx],
                     endpoint=endpoint,
                 )
+                return [df]
             except Exception as e:
-                df = create_empty_df(
-                    o_start_idx,
-                    d_start_idx,
-                    o_end_idx,
-                    d_end_idx,
-                    origins["id"],
-                    destinations["id"],
-                )
                 if print_log or self.config.verbose:
                     self.config.logger.warning(
                         f"{e}. Returning empty DataFrame"
                     )
-
-            return [df]
+                return [empty_df]
 
         max_depth = self.config.params["times"]["max_recursion_depth"]
         if cur_depth >= max_depth:
@@ -508,14 +510,6 @@ class TravelTimeCalculator:
                     f"Max recursion depth {max_depth} reached. "
                     "Returning empty DataFrame"
                 )
-            empty_df = create_empty_df(
-                o_start_idx,
-                d_start_idx,
-                o_end_idx,
-                d_end_idx,
-                origins["id"],
-                destinations["id"],
-            )
             return [empty_df]
 
         try:
@@ -544,6 +538,10 @@ class TravelTimeCalculator:
         # If the request fails, split the origins and destinations into
         # quadrants and start a binary search
         except Exception as e:
+            if "No path could be found for input" in str(e):
+                self.config.logger.warning(f"{e}. Returning empty DataFrame")
+                return [empty_df]
+
             if print_log or self.config.verbose:
                 self.config.logger.warning(f"{e}. Starting binary search...")
             osi, oei, dsi, dei = o_start_idx, o_end_idx, d_start_idx, d_end_idx
@@ -557,7 +555,11 @@ class TravelTimeCalculator:
             )
             # fmt: on
 
-    def many_to_many(self, second_pass: bool = True) -> pd.DataFrame:
+    def many_to_many(
+        self,
+        endpoint: str = DOCKER_ENDPOINT_FIRST_PASS,
+        second_pass: bool = True,
+    ) -> pd.DataFrame:
         """
         Entrypoint to calculate times for all combinations of origins and
         destinations in inputs. Includes an optional second pass which performs
@@ -589,7 +591,7 @@ class TravelTimeCalculator:
                             cur_depth=0,
                             origins=self.inputs.origins,
                             destinations=self.inputs.destinations,
-                            endpoint=DOCKER_ENDPOINT_FIRST_PASS,
+                            endpoint=endpoint,
                         )
                     )
             for future in futures:
@@ -671,9 +673,16 @@ class TravelTimeCalculator:
                 len(merged_sets),
             )
             for idx, missing_set in enumerate(merged_sets):
-                self.config.logger.info("Routing missing set number %s", idx)
                 o_ids = missing_set["origin_id"].unique()
                 d_ids = missing_set["destination_id"].unique()
+                self.config.logger.info(
+                    "Routing missing set number %s with "
+                    "%s origins to %s destinations (%s pairs)",
+                    idx,
+                    len(o_ids),
+                    len(d_ids),
+                    len(o_ids) * len(d_ids),
+                )
 
                 with ThreadPoolExecutor(self.config.ncpu) as executor:
                     futures = []

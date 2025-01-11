@@ -34,7 +34,7 @@ on:
       geography:
         required: true
         description: Comma-separated list of Census geographies
-        default: 'state,county,county_subdivision,tract,block_group,zcta'
+        default: 'state,county,county_subdivision,tract,zcta'
         type: string
 
 env:
@@ -91,6 +91,7 @@ jobs:
         shell: bash
         run: |
           uv python install
+          uv venv
           uv pip install ".[site,data]"
 
       - name: Setup Cloudflare credentials

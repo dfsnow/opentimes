@@ -9,13 +9,14 @@ with open(Path.cwd() / "params.yaml") as file:
 
 
 def split_chunks(
+    mode: str,
     year: str,
     geography: str,
     state: str,
-    origin_n_chunks: int = 64,
-    origin_min_chunk_size: int = 500,
-    destination_n_chunks: int = 4,
-    destination_min_chunk_size: int = 10000,
+    origin_n_chunks: str | None = None,
+    origin_min_chunk_size: str | None = None,
+    destination_n_chunks: str | None = None,
+    destination_min_chunk_size: str | None = None,
 ) -> None:
     """
     Split Parquet files into N chunks, where each chunk is at least a certain
@@ -24,20 +25,19 @@ def split_chunks(
     more OD pairs get squeezed into each job as origin_n_chunks decreases.
 
     The maximum number of chunks is equal to
-    origin_n_chunks * destination_n_chunks. By default, it's 256, which is
-    the maximum number of GitHub jobs per workflow.
+    origin_n_chunks * destination_n_chunks. By default, all chunk settings
+    pull from the params.yaml file.
 
     Args:
+        mode: Travel mode. Determines the chunk settings pulled
+            from params.yaml.
         year: The year of the input origins data.
         geography: The geography type of the origins data.
         state: The two-digit state FIPS code of the origins data.
-        origin_n_chunks: The maximum number of origin chunks. Defaults to 128.
+        origin_n_chunks: The maximum number of origin chunks.
         origin_min_chunk_size: The minimum size of each origin chunk.
-            Defaults to 500.
         destination_n_chunks: The maximum number of destination chunks.
-            Defaults to 2.
         origin_min_chunk_size: The minimum size of each destination chunk.
-            Defaults to 10000.
     """
     origin_file = (
         Path.cwd()
@@ -60,11 +60,27 @@ def split_chunks(
 
     file_chunks = split_od_files_to_json(
         origin_file=origin_file,
-        origin_n_chunks=origin_n_chunks,
-        origin_min_chunk_size=origin_min_chunk_size,
+        origin_n_chunks=int(
+            params["actions"]["origin_n_chunks"]
+            if not origin_n_chunks
+            else origin_n_chunks
+        ),
+        origin_min_chunk_size=int(
+            params["actions"]["origin_min_chunk_size"][mode]
+            if not origin_min_chunk_size
+            else origin_min_chunk_size
+        ),
         destination_file=destination_file,
-        destination_n_chunks=destination_n_chunks,
-        destination_min_chunk_size=destination_min_chunk_size,
+        destination_n_chunks=int(
+            params["actions"]["destination_n_chunks"]
+            if not destination_n_chunks
+            else destination_n_chunks
+        ),
+        destination_min_chunk_size=int(
+            params["actions"]["destination_min_chunk_size"][mode]
+            if not destination_min_chunk_size
+            else destination_min_chunk_size
+        ),
     )
 
     print(file_chunks)
@@ -72,6 +88,7 @@ def split_chunks(
 
 def main() -> None:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--mode", required=True, type=str)
     parser.add_argument("--year", required=True, type=str)
     parser.add_argument("--geography", required=True, type=str)
     parser.add_argument("--state", required=True, type=str)
@@ -79,35 +96,32 @@ def main() -> None:
         "--origin_n_chunks",
         required=False,
         type=str,
-        default=params["actions"]["origin_n_chunks"],
     )
     parser.add_argument(
         "--origin_min_chunk_size",
         required=False,
         type=str,
-        default=params["actions"]["origin_min_chunk_size"],
     )
     parser.add_argument(
         "--destination_n_chunks",
         required=False,
         type=str,
-        default=params["actions"]["destination_n_chunks"],
     )
     parser.add_argument(
         "--destination_min_chunk_size",
         required=False,
         type=str,
-        default=params["actions"]["destination_min_chunk_size"],
     )
     args = parser.parse_args()
     split_chunks(
+        args.mode,
         args.year,
         args.geography,
         args.state,
-        int(args.origin_n_chunks),
-        int(args.origin_min_chunk_size),
-        int(args.destination_n_chunks),
-        int(args.destination_min_chunk_size),
+        args.origin_n_chunks,
+        args.origin_min_chunk_size,
+        args.destination_n_chunks,
+        args.destination_min_chunk_size,
     )
 
 
