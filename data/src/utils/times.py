@@ -477,6 +477,16 @@ class TravelTimeCalculator:
         if o_start_idx >= o_end_idx or d_start_idx >= d_end_idx:
             return []
 
+        # Create an empty DataFrame to return in case of exceptions
+        empty_df = create_empty_df(
+            o_start_idx,
+            d_start_idx,
+            o_end_idx,
+            d_end_idx,
+            origins["id"],
+            destinations["id"],
+        )
+
         # Stop recursion if the chunks are too small (i.e. equal to 1)
         if (o_end_idx - o_start_idx <= 1) and (d_end_idx - d_start_idx <= 1):
             try:
@@ -485,21 +495,13 @@ class TravelTimeCalculator:
                     destinations=destinations.iloc[d_start_idx:d_end_idx],
                     endpoint=endpoint,
                 )
+                return [df]
             except Exception as e:
-                df = create_empty_df(
-                    o_start_idx,
-                    d_start_idx,
-                    o_end_idx,
-                    d_end_idx,
-                    origins["id"],
-                    destinations["id"],
-                )
                 if print_log or self.config.verbose:
                     self.config.logger.warning(
                         f"{e}. Returning empty DataFrame"
                     )
-
-            return [df]
+                return [empty_df]
 
         max_depth = self.config.params["times"]["max_recursion_depth"]
         if cur_depth >= max_depth:
@@ -508,14 +510,6 @@ class TravelTimeCalculator:
                     f"Max recursion depth {max_depth} reached. "
                     "Returning empty DataFrame"
                 )
-            empty_df = create_empty_df(
-                o_start_idx,
-                d_start_idx,
-                o_end_idx,
-                d_end_idx,
-                origins["id"],
-                destinations["id"],
-            )
             return [empty_df]
 
         try:
