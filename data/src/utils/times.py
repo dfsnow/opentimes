@@ -538,6 +538,10 @@ class TravelTimeCalculator:
         # If the request fails, split the origins and destinations into
         # quadrants and start a binary search
         except Exception as e:
+            if "No path could be found for input" in str(e):
+                self.config.logger.warning(f"{e}. Returning empty DataFrame")
+                return [empty_df]
+
             if print_log or self.config.verbose:
                 self.config.logger.warning(f"{e}. Starting binary search...")
             osi, oei, dsi, dei = o_start_idx, o_end_idx, d_start_idx, d_end_idx
