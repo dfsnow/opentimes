@@ -13,10 +13,10 @@ def split_chunks(
     year: str,
     geography: str,
     state: str,
-    origin_n_chunks: int | None = None,
-    origin_min_chunk_size: int | None = None,
-    destination_n_chunks: int | None = None,
-    destination_min_chunk_size: int | None = None,
+    origin_n_chunks: str | None = None,
+    origin_min_chunk_size: str | None = None,
+    destination_n_chunks: str | None = None,
+    destination_min_chunk_size: str | None = None,
 ) -> None:
     """
     Split Parquet files into N chunks, where each chunk is at least a certain
@@ -60,23 +60,23 @@ def split_chunks(
 
     file_chunks = split_od_files_to_json(
         origin_file=origin_file,
-        origin_n_chunks=(
+        origin_n_chunks=int(
             params["actions"]["origin_n_chunks"][mode]
             if not origin_n_chunks
             else origin_n_chunks
         ),
-        origin_min_chunk_size=(
+        origin_min_chunk_size=int(
             params["actions"]["origin_min_chunk_size"][mode]
             if not origin_min_chunk_size
             else origin_min_chunk_size
         ),
         destination_file=destination_file,
-        destination_n_chunks=(
+        destination_n_chunks=int(
             params["actions"]["destination_n_chunks"][mode]
             if not destination_n_chunks
             else destination_n_chunks
         ),
-        destination_min_chunk_size=(
+        destination_min_chunk_size=int(
             params["actions"]["destination_min_chunk_size"][mode]
             if not destination_min_chunk_size
             else destination_min_chunk_size
@@ -118,10 +118,10 @@ def main() -> None:
         args.year,
         args.geography,
         args.state,
-        int(args.origin_n_chunks),
-        int(args.origin_min_chunk_size),
-        int(args.destination_n_chunks),
-        int(args.destination_min_chunk_size),
+        args.origin_n_chunks,
+        args.origin_min_chunk_size,
+        args.destination_n_chunks,
+        args.destination_min_chunk_size,
     )
 
 
