@@ -44,6 +44,11 @@ times:
     - pedestrian
     #- multimodal
 
+  # Costing modes in this list will do a first pass with cheaper/faster matrix
+  # API settings. Otherwise, skip straight to a more expensive second pass
+  two_pass:
+    - auto
+
   # Maximum size of chunk of origins AND destinations to process in a single call to
   # Valhalla. This is necessary because larger matrices will cause it to choke
   max_split_size: 100

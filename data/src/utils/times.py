@@ -555,7 +555,11 @@ class TravelTimeCalculator:
             )
             # fmt: on
 
-    def many_to_many(self, second_pass: bool = True) -> pd.DataFrame:
+    def many_to_many(
+        self,
+        endpoint: str = DOCKER_ENDPOINT_FIRST_PASS,
+        second_pass: bool = True,
+    ) -> pd.DataFrame:
         """
         Entrypoint to calculate times for all combinations of origins and
         destinations in inputs. Includes an optional second pass which performs
@@ -587,7 +591,7 @@ class TravelTimeCalculator:
                             cur_depth=0,
                             origins=self.inputs.origins,
                             destinations=self.inputs.destinations,
-                            endpoint=DOCKER_ENDPOINT_FIRST_PASS,
+                            endpoint=endpoint,
                         )
                     )
             for future in futures:
