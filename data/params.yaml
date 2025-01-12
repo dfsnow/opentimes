@@ -22,8 +22,8 @@ actions:
   # that take longer. Lower = more jobs that finish quicker
   origin_min_chunk_size:
     auto: 1000
-    bicycle: 800
-    pedestrian: 800
+    bicycle: 500
+    pedestrian: 500
 
   # The max number of destination splits to create for a workflow
   destination_n_chunks: 4
