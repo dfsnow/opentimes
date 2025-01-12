@@ -7,7 +7,6 @@ from pathlib import Path
 
 import pandas as pd
 import yaml
-from utils.constants import DOCKER_ENDPOINT_SECOND_PASS
 from utils.logging import create_logger
 from utils.times import (
     TravelTimeCalculator,
@@ -71,13 +70,7 @@ def main() -> None:
     # if second-pass is enabled)
     logger.info("Tiles loaded and coodinates ready, starting routing")
     tt_calc = TravelTimeCalculator(config, inputs)
-    if config.args.mode not in config.params["times"]["two_pass"]:
-        logger.info("Skipping second pass for %s mode", config.args.mode)
-        results_df = tt_calc.many_to_many(
-            endpoint=DOCKER_ENDPOINT_SECOND_PASS, second_pass=False
-        )
-    else:
-        results_df = tt_calc.many_to_many()
+    results_df = tt_calc.many_to_many()
 
     logger.info(
         "Finished calculating times for %s pairs in %s",
