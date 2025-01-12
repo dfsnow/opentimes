@@ -1,6 +1,8 @@
 {{- define "scripts" -}}
 {{- $mermaid := resources.Get "vendor/mermaid-11.4.1.min.js" | fingerprint -}}
+{{- $details := resources.Get "js/details.js" | minify | fingerprint -}}
 <script type="module" src="{{- $mermaid.RelPermalink -}}"></script>
+<script src="{{- $details.RelPermalink -}}"></script>
 {{- end -}}
 
 {{- define "main" -}}
