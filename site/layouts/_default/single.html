@@ -1,3 +1,10 @@
+{{- define "scripts" -}}
+{{- if .Store.Get "hasMermaid" -}}
+{{- $mermaid := resources.Get "vendor/mermaid-11.4.1.min.js" | fingerprint -}}
+<script type="module" src="{{- $mermaid.RelPermalink -}}"></script>
+{{- end -}}
+{{- end -}}
+
 {{- define "main" -}}
 <article>
     {{- partial "header-link.html" .Content -}}
