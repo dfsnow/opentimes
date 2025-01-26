@@ -17,7 +17,6 @@ DATASET_DICT: dict = {
                 "origin_id",
                 "destination_id",
                 "duration_sec",
-                "distance_km",
             ],
             "order_by_columns": [
                 "origin_id",
@@ -56,9 +55,6 @@ DATASET_DICT: dict = {
                 "run_id",
                 "calc_datetime_finished",
                 "calc_time_elapsed_sec",
-                "calc_chunk_id",
-                "calc_chunk_n_origins",
-                "calc_chunk_n_destinations",
                 "calc_n_origins",
                 "calc_n_destinations",
                 "git_commit_sha_short",
@@ -74,7 +70,7 @@ DATASET_DICT: dict = {
                 "file_output_missing_pairs_md5",
             ],
             "order_by_columns": [
-                "calc_chunk_id",
+                "calc_datetime_finished",
             ],
         },
     }

@@ -28,7 +28,6 @@ def main() -> None:
     parser.add_argument("--geography", required=True, type=str)
     parser.add_argument("--state", required=True, type=str)
     parser.add_argument("--centroid-type", required=True, type=str)
-    parser.add_argument("--chunk", required=False, type=str)
     parser.add_argument("--write-to-s3", action="store_true", default=False)
     args = parser.parse_args()
     script_start_time = time.time()
@@ -37,7 +36,6 @@ def main() -> None:
     config = TravelTimeConfig(args, params=params, logger=logger)
     inputs = config.load_default_inputs()
 
-    chunk_msg = f", chunk: {config.args.chunk}" if config.args.chunk else ""
     logger.info(
         "Starting times calculation with parameters: version=%s, "
         "mode=%s, year=%s, geography=%s, state=%s, centroid_type=%s%s",
@@ -47,7 +45,6 @@ def main() -> None:
         config.args.geography,
         config.args.state,
         config.args.centroid_type,
-        chunk_msg,
     )
     logger.info(
         "Starting with %s origins to %s destinations (%s pairs)",
@@ -56,7 +53,7 @@ def main() -> None:
         len(inputs.origins) * inputs.n_destinations,
     )
 
-    # Use the OSRM Match API to append coordinates that are snapped to OSM
+    # Use the OSRM Nearest API to append coordinates that are snapped to OSM
     if config.params["times"]["use_snapped"]:
         logger.info("Snapping coordinates to OSM network")
         inputs.origins = snap_df_to_osm(inputs.origins, config.args.mode)
@@ -64,8 +61,8 @@ def main() -> None:
             inputs.destinations, config.args.mode
         )
 
-    # Calculate times for each chunk and return a single DataFrame. Assumes
-    # an OSRM service is running locally at localhost:5333
+    # Calculate times from all origins to all destinations and return a single
+    # DataFrame. Assumes an OSRM service is running locally at localhost:5333
     logger.info("Tiles loaded and coodinates ready, starting routing")
     tt_calc = TravelTimeCalculator(config, inputs)
     results_df = tt_calc.many_to_many()
@@ -123,10 +120,7 @@ def main() -> None:
             "run_id": run_id,
             "calc_datetime_finished": pd.Timestamp.now(tz="UTC"),
             "calc_time_elapsed_sec": time.time() - script_start_time,
-            "calc_chunk_id": args.chunk,
-            "calc_chunk_n_origins": inputs.n_origins,
-            "calc_chunk_n_destinations": inputs.n_destinations,
-            "calc_n_origins": inputs.n_origins_full,
+            "calc_n_origins": inputs.n_origins,
             "calc_n_destinations": inputs.n_destinations,
             "git_commit_sha_short": git_commit_sha_short,
             "git_commit_sha_long": git_commit_sha,
@@ -164,7 +158,6 @@ def main() -> None:
         config.args.geography,
         config.args.state,
         config.args.centroid_type,
-        chunk_msg,
         format_time(time.time() - script_start_time),
     )
 
