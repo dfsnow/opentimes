@@ -121,20 +121,8 @@ jobs:
           uv venv
           uv pip install ".[site,data]"
 
-      # In rare cases the runner gets killed due to OoM errors. This bumps swap
-      # to 90% of the space remaining on disk
-      - name: Increase swapfile
-        run: |
-          space_left=$(df /dev/root -B 1 --output=avail | grep -v Avail)
-          space_mult=0.9
-          space_alloc=$(echo "${space_left}*${space_mult}" | bc)
-          space_alloc_rnd=$(printf %.0f $(echo ${space_alloc}))
-          sudo swapoff -a
-          sudo fallocate -l ${space_alloc_rnd} /swapfile
-          sudo chmod 600 /swapfile
-          sudo mkswap /swapfile
-          sudo swapon /swapfile
-          sudo swapon --show
+      - name: Increase swap space
+        uses: ./.github/actions/increase-swap
 
       - name: Create jobs per geography
         id: create-geo-jobs
