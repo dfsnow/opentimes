@@ -1,27 +1,18 @@
 import argparse
 import json
 import logging
-import os
 import re
-import shutil
-import subprocess
 import time
-from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, Literal
 
 import pandas as pd
 import requests as r
 
-from utils.constants import (
-    DOCKER_ENDPOINT_FIRST_PASS,
-    DOCKER_ENDPOINT_SECOND_PASS,
-)
+from utils.constants import DOCKER_ENDPOINT
 from utils.utils import (
     create_empty_df,
     format_time,
-    group_by_column_sets,
-    merge_overlapping_df_list,
 )
 
 
@@ -155,18 +146,20 @@ class TravelTimePaths:
         return {
             "main": {"path": self._main_path},
             "dirs": {
-                "valhalla_tiles": Path(
+                "osrm_network": Path(
                     Path.cwd(),
-                    f"intermediate/valhalla_tiles/year={self.args.year}",
+                    f"intermediate/osrmnetwork/year={self.args.year}",
                     f"geography=state/state={self.args.state}",
+                    f"mode={self.args.mode}",
                 )
             },
             "files": {
-                "valhalla_tiles_file": Path(
+                "osrm_network_file": Path(
                     Path.cwd(),
-                    f"intermediate/valhalla_tiles/year={self.args.year}",
+                    f"intermediate/osrmnetwork/year={self.args.year}",
                     f"geography=state/state={self.args.state}/",
-                    "valhalla_tiles.tar.zst",
+                    f"mode={self.args.mode}",
+                    "osrmnetwork.tar.zst",
                 ),
                 "origins_file": Path(
                     Path.cwd(),
@@ -337,7 +330,6 @@ class TravelTimeConfig:
         args: argparse.Namespace,
         params: dict,
         logger: logging.Logger,
-        ncpu: int | None = None,
         verbose: bool = False,
     ) -> None:
         self.args = TravelTimeArgs(args, params)
@@ -351,11 +343,10 @@ class TravelTimeConfig:
             endpoint_url=self.params["s3"]["endpoint_url"],
         )
         self.logger = logger
-        self.ncpu = ncpu if ncpu else os.cpu_count()
         self.verbose = verbose
 
     def _load_od_file(self, path: str) -> pd.DataFrame:
-        """Load an origins or destinations file and prep for Valhalla."""
+        """Load an origins or destinations file and prep for routing."""
         df = (
             pd.read_parquet(self.paths.get_path(path, path_type="input"))
             .loc[:, list(self.OD_COLS[self.args.centroid_type].keys())]
@@ -380,7 +371,7 @@ class TravelTimeConfig:
 class TravelTimeCalculator:
     """
     Class to calculate travel times between origins and destinations.
-    Uses chunked requests to the Valhalla Matrix API for calculation.
+    Uses chunked requests to the OSRM Table API for calculation.
     """
 
     def __init__(
@@ -395,10 +386,9 @@ class TravelTimeCalculator:
         self,
         origins: pd.DataFrame,
         destinations: pd.DataFrame,
-        endpoint: str,
     ) -> pd.DataFrame:
         """
-        Sends the travel time calculation request to the Valhalla Matrix API.
+        Sends the travel time calculation request to the OSRM Table API.
         Responsible for taking an origin/destination input, transforming it to
         the required JSON format, and parsing the response.
 
@@ -413,28 +403,41 @@ class TravelTimeCalculator:
             return {"lat": x[f"lat{col_suffix}"], "lon": x[f"lon{col_suffix}"]}
 
         # Convert the origin and destination points to lists, then squash them
-        # into JSON: https://valhalla.github.io/valhalla/api/matrix/api-reference/
+        # into a GET request in the style expected by OSRM. See API docs:
+        # https://project-osrm.org/docs/v5.5.1/api/#table-service
         origins_list = origins.apply(_col_dict, axis=1).tolist()
         destinations_list = destinations.apply(_col_dict, axis=1).tolist()
-        request_json = json.dumps(
-            {
-                "sources": origins_list,
-                "targets": destinations_list,
-                "costing": self.config.args.mode,
-                "verbose": False,
-            }
+        coords_set = {
+            f"{item['lon']},{item['lat']}"
+            for item in origins_list + destinations_list
+        }
+        source_index = [
+            str(index)
+            for index, item in enumerate(origins_list)
+            if f"{item['lon']},{item['lat']}" in coords_set
+        ]
+        destination_index = [
+            str(index)
+            for index, item in enumerate(destinations_list)
+            if f"{item['lon']},{item['lat']}" in coords_set
+        ]
+        request_body = (
+            DOCKER_ENDPOINT
+            + "/table/v1/car/"
+            + ";".join([item for item in list(coords_set)])
+            + f"?sources={';'.join(source_index)}"
+            + f"&destinations={';'.join(destination_index)}"
         )
 
         # Get the actual JSON response from the API
-        response = r.post(endpoint + "/sources_to_targets", data=request_json)
+        response = r.get(request_body)
         response_data = response.json()
         if response.status_code != 200:
-            raise ValueError(response_data["error"])
+            raise ValueError(response_data["message"])
 
         # Parse the response data and convert it to a DataFrame. Recover the
         # origin and destination indices and append them to the DataFrame
-        durations = response_data["sources_to_targets"]["durations"]
-        distances = response_data["sources_to_targets"]["distances"]
+        durations = response_data["durations"]
         origin_ids = origins["id"].repeat(len(destinations)).tolist()
         destination_ids = destinations["id"].tolist() * (len(origins))
 
@@ -443,7 +446,6 @@ class TravelTimeCalculator:
                 "origin_id": origin_ids,
                 "destination_id": destination_ids,
                 "duration_sec": [i for sl in durations for i in sl],
-                "distance_km": [i for sl in distances for i in sl],
             }
         )
 
@@ -459,7 +461,6 @@ class TravelTimeCalculator:
         cur_depth: int,
         origins: pd.DataFrame,
         destinations: pd.DataFrame,
-        endpoint: str,
     ) -> list[pd.DataFrame]:
         """
         Recursively split the origins and destinations into smaller chunks.
@@ -493,7 +494,6 @@ class TravelTimeCalculator:
                 df = self._calculate_times(
                     origins=origins.iloc[o_start_idx:o_end_idx],
                     destinations=destinations.iloc[d_start_idx:d_end_idx],
-                    endpoint=endpoint,
                 )
                 return [df]
             except Exception as e:
@@ -517,7 +517,6 @@ class TravelTimeCalculator:
             times = self._calculate_times(
                 origins=origins.iloc[o_start_idx:o_end_idx],
                 destinations=destinations.iloc[d_start_idx:d_end_idx],
-                endpoint=endpoint,
             )
 
             if print_log or self.config.verbose:
@@ -548,18 +547,14 @@ class TravelTimeCalculator:
             mo, md = (osi + oei) // 2, (dsi + dei) // 2
             # fmt: off
             return (
-                self._binary_search(osi, dsi, mo, md, False, cur_depth + 1, origins, destinations, endpoint)
-                + self._binary_search(mo, dsi, oei, md, False, cur_depth + 1, origins, destinations, endpoint)
-                + self._binary_search(osi, md, mo, dei, False, cur_depth + 1, origins, destinations, endpoint)
-                + self._binary_search(mo, md, oei, dei, False, cur_depth + 1, origins, destinations, endpoint)
+                self._binary_search(osi, dsi, mo, md, False, cur_depth + 1, origins, destinations)
+                + self._binary_search(mo, dsi, oei, md, False, cur_depth + 1, origins, destinations)
+                + self._binary_search(osi, md, mo, dei, False, cur_depth + 1, origins, destinations)
+                + self._binary_search(mo, md, oei, dei, False, cur_depth + 1, origins, destinations)
             )
             # fmt: on
 
-    def many_to_many(
-        self,
-        endpoint: str = DOCKER_ENDPOINT_FIRST_PASS,
-        second_pass: bool = True,
-    ) -> pd.DataFrame:
+    def many_to_many(self) -> pd.DataFrame:
         """
         Entrypoint to calculate times for all combinations of origins and
         destinations in inputs. Includes an optional second pass which performs
@@ -575,27 +570,20 @@ class TravelTimeCalculator:
         n_oc = self.inputs.n_origins
         m_spl_d = self.inputs.max_split_size_destinations
         n_dc = self.inputs.n_destinations
-
-        with ThreadPoolExecutor(self.config.ncpu) as executor:
-            futures = []
-            for o in range(0, n_oc, max_spl_o):
-                for d in range(0, n_dc, m_spl_d):
-                    futures.append(
-                        executor.submit(
-                            self._binary_search,
-                            o_start_idx=o,
-                            d_start_idx=d,
-                            o_end_idx=min(o + max_spl_o, n_oc),
-                            d_end_idx=min(d + m_spl_d, n_dc),
-                            print_log=True,
-                            cur_depth=0,
-                            origins=self.inputs.origins,
-                            destinations=self.inputs.destinations,
-                            endpoint=endpoint,
-                        )
+        for o in range(0, n_oc, max_spl_o):
+            for d in range(0, n_dc, m_spl_d):
+                results.append(
+                    self._binary_search(
+                        o_start_idx=o,
+                        d_start_idx=d,
+                        o_end_idx=min(o + max_spl_o, n_oc),
+                        d_end_idx=min(d + m_spl_d, n_dc),
+                        print_log=True,
+                        cur_depth=0,
+                        origins=self.inputs.origins,
+                        destinations=self.inputs.destinations,
                     )
-            for future in futures:
-                results.extend(future.result())
+                )
 
         # Return empty result set if nothing is routable
         if len(results) == 0:
@@ -604,124 +592,16 @@ class TravelTimeCalculator:
                     "origin_id",
                     "destination_id",
                     "duration_sec",
-                    "distance_km",
                 ]
             )
         else:
-            results_df = (
-                pd.concat(results, ignore_index=True)
+            return (
+                pd.concat(
+                    [df for sl in results for df in sl], ignore_index=True
+                )
                 .set_index(["origin_id", "destination_id"])
                 .sort_index()
             )
-            del results
-
-        # Check for completeness in the output. If any times are missing
-        # after the first pass, run a second pass with the fallback router
-        if results_df.isnull().values.any() and second_pass:
-            # Stop the first-pass Docker container with the goal of freeing
-            # the memory used by Valhalla caching
-            if shutil.which("docker"):
-                self.config.logger.info(
-                    "Stopping first-pass Valhalla Docker container"
-                )
-                subprocess.run(
-                    ["docker", "compose", "down", "valhalla-run-fp"],
-                    check=True,
-                    text=True,
-                )
-            else:
-                self.config.logger.warning(
-                    "Tried to stop the first-pass Valhalla Docker container, "
-                    "but Docker is not installed on this machine"
-                )
-            missing = results_df[results_df["duration_sec"].isnull()]
-            self.config.logger.info(
-                "Starting second pass for %s missing pairs (out of %s total)",
-                len(missing),
-                len(results_df),
-            )
-
-            # Find the unique set of destinations, then use it to create groups
-            # of origins, such that all origins in a DataFrame share the same
-            # set of destinations. This greatly increases second pass speed
-            results_sp = []
-            missing_sets = group_by_column_sets(
-                missing.reset_index(), "origin_id", "destination_id"
-            )
-
-            # Merge missing sets of OD pairs that overlap significantly (think
-            # two origins that share 1000 destinations but not the 1001st)
-            missing_sets = [
-                df[["origin_id", "destination_id"]] for df in missing_sets
-            ]
-            merged_sets = merge_overlapping_df_list(missing_sets, 0.8)
-
-            # Gut check that both sets contain the same number of rows
-            try:
-                assert sum(len(df) for df in missing_sets) == sum(
-                    len(df) for df in merged_sets
-                )
-            except AssertionError:
-                raise ValueError(
-                    "The total number of rows in missing_sets does not"
-                    "match the total number of rows in merged_sets"
-                )
-
-            self.config.logger.info(
-                "Found %s unique missing sets. Merged to %s sets",
-                len(missing_sets),
-                len(merged_sets),
-            )
-            for idx, missing_set in enumerate(merged_sets):
-                o_ids = missing_set["origin_id"].unique()
-                d_ids = missing_set["destination_id"].unique()
-                self.config.logger.info(
-                    "Routing missing set number %s with "
-                    "%s origins to %s destinations (%s pairs)",
-                    idx,
-                    len(o_ids),
-                    len(d_ids),
-                    len(o_ids) * len(d_ids),
-                )
-
-                with ThreadPoolExecutor(self.config.ncpu) as executor:
-                    futures = []
-                    for o in range(0, len(o_ids), max_spl_o):
-                        for d in range(0, len(d_ids), m_spl_d):
-                            futures.append(
-                                executor.submit(
-                                    self._binary_search,
-                                    o_start_idx=o,
-                                    d_start_idx=d,
-                                    o_end_idx=min(o + max_spl_o, len(o_ids)),
-                                    d_end_idx=min(d + m_spl_d, len(d_ids)),
-                                    print_log=True,
-                                    cur_depth=0,
-                                    origins=self.inputs.origins[
-                                        self.inputs.origins["id"].isin(o_ids)
-                                    ],
-                                    destinations=self.inputs.destinations[
-                                        self.inputs.destinations["id"].isin(
-                                            d_ids
-                                        )
-                                    ],
-                                    endpoint=DOCKER_ENDPOINT_SECOND_PASS,
-                                )
-                            )
-
-                    for future in futures:
-                        results_sp.extend(future.result())
-
-            # Merge the results from the second pass with the first pass
-            results_sp_df = (
-                pd.concat(results_sp, ignore_index=True)
-                .set_index(["origin_id", "destination_id"])
-                .sort_index()
-            )
-            del results_sp
-            results_df.update(results_sp_df)
-
-        return results_df
 
 
 def snap_df_to_osm(df: pd.DataFrame, mode: str) -> pd.DataFrame:
@@ -744,9 +624,7 @@ def snap_df_to_osm(df: pd.DataFrame, mode: str) -> pd.DataFrame:
         }
     )
 
-    response = r.post(
-        DOCKER_ENDPOINT_FIRST_PASS + "/locate", data=request_json
-    )
+    response = r.post(DOCKER_ENDPOINT + "/locate", data=request_json)
     response_data = response.json()
     if response.status_code != 200:
         raise ValueError(response_data["error"])

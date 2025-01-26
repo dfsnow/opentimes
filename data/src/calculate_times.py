@@ -1,5 +1,4 @@
 import argparse
-import json
 import os
 import time
 import uuid
@@ -7,7 +6,6 @@ from pathlib import Path
 
 import pandas as pd
 import yaml
-from utils.constants import DOCKER_ENDPOINT_SECOND_PASS
 from utils.logging import create_logger
 from utils.times import (
     TravelTimeCalculator,
@@ -58,7 +56,7 @@ def main() -> None:
         len(inputs.origins) * inputs.n_destinations,
     )
 
-    # Use the Vahalla Locate API to append coordinates that are snapped to OSM
+    # Use the OSRM Match API to append coordinates that are snapped to OSM
     if config.params["times"]["use_snapped"]:
         logger.info("Snapping coordinates to OSM network")
         inputs.origins = snap_df_to_osm(inputs.origins, config.args.mode)
@@ -67,29 +65,21 @@ def main() -> None:
         )
 
     # Calculate times for each chunk and return a single DataFrame. Assumes
-    # there are Valhalla services running locally at localhost:8002 (and :8003
-    # if second-pass is enabled)
+    # an OSRM service is running locally at localhost:5333
     logger.info("Tiles loaded and coodinates ready, starting routing")
     tt_calc = TravelTimeCalculator(config, inputs)
-    if config.args.mode not in config.params["times"]["two_pass"]:
-        logger.info("Skipping second pass for %s mode", config.args.mode)
-        results_df = tt_calc.many_to_many(
-            endpoint=DOCKER_ENDPOINT_SECOND_PASS, second_pass=False
-        )
-    else:
-        results_df = tt_calc.many_to_many()
-
+    results_df = tt_calc.many_to_many()
     logger.info(
         "Finished calculating times for %s pairs in %s",
         len(results_df),
         format_time(time.time() - script_start_time),
     )
 
-    # Extract missing pairs to a separate DataFrame and sort all outputs
+    # Extract any missing pairs to a separate DataFrame and sort all outputs
     # for efficient compression
     missing_pairs_df = results_df[results_df["duration_sec"].isnull()]
     missing_pairs_df = (
-        missing_pairs_df.drop(columns=["duration_sec", "distance_km"])
+        missing_pairs_df.drop(columns=["duration_sec"])
         .sort_index()
         .reset_index()
     )
@@ -128,10 +118,6 @@ def main() -> None:
 
     # Create a metadata DataFrame of all settings and data used for creating
     # inputs and generating times
-    with open(Path.cwd() / "valhalla.json", "r") as f:
-        valhalla_data = json.load(f)
-    with open(Path.cwd() / "valhalla_sp.json", "r") as f:
-        valhalla_data_sp = json.load(f)
     metadata_df = pd.DataFrame(
         {
             "run_id": run_id,
@@ -148,8 +134,8 @@ def main() -> None:
             "param_destination_buffer_m": params["input"][
                 "destination_buffer_m"
             ],
-            "file_input_valhalla_tiles_md5": input_file_hashes[
-                "valhalla_tiles_file"
+            "file_input_osrm_network_md5": input_file_hashes[
+                "osrm_network_file"
             ],
             "file_input_origins_md5": input_file_hashes["origins_file"],
             "file_input_destinations_md5": input_file_hashes[
@@ -163,12 +149,6 @@ def main() -> None:
             "file_output_missing_pairs_md5": output_file_hashes[
                 "missing_pairs_file"
             ],
-            "valhalla_config_data": json.dumps(
-                valhalla_data, separators=(",", ":")
-            ),
-            "valhalla_config_data_second_pass": json.dumps(
-                valhalla_data_sp, separators=(",", ":")
-            ),
         },
         index=[0],
     )
