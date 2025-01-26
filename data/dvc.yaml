@@ -126,44 +126,7 @@ stages:
       year: ${input.year}
       state: ${input.state}
     # See: https://docs.conveyal.com/prepare-inputs#preparing-the-osm-data
-    cmd: '
-      OUT_DIR=./intermediate/osmextract/year=${item.year}/geography=state/state=${item.state} &&
-      mkdir -p $OUT_DIR &&
-      osmium extract
-        --strategy complete_ways
-        -p intermediate/osmclip/year=${item.year}/geography=state/state=${item.state}/${item.state}.geojson
-        ./input/osm/year=${item.year}/us-${item.year}.osm.pbf --overwrite
-        -o "$OUT_DIR"/tmp.osm.pbf &&
-      osmium tags-filter "$OUT_DIR"/tmp.osm.pbf
-        w/highway w/public_transport=platform
-        w/railway=platform w/park_ride r/type=restriction --overwrite
-        -o "$OUT_DIR"/${item.state}.osm.pbf &&
-      rm $OUT_DIR/tmp.osm.pbf
-      '
+    cmd: "./src/extract_osm.sh ${item.year} ${item.state}"
     outs:
       - ./intermediate/osmextract/year=${item.year}/geography=state/state=${item.state}/${item.state}.osm.pbf:
-          persist: true
-
-  create_osrmnetwork_by_state:
-    deps:
-      - ./intermediate/osmextract/year=${item.year}/geography=state/state=${item.state}/${item.state}.osm.pbf
-    matrix:
-      mode: ${times.mode}
-      year: ${input.year}
-      state: ${input.state}
-    cmd: '
-      BUILD_DIR=build &&
-      IN_FILE=intermediate/osmextract/year=${item.year}/geography=state/state=${item.state}/${item.state}.osm.pbf &&
-      OUT_DIR=intermediate/osrmnetwork/mode=${item.mode}/year=${item.year}/geography=state/state=${item.state} &&
-      rm -rf ./"$BUILD_DIR"/* &&
-      mkdir -p ./"$OUT_DIR" &&
-      ln ./"$IN_FILE" ./"$BUILD_DIR"/${item.state}.osm.pbf &&
-      docker run -t -v ./"$BUILD_DIR":/data osrm/osrm-backend osrm-extract -p /opt/${item.mode}.lua /data/${item.state}.osm.pbf &&
-      docker run -t -v ./"$BUILD_DIR":/data osrm/osrm-backend osrm-contract /data/${item.state}.osrm &&
-      rm ./"$BUILD_DIR"/${item.state}.osm.pbf &&
-      ZSTD_CLEVEL=19 sudo tar --zstd --remove-files -cf ./osrmnetwork.tar.zst ./"$BUILD_DIR" &&
-      mv ./osrmnetwork.tar.zst ./"$OUT_DIR"
-      '
-    outs:
-      - ./intermediate/osrmnetwork/mode=${item.mode}/year=${item.year}/geography=state/state=${item.state}/osrmnetwork.tar.zst:
           persist: true
