@@ -94,47 +94,9 @@ env:
   PYTHONUNBUFFERED: "1"
 
 jobs:
-  setup-jobs:
-    runs-on: ubuntu-24.04
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Cloudflare credentials
-        uses: ./.github/actions/setup-cloudflare-s3
-        with:
-          CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
-          CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
-
-      - name: Fetch locations data
-        uses: ./.github/actions/fetch-locations
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          enable-cache: true
-          cache-suffix: "site-data"
-          cache-dependency-glob: |
-            pyproject.toml
-            uv.lock
-
-      - name: Install Python dependencies
-        id: install-python-dependencies
-        shell: bash
-        run: |
-          uv python install
-          uv venv
-          uv pip install ".[site,data]"
-
   run-job:
     runs-on: ubuntu-24.04
     needs: setup-jobs
-    strategy:
-      # Don't fail all chunks if one fails
-      fail-fast: false
-      matrix:
-        chunk: ${{ fromJSON(needs.setup-jobs.outputs.chunks) }}
 
     steps:
       - name: Checkout
@@ -146,35 +108,22 @@ jobs:
           CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
           CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
 
+      - name: Install DVC
+        uses: ./.github/actions/setup-dvc
+
       - name: Fetch locations data
         uses: ./.github/actions/fetch-locations
 
-      # Don't fetch tile data in setup-jobs because they're very large and
-      # will churn the Actions cache. We want to wait to fetch it until jobs
-      # have actually been picked up
-      - name: Fetch OSRM network data
-        uses: ./.github/actions/fetch-osrm-network
-        with:
-          year: ${{ inputs.year }}
-          state: ${{ inputs.state }}
-
-      - name: Fetch GitHub user and group ID
+      - name: Fetch network data
         shell: bash
-        id: fetch-ids
+        working-directory: 'data'
         run: |
-          echo "USER_ID=$(id -u)" >> $GITHUB_ENV
-          echo "GROUP_ID=$(id -g)" >> $GITHUB_ENV
-
-      - name: Fetch Docker image
-        uses: actions/download-artifact@v4
-        with:
-          name: opentimes-docker-${{ hashFiles('./data/Dockerfile', './pyproject.toml') }}
-          path: /tmp
-
-      - name: Load Docker image
-        run: |
-          docker load --input /tmp/opentimes.tar
-          docker image ls -a
+          path=mode=${{ inputs.mode }}/year=${{ inputs.year }}/geography=state/state=${{ inputs.state }}
+          uv run dvc pull --no-run-cache \
+            ./intermediate/osrmnetwork/"$path"/osrmnetwork.tar.zst
+          ln ./intermediate/osrmnetwork/"$path"/osrmnetwork.tar.zst ./build/
+          tar -xf ./build/osrmnetwork.tar.zst -C ./build
+          rm -f ./build/osrmnetwork.tar.zst
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
@@ -192,15 +141,6 @@ jobs:
           uv python install
           uv venv
           uv pip install ".[site,data]"
-
-      - name: Extract tiles
-        shell: bash
-        working-directory: 'data'
-        run: |
-          tile_path="year=${{ inputs.year }}/geography=state/state=${{ inputs.state }}"
-          ln ./intermediate/valhalla_tiles/"$tile_path"/valhalla_tiles.tar.zst ./build/
-          tar -xf ./build/valhalla_tiles.tar.zst -C ./build
-          rm -f ./build/valhalla_tiles.tar.zst
 
       # In rare cases the runner gets killed due to OoM errors. This bumps swap
       # to 90% of the space remaining on disk
@@ -221,38 +161,8 @@ jobs:
         shell: bash
         working-directory: 'data'
         run: |
-          export USER_ID=${{ env.USER_ID }}
-          export GROUP_ID=${{ env.GROUP_ID }}
-          docker compose up --quiet-pull valhalla-run-fp valhalla-run-sp -d
           uv run ./src/calculate_times.py \
             --mode ${{ inputs.mode }} --year ${{ inputs.year }} \
             --geography ${{ inputs.geography }} --state ${{ inputs.state }} \
             --centroid-type ${{ inputs.centroid_type }} \
             --chunk ${{ matrix.chunk }} --write-to-s3
-
-      # Clear the cache if we're one of the last running jobs. Using this instead
-      # of a separate workflow step because the steps often come last in the job
-      # queue and then won't run when many workflows are queued at the same time
-      - name: Clear workflow cache
-        if: always()
-        continue-on-error: true
-        shell: bash
-        run: |
-          endpoint='repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs --paginate -q'
-          total_jobs=$(gh api $endpoint '.total_count')
-          complete_jobs=$(gh api $endpoint '.jobs[] | select(.status == "completed")' | wc -l)
-          in_progress_jobs=$(gh api $endpoint '.jobs[] | select(.status == "in_progress")' | wc -l)
-
-          n_remaining=$((total_jobs - complete_jobs))
-          all_statuses=$((complete_jobs + in_progress_jobs))
-          echo "Total number of jobs: $total_jobs"
-          echo "Number of jobs complete: $total_jobs"
-          echo "Number of jobs remaining: $n_remaining"
-          echo "Number of jobs run/running: $all_statuses"
-          if [ "$n_remaining" -lt 2 ] && [ "$total_jobs" -eq "$all_statuses" ]; then
-            echo "Less than 5 jobs still running. Clearing workflow cache!"
-            gh cache delete \
-              valhalla-tiles-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }} || true
-          fi
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
