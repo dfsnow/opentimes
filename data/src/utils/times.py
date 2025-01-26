@@ -125,17 +125,17 @@ class TravelTimePaths:
             "dirs": {
                 "osrm_network": Path(
                     Path.cwd(),
-                    f"intermediate/osrmnetwork/year={self.args.year}",
+                    f"intermediate/osrmnetwork/mode={self.args.mode}",
+                    f"year={self.args.year}",
                     f"geography=state/state={self.args.state}",
-                    f"mode={self.args.mode}",
                 )
             },
             "files": {
                 "osrm_network_file": Path(
                     Path.cwd(),
-                    f"intermediate/osrmnetwork/year={self.args.year}",
+                    f"intermediate/osrmnetwork/mode={self.args.mode}",
+                    f"year={self.args.year}",
                     f"geography=state/state={self.args.state}/",
-                    f"mode={self.args.mode}",
                     "osrmnetwork.tar.zst",
                 ),
                 "origins_file": Path(
