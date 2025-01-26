@@ -161,6 +161,7 @@ stages:
       docker run -t -v ./"$BUILD_DIR":/data osrm/osrm-backend osrm-extract -p /opt/${item.mode}.lua /data/${item.state}.osm.pbf &&
       docker run -t -v ./"$BUILD_DIR":/data osrm/osrm-backend osrm-contract /data/${item.state}.osrm &&
       rm ./"$BUILD_DIR"/${item.state}.osm.pbf &&
+      chown -R $UID ./"$BUILD_DIR" &&
       ZSTD_CLEVEL=19 tar -cf ./osrmnetwork.tar.zst ./"$BUILD_DIR" &&
       mv ./osrmnetwork.tar.zst ./"$OUT_DIR"
       '
