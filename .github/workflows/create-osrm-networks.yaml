@@ -100,11 +100,6 @@ jobs:
         run: |
           uv run dvc repro -s create_osrmnetwork_by_state@${{ matrix.mode }}-${{ inputs.year }}-${{ matrix.state }}
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        with:
-          limit-access-to-actor: true
-
       - name: Write network files to S3
         shell: bash
         working-directory: 'data'
