@@ -28,7 +28,7 @@ times:
   # call to OSRM. Useful for limiting total OSRM memory consumption
   max_split_size: 5000
 
-  # Coordinates are snapped to the OSM street network before time calculation
+  # Use coordinates snapped to the OSM street network as origin/destinations
   use_snapped: true
 
   # If OSRM fails on the first pass, the time calculator begins a recursive

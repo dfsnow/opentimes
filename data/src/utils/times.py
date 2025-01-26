@@ -1,5 +1,4 @@
 import argparse
-import json
 import logging
 import time
 from pathlib import Path
@@ -227,7 +226,7 @@ class TravelTimePaths:
 
 class TravelTimeInputs:
     """
-    Class to hold input data for travel time calculations.
+    Class to prep and hold input data for travel time calculations.
     """
 
     def __init__(
@@ -286,10 +285,19 @@ class TravelTimeConfig:
         )
         return df
 
-    def load_default_inputs(self) -> TravelTimeInputs:
-        """Load default origins and destinations files."""
+    def load_default_inputs(self, snap: bool = True) -> TravelTimeInputs:
+        """Load default origins/destinations and optionally snap them."""
         origins = self._load_od_file("origins")
         destinations = self._load_od_file("destinations")
+
+        if snap:
+            self.logger.info(f"Snapping {len(origins)} origins to OSM network")
+            origins = snap_df_to_osm(origins, self.args.mode)
+            self.logger.info(
+                f"Snapping {len(destinations)} destinations to OSM network"
+            )
+            destinations = snap_df_to_osm(destinations, self.args.mode)
+
         return TravelTimeInputs(
             origins=origins,
             destinations=destinations,
@@ -327,14 +335,13 @@ class TravelTimeCalculator:
             and distances.
         """
 
-        # Helper to use the snapped lat/lon columns (if specified via parameter)
+        # Helper to use the snapped lat/lon columns if specified
         def _col_dict(x, snapped=self.config.params["times"]["use_snapped"]):
             col_suffix = "_snapped" if snapped else ""
             return {"lat": x[f"lat{col_suffix}"], "lon": x[f"lon{col_suffix}"]}
 
-        # Convert the origin and destination points to lists, then squash them
-        # into a GET request in the style expected by OSRM. See API docs:
-        # https://project-osrm.org/docs/v5.5.1/api/#table-service
+        # Convert origin and destination points to the style of an OSRM API
+        # request: https://project-osrm.org/docs/v5.5.1/api/#table-service
         origins_list = origins.apply(_col_dict, axis=1).tolist()
         destinations_list = destinations.apply(_col_dict, axis=1).tolist()
         coords_set = {
@@ -353,13 +360,12 @@ class TravelTimeCalculator:
         ]
         request_body = (
             DOCKER_ENDPOINT
-            + "/table/v1/car/"
+            + f"/table/v1/{self.config.args.mode}/"
             + ";".join([item for item in list(coords_set)])
             + f"?sources={';'.join(source_index)}"
             + f"&destinations={';'.join(destination_index)}"
         )
 
-        # Get the actual JSON response from the API
         response = r.get(request_body)
         response_data = response.json()
         if response.status_code != 200:
@@ -464,7 +470,7 @@ class TravelTimeCalculator:
 
             return [times]
 
-        # If the request fails, split the origins and destinations into
+        # If the request fails, split the origins/destinations into
         # quadrants and start a binary search
         except Exception as e:
             if "No path could be found for input" in str(e):
@@ -543,43 +549,30 @@ def snap_df_to_osm(df: pd.DataFrame, mode: str) -> pd.DataFrame:
         df: DataFrame containing the columns 'id', 'lat', and 'lon'.
         mode: Travel mode to use for snapping.
     """
-    df_list = df.apply(
-        lambda x: {"lat": x["lat"], "lon": x["lon"]}, axis=1
-    ).tolist()
-    request_json = json.dumps(
-        {
-            "locations": df_list,
-            "costing": mode,
-            "verbose": False,
-        }
-    )
+    coords_list = df.apply(lambda x: f"{x['lon']},{x['lat']}", axis=1).tolist()
+    request_endpoint = DOCKER_ENDPOINT + f"/nearest/v1/{mode}/"
 
-    response = r.post(DOCKER_ENDPOINT + "/locate", data=request_json)
-    response_data = response.json()
-    if response.status_code != 200:
-        raise ValueError(response_data["error"])
+    # Snapped each input coordinate to the OSM grid. The nearest API only takes
+    # one coordinate pair at a time
+    snapped_list = []
+    for coord in coords_list:
+        request_body = request_endpoint + coord
+        response = r.get(request_body)
+        response_data = response.json()
+        if response.status_code != 200:
+            raise ValueError(response_data["message"])
 
-    # Use the first element of nodes to populate the snapped lat/lon, otherwise
-    # fallback to the correlated lat/lon from edges
-    def _get_col(x: dict, col: str):
-        return (
-            x["nodes"][0][col]
-            if x["nodes"]
-            else (x["edges"][0][f"correlated_{col}"] if x["edges"] else None)
-        )
+        snapped_list.append(response_data["waypoints"][0]["location"])
 
-    response_df = pd.DataFrame(
+    snapped_df = pd.DataFrame(
         [
-            {
-                "lon_snapped": _get_col(item, "lon"),
-                "lat_snapped": _get_col(item, "lat"),
-            }
-            for item in response_data
+            {"lon_snapped": coord[0], "lat_snapped": coord[1]}
+            for coord in snapped_list
         ]
     )
 
     df = pd.concat(
-        [df.reset_index(drop=True), response_df.reset_index(drop=True)],
+        [df.reset_index(drop=True), snapped_df.reset_index(drop=True)],
         axis=1,
     )
     df.fillna({"lon_snapped": df["lon"]}, inplace=True)

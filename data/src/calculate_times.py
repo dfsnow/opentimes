@@ -10,7 +10,6 @@ from utils.logging import create_logger
 from utils.times import (
     TravelTimeCalculator,
     TravelTimeConfig,
-    snap_df_to_osm,
 )
 from utils.utils import format_time, get_md5_hash
 
@@ -38,7 +37,7 @@ def main() -> None:
 
     logger.info(
         "Starting times calculation with parameters: version=%s, "
-        "mode=%s, year=%s, geography=%s, state=%s, centroid_type=%s%s",
+        "mode=%s, year=%s, geography=%s, state=%s, centroid_type=%s",
         config.params["times"]["version"],
         config.args.mode,
         config.args.year,
@@ -52,14 +51,6 @@ def main() -> None:
         inputs.n_destinations,
         len(inputs.origins) * inputs.n_destinations,
     )
-
-    # Use the OSRM Nearest API to append coordinates that are snapped to OSM
-    if config.params["times"]["use_snapped"]:
-        logger.info("Snapping coordinates to OSM network")
-        inputs.origins = snap_df_to_osm(inputs.origins, config.args.mode)
-        inputs.destinations = snap_df_to_osm(
-            inputs.destinations, config.args.mode
-        )
 
     # Calculate times from all origins to all destinations and return a single
     # DataFrame. Assumes an OSRM service is running locally at localhost:5333
@@ -151,7 +142,7 @@ def main() -> None:
 
     logger.info(
         "Finished routing for version: %s, mode: %s, year: %s, "
-        "geography: %s, state: %s, centroid type: %s%s in %s",
+        "geography: %s, state: %s, centroid type: %s in %s",
         config.params["times"]["version"],
         config.args.mode,
         config.args.year,

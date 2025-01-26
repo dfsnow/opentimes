@@ -29,8 +29,11 @@ DATASET_DICT: dict = {
                 "centroid_type",
                 "point_type",
                 "id",
-                "lat",
                 "lon",
+                "lat",
+                "lon_snapped",
+                "lat_snapped",
+                "is_snapped",
             ],
             "order_by_columns": [
                 "id",
