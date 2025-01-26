@@ -130,9 +130,7 @@ jobs:
              s3://opentimes-resources/osrmnetwork/${path}/osrmnetwork.tar.zst \
              ./intermediate/osrmnetwork/${path}/osrmnetwork.tar.zst \
             --profile cloudflare
-          ln ./intermediate/osrmnetwork/"$path"/osrmnetwork.tar.zst ./build/
-          tar -xf ./build/osrmnetwork.tar.zst -C ./build
-          rm -f ./build/osrmnetwork.tar.zst
+          tar -xf ./intermediate/osrmnetwork/"$path"/osrmnetwork.tar.zst .
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
@@ -177,6 +175,11 @@ jobs:
         shell: bash
         working-directory: 'data'
         run: |
+          # Start the Docker backend before running jobs
+          docker run -d -p 5333:5000 -v "./build:/data" \
+            osrm/osrm-backend osrm-routed --algorithm ch \
+            --max-table-size 100000000 /data/${{ inputs.state }}.osrm
+
           geographies='${{ steps.create-geo-jobs.outputs.param }}'
           geographies_array=($(echo "$geographies" | jq -r '.[]'))
           for geo in "${geographies_array[@]}"; do
