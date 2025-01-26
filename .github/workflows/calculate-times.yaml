@@ -126,8 +126,11 @@ jobs:
         working-directory: 'data'
         run: |
           path=mode=${{ inputs.mode }}/year=${{ inputs.year }}/geography=state/state=${{ inputs.state }}
-          uv run dvc pull --no-run-cache \
-            ./intermediate/osrmnetwork/"$path"/osrmnetwork.tar.zst
+          aws s3 cp --quiet --endpoint-url \
+            https://${{ vars.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com \
+             s3://opentimes-resources/osrmnetwork/${path}/osrmnetwork.tar.zst \
+             ./intermediate/osrmnetwork/${path}/osrmnetwork.tar.zst \
+            --profile cloudflare
           ln ./intermediate/osrmnetwork/"$path"/osrmnetwork.tar.zst ./build/
           tar -xf ./build/osrmnetwork.tar.zst -C ./build
           rm -f ./build/osrmnetwork.tar.zst
