@@ -345,6 +345,26 @@ class TravelTimeCalculator:
                 "lat": x[f"lat{col_suffix}"],
             }
 
+        # If there is only one origin and one destination e.g. the state of
+        # Alaska, return a DataFrame of the coordinate pair
+        if (
+            len(origins) == 1
+            and len(destinations) == 1
+            and (origins["id"] == destinations["id"]).all()
+        ):
+            self.config.logger.warning(
+                "Only one origin and destination. "
+                "Returning constructed DataFrame"
+            )
+            df = pd.DataFrame(
+                {
+                    "origin_id": origins["id"],
+                    "destination_id": destinations["id"],
+                    "duration_sec": 0.0,
+                }
+            )
+            return df
+
         # Convert origin and destination points to the style of an OSRM API
         # request: https://project-osrm.org/docs/v5.5.1/api/#table-service
         origins_list = origins.apply(_col_dict, axis=1).tolist()
