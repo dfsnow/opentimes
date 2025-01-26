@@ -144,29 +144,26 @@ stages:
       - ./intermediate/osmextract/year=${item.year}/geography=state/state=${item.state}/${item.state}.osm.pbf:
           persist: true
 
-  create_valhalla_tiles:
+  create_osrmnetwork_by_state:
     deps:
       - ./intermediate/osmextract/year=${item.year}/geography=state/state=${item.state}/${item.state}.osm.pbf
     matrix:
       year: ${input.year}
       state: ${input.state}
-    # Here we're using compose to run containerized valhalla to prep tiles.
-    # This horrible bash will output a nice tarball of routing tiles, elevation,
-    # etc. to the target DVC directory. The obscene conditional is because
-    # sometimes the elevation_data dir may not exist i.e. for Alaska
+      mode: ${times.mode}
     cmd: '
       BUILD_DIR=build &&
-      OUT_DIR=intermediate/valhalla_tiles/year=${item.year}/geography=state/state=${item.state} &&
+      IN_FILE=intermediate/osmextract/year=${item.year}/geography=state/state=${item.state}/${item.state}.osm.pbf &&
+      OUT_DIR=intermediate/osrmnetwork/year=${item.year}/geography=state/state=${item.state}/mode=${item.mode} &&
       rm -rf ./"$BUILD_DIR"/* &&
-      mkdir -p $OUT_DIR &&
-      ln ./intermediate/osmextract/year=${item.year}/geography=state/state=${item.state}/${item.state}.osm.pbf
-        ./"$BUILD_DIR"/${item.state}.osm.pbf &&
-      docker compose run --rm valhalla-build &&
-      tar --zstd --ignore-failed-read -cf "$BUILD_DIR"/valhalla_tiles.tar.zst -C "$BUILD_DIR"
-        elevation_data admin_data timezone_data tiles.tar traffic.tar default_speeds.json
-        file_hashes.txt duplicateways.txt &&
-      mv "$BUILD_DIR"/valhalla_tiles.tar.zst "$OUT_DIR"
+      mkdir -p ./"$OUT_DIR" &&
+      ln ./"$IN_FILE" ./"$BUILD_DIR"/${item.state}.osm.pbf &&
+      docker run -t -v ./"$BUILD_DIR":/data osrm/osrm-backend osrm-extract -p /opt/${item.mode}.lua /data/${item.state}.osm.pbf &&
+      docker run -t -v ./"$BUILD_DIR":/data osrm/osrm-backend osrm-contract /data/${item.state}.osrm &&
+      rm ./"$BUILD_DIR"/${item.state}.osm.pbf &&
+      ZSTD_CLEVEL=19 tar -cf ./"$BUILD_DIR"/osrmnetwork.tar.zst ./"$BUILD_DIR" &&
+      mv "$BUILD_DIR"/osrmnetwork.tar.zst ./"$OUT_DIR"
       '
     outs:
-      - ./intermediate/valhalla_tiles/year=${item.year}/geography=state/state=${item.state}/valhalla_tiles.tar.zst:
+      - ./intermediate/osrmnetwork/year=${item.year}/geography=state/state=${item.state}/mode=${item.mode}/osrmnetwork.tar.zst:
           persist: true
