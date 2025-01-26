@@ -1,22 +1,11 @@
 ---
 
 name: calculate-times
-run-name: calculate-times-${{ inputs.mode }}-${{ inputs.year }}-${{ inputs.geography }}-${{ inputs.state }}-${{ inputs.centroid_type }}
+run-name: calculate-times-${{ inputs.year }}-${{ inputs.mode }}-${{ inputs.state }}
 
 on:
   workflow_dispatch:
     inputs:
-      # Input values match those in params.yaml
-      mode:
-        required: true
-        description: Mode of travel
-        default: 'auto'
-        type: choice
-        options:
-          - auto
-          - bicycle
-          - pedestrian
-
       year:
         required: true
         description: Census/OSM data year
@@ -29,17 +18,16 @@ on:
           - '2023'
           - '2024'
 
-      geography:
+      # Input values must match those in params.yaml
+      mode:
         required: true
-        description: Census data geography
-        default: county
+        description: Mode of travel
+        default: 'auto'
         type: choice
         options:
-          - state
-          - county
-          - county_subdivision
-          - tract
-          - zcta
+          - car
+          - bicycle
+          - foot
 
       state:
         required: true
@@ -99,22 +87,6 @@ on:
           - '55'
           - '56'
 
-      centroid_type:
-        required: true
-        description: Whether or not to use population-weighted locations
-        default: weighted
-        type: choice
-        options:
-          - weighted
-          - unweighted
-
-      override_chunks:
-        required: false
-        description: |
-          Comma-separated chunks to run e.g. 0-5_000-100,6-11_000-100.
-          Will run all chunks if null
-        type: string
-
 env:
   AWS_DEFAULT_REGION: us-east-1
   # See: https://github.com/aws/aws-cli/issues/5262#issuecomment-705832151
@@ -122,11 +94,9 @@ env:
   PYTHONUNBUFFERED: "1"
 
 jobs:
-  # Using the location data, split the origins into N jobs (max 256)
   setup-jobs:
     runs-on: ubuntu-24.04
-    outputs:
-      chunks: ${{ steps.create-job-chunks.outputs.chunks }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -136,23 +106,6 @@ jobs:
         with:
           CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
           CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
-
-      - name: Fetch GitHub user and group ID
-        shell: bash
-        id: fetch-ids
-        run: |
-          echo "USER_ID=$(id -u)" >> $GITHUB_ENV
-          echo "GROUP_ID=$(id -g)" >> $GITHUB_ENV
-
-      - name: Build Dockerized dependencies
-        uses: ./.github/actions/build-docker
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Load Docker image
-        run: |
-          docker load --input /tmp/opentimes.tar
-          docker image ls -a
 
       - name: Fetch locations data
         uses: ./.github/actions/fetch-locations
@@ -173,37 +126,6 @@ jobs:
           uv python install
           uv venv
           uv pip install ".[site,data]"
-
-      - name: Create job chunks
-        id: create-job-chunks
-        working-directory: 'data'
-        shell: bash
-        run: |
-          export USER_ID=${{ env.USER_ID }}
-          export GROUP_ID=${{ env.GROUP_ID }}
-          uv run ./src/split_chunks.py \
-            --mode ${{ inputs.mode }} --year ${{ inputs.year }} \
-            --geography ${{ inputs.geography }} \
-            --state ${{ inputs.state }} > chunks.txt
-          echo "chunks=$(cat chunks.txt)" >> $GITHUB_OUTPUT
-
-          # If override chunks are set, use those instead
-          chunks_parsed=($(cat chunks.txt | jq -r '.[]'))
-          if [ -n "${{ inputs.override_chunks }}" ]; then
-            override_chunks_parsed=($(echo "${{ inputs.override_chunks }}" | tr -d ' ' | tr ',' ' '))
-            for chunk in "${override_chunks_parsed[@]}"; do
-              if [[ ! " ${chunks_parsed[@]} " =~ " ${chunk} " ]]; then
-                echo "Error: Override chunk ${chunk} is not in the chunks for this origin"
-                echo "Chunks include: ${chunks_parsed[@]}"
-                exit 1
-              fi
-            done
-            chunks_json=$(printf '%s\n' "${override_chunks_parsed[@]}" | jq -c -R . | jq -c -s .)
-            echo "Creating jobs for chunks: ${override_chunks_parsed[@]}"
-            echo "chunks=$chunks_json" > $GITHUB_OUTPUT
-          else
-            echo "Creating jobs for chunks: ${chunks_parsed[@]}"
-          fi
 
   run-job:
     runs-on: ubuntu-24.04

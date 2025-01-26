@@ -1,7 +1,7 @@
 ---
 
 name: create-osrm-networks
-run-name: create-osrm-network-${{ inputs.year }}-${{ inputs.mode }}
+run-name: create-osrm-networks-${{ inputs.year }}
 
 on:
   workflow_dispatch:
@@ -70,7 +70,7 @@ jobs:
             done
             states_json=$(printf '%s\n' "${override_states_parsed[@]}" | jq -c -R . | jq -c -s .)
             echo "Creating jobs for states: ${override_states_parsed[@]}"
-            echo "states=$states_json" > $GITHUB_OUTPUT
+            echo "states=$states_json" >> $GITHUB_OUTPUT
           else
             echo "Creating jobs for states: ${states_parsed[@]}"
           fi
@@ -82,7 +82,7 @@ jobs:
           modes_parsed=($(echo "$modes" | jq -r '.[]'))
           if [ -n "${{ inputs.override_modes }}" ]; then
             override_modes_parsed=($(echo "${{ inputs.override_modes }}" | tr -d ' ' | tr ',' ' '))
-            for state in "${override_modes_parsed[@]}"; do
+            for mode in "${override_modes_parsed[@]}"; do
               if [[ ! " ${modes_parsed[@]} " =~ " ${mode} " ]]; then
                 echo "Error: Override mode ${mode} is not in the modes for this workflow"
                 echo "Modes include: ${modes_parsed[@]}"
@@ -91,7 +91,7 @@ jobs:
             done
             modes_json=$(printf '%s\n' "${override_modes_parsed[@]}" | jq -c -R . | jq -c -s .)
             echo "Creating jobs for modes: ${override_modes_parsed[@]}"
-            echo "modes=$modes_json" > $GITHUB_OUTPUT
+            echo "modes=$modes_json" >> $GITHUB_OUTPUT
           else
             echo "Creating jobs for modes: ${modes_parsed[@]}"
           fi
@@ -130,7 +130,7 @@ jobs:
         shell: bash
         working-directory: 'data'
         run: |
-          uv dvc repro -s create_osrmnetwork_by_state@${{ inputs.year }}-${{ matrix.state }}-${{ matrix.mode }}
+          uv run dvc repro -s create_osrmnetwork_by_state@${{ inputs.year }}-${{ matrix.state }}-${{ matrix.mode }}
 
       - name: Write network files to S3
         shell: bash
