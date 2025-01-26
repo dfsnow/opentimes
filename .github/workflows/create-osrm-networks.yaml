@@ -100,12 +100,19 @@ jobs:
         run: |
           uv run dvc repro -s create_osrmnetwork_by_state@${{ matrix.mode }}-${{ inputs.year }}-${{ matrix.state }}
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+
       - name: Write network files to S3
         shell: bash
         working-directory: 'data'
         run: |
-          aws s3 cp --quiet --endpoint-url \
+          export AWS_MAX_ATTEMPTS=5
+          ls -lah ./intermediate/osrmnetwork/mode=${{ matrix.mode }}/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/osrmnetwork.tar.zst
+          aws s3 cp --endpoint-url \
             https://${{ vars.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com \
-             ./intermediate/osrmnetwork/mode=${{ matrix.mode}}/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/osrmnetwork.tar.zst \
+             ./intermediate/osrmnetwork/mode=${{ matrix.mode }}/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/osrmnetwork.tar.zst \
              s3://opentimes-resources/osrmnetwork/mode=${{ matrix.mode }}/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/osrmnetwork.tar.zst \
             --profile cloudflare
