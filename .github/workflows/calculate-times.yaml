@@ -1,53 +1,40 @@
 ---
 
 name: calculate-times
-run-name: calculate-times-${{ inputs.year }}
+run-name: calculate-times-${{ inputs.mode }}
 
 on:
   workflow_dispatch:
     inputs:
-      # Input values must match those in params.yaml
       mode:
         required: true
         description: Mode of travel
-        default: 'auto'
+        default: 'car'
         type: choice
         options:
           - car
           - bicycle
           - foot
 
-      year:
-        required: true
-        description: Census/OSM data year
-        default: '2020'
-        type: choice
-        options:
-          - '2020'
-          - '2021'
-          - '2022'
-          - '2023'
-          - '2024'
-
-      override_modes:
+      override_years:
         required: false
         description: |
-          Comma-separated list of OSRM modes to run e.g. car,foot.
-          Will run all if null
-        type: string
-
-      override_geographies:
-        required: false
-        description: |
-          Comma-separated geographies to limit run e.g. county,tract.
-          Will run all if null
+          Comma-separated list of OSM data years to run e.g. 2020,2023.
+          Will run all (see params.yaml) if null
         type: string
 
       override_states:
         required: false
         description: |
           Comma-separated state codes to run e.g. 01,06.
-          Will run all if null
+          Will run all (see params.yaml) if null
+        type: string
+
+      override_geographies:
+        required: false
+        description: |
+          Comma-separated geographies to limit run e.g. county,tract.
+          Will run all (see params.yaml) if null
         type: string
 
 env:
@@ -61,19 +48,19 @@ jobs:
     runs-on: ubuntu-24.04
 
     outputs:
-      modes: ${{ steps.create-mode-jobs.outputs.param }}
+      years: ${{ steps.create-year-jobs.outputs.param }}
       states: ${{ steps.create-state-jobs.outputs.param }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Create mode jobs
-        id: create-mode-jobs
+      - name: Create year jobs
+        id: create-year-jobs
         uses: ./.github/actions/parse-gh-input
         with:
-          param_path: '.times.mode'
-          param_override: '${{ inputs.override_modes }}'
+          param_path: '.input.year'
+          param_override: '${{ inputs.override_years }}'
 
       - name: Create state jobs
         id: create-state-jobs
@@ -89,7 +76,7 @@ jobs:
       # Don't fail all chunks if one fails
       fail-fast: false
       matrix:
-        mode: ${{ fromJSON(needs.setup-jobs.outputs.modes) }}
+        year: ${{ fromJSON(needs.setup-jobs.outputs.years) }}
         state: ${{ fromJSON(needs.setup-jobs.outputs.states) }}
 
     steps:
@@ -102,23 +89,22 @@ jobs:
           CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
           CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
 
+      - name: Increase swap space
+        uses: ./.github/actions/increase-swap
+
       - name: Install DVC
         uses: ./.github/actions/setup-dvc
 
       - name: Fetch locations data
         uses: ./.github/actions/fetch-locations
 
-      - name: Fetch network data
+      - name: Fetch OSM extract data
         shell: bash
         working-directory: 'data'
         run: |
-          path=mode=${{ matrix.mode }}/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}
-          aws s3 cp --quiet --endpoint-url \
-            https://${{ vars.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com \
-             s3://opentimes-resources/osrmnetwork/${path}/osrmnetwork.tar.zst \
-             ./intermediate/osrmnetwork/${path}/osrmnetwork.tar.zst \
-            --profile cloudflare
-          tar -xf ./intermediate/osrmnetwork/"$path"/osrmnetwork.tar.zst .
+          path=year=${{ matrix.year }}/geography=state/state=${{ matrix.state }}/${{ matrix.state }}
+          uv run dvc pull --no-run-cache \
+            ./intermediate/osmextract/"$path".osm.pbf
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
@@ -137,17 +123,21 @@ jobs:
           uv venv
           uv pip install ".[site,data]"
 
-      - name: Increase swap space
-        uses: ./.github/actions/increase-swap
+      - name: Create OSRM network files
+        shell: bash
+        working-directory: 'data'
+        run: |
+          ./src/create_osrmnetwork.sh ${{ inputs.mode }} \
+            ${{ matrix.year }} ${{ matrix.state }}
 
-      - name: Create jobs per geography
+      - name: Create routing jobs per geography
         id: create-geo-jobs
         uses: ./.github/actions/parse-gh-input
         with:
           param_path: '.input.census.geography.all'
           param_override: '${{ inputs.override_geographies }}'
 
-      - name: Run job(s)
+      - name: Run routing job(s)
         shell: bash
         working-directory: 'data'
         run: |
@@ -159,9 +149,9 @@ jobs:
           geographies='${{ steps.create-geo-jobs.outputs.param }}'
           geographies_array=($(echo "$geographies" | jq -r '.[]'))
           for geo in "${geographies_array[@]}"; do
-            echo "Starting job with parameters: mode=${{ matrix.mode }}, year=${{ inputs.year }}, geography=${geo}, state=${{ matrix.state }}"
+            echo "Starting job with parameters: mode=${{ inputs.mode }}, year=${{ matrix.year }}, geography=${geo}, state=${{ matrix.state }}"
             uv run ./src/calculate_times.py \
-              --mode ${{ matrix.mode }} --year ${{ inputs.year }} \
+              --mode ${{ inputs.mode }} --year ${{ matrix.year }} \
               --geography "$geo" --state ${{ matrix.state }} \
               --centroid-type weighted \
               --write-to-s3
