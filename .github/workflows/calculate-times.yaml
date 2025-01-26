@@ -89,8 +89,11 @@ jobs:
           CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
           CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
 
-      - name: Increase swap space
-        uses: ./.github/actions/increase-swap
+      - name: Remove unnecessary software and increase swap space
+        uses: ./.github/actions/prep-disk-and-swap
+        with:
+          # Increase swapfile size to 10 GB
+          swap_override: 10737418240
 
       - name: Install DVC
         uses: ./.github/actions/setup-dvc
@@ -137,7 +140,7 @@ jobs:
           param_path: '.input.census.geography.all'
           param_override: '${{ inputs.override_geographies }}'
 
-      - name: Run routing job(s)
+      - name: Run routing jobs
         shell: bash
         working-directory: 'data'
         run: |
