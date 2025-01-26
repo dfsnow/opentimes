@@ -1,7 +1,7 @@
 ---
 
 name: calculate-times
-run-name: calculate-times-${{ inputs.year }}-${{ inputs.mode }}
+run-name: calculate-times-${{ inputs.year }}
 
 on:
   workflow_dispatch:
@@ -29,6 +29,13 @@ on:
           - '2023'
           - '2024'
 
+      override_modes:
+        required: false
+        description: |
+          Comma-separated list of OSRM modes to run e.g. car,foot.
+          Will run all if null
+        type: string
+
       override_geographies:
         required: false
         description: |
@@ -54,11 +61,19 @@ jobs:
     runs-on: ubuntu-24.04
 
     outputs:
+      modes: ${{ steps.create-mode-jobs.outputs.param }}
       states: ${{ steps.create-state-jobs.outputs.param }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Create mode jobs
+        id: create-mode-jobs
+        uses: ./.github/actions/parse-gh-input
+        with:
+          param_path: '.times.mode'
+          param_override: '${{ inputs.override_modes }}'
 
       - name: Create state jobs
         id: create-state-jobs
@@ -74,6 +89,7 @@ jobs:
       # Don't fail all chunks if one fails
       fail-fast: false
       matrix:
+        mode: ${{ fromJSON(needs.setup-jobs.outputs.modes) }}
         state: ${{ fromJSON(needs.setup-jobs.outputs.states) }}
 
     steps:
@@ -96,7 +112,7 @@ jobs:
         shell: bash
         working-directory: 'data'
         run: |
-          path=mode=${{ inputs.mode }}/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}
+          path=mode=${{ matrix.mode }}/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}
           aws s3 cp --quiet --endpoint-url \
             https://${{ vars.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com \
              s3://opentimes-resources/osrmnetwork/${path}/osrmnetwork.tar.zst \
@@ -143,9 +159,9 @@ jobs:
           geographies='${{ steps.create-geo-jobs.outputs.param }}'
           geographies_array=($(echo "$geographies" | jq -r '.[]'))
           for geo in "${geographies_array[@]}"; do
-            echo "Starting job with parameters: mode=${{ inputs.mode }}, year=${{ inputs.year }}, geography=${geo}, state=${{ matrix.state }}"
+            echo "Starting job with parameters: mode=${{ matrix.mode }}, year=${{ inputs.year }}, geography=${geo}, state=${{ matrix.state }}"
             uv run ./src/calculate_times.py \
-              --mode ${{ inputs.mode }} --year ${{ inputs.year }} \
+              --mode ${{ matrix.mode }} --year ${{ inputs.year }} \
               --geography "$geo" --state ${{ matrix.state }} \
               --centroid-type weighted \
               --write-to-s3

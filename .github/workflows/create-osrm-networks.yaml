@@ -94,9 +94,6 @@ jobs:
           uv run dvc pull --no-run-cache \
             ./intermediate/osmextract/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/${{ matrix.state }}.osm.pbf
 
-      - name: Increase swap space
-        uses: ./.github/actions/increase-swap
-
       - name: Run job chunk
         shell: bash
         working-directory: 'data'
