@@ -1,7 +1,7 @@
 ---
 
 name: calculate-times
-run-name: calculate-times-${{ inputs.year }}-${{ inputs.mode }}-${{ inputs.state }}
+run-name: calculate-times-${{ inputs.year }}-${{ inputs.mode }}
 
 on:
   workflow_dispatch:
@@ -29,68 +29,17 @@ on:
           - '2023'
           - '2024'
 
-      state:
-        required: true
-        description: Target Census state
-        default: '01'
-        type: choice
-        options:
-          - '01'
-          - '02'
-          - '04'
-          - '05'
-          - '06'
-          - '08'
-          - '09'
-          - '10'
-          - '11'
-          - '12'
-          - '13'
-          - '15'
-          - '16'
-          - '17'
-          - '18'
-          - '19'
-          - '20'
-          - '21'
-          - '22'
-          - '23'
-          - '24'
-          - '25'
-          - '26'
-          - '27'
-          - '28'
-          - '29'
-          - '30'
-          - '31'
-          - '32'
-          - '33'
-          - '34'
-          - '35'
-          - '36'
-          - '37'
-          - '38'
-          - '39'
-          - '40'
-          - '41'
-          - '42'
-          - '44'
-          - '45'
-          - '46'
-          - '47'
-          - '48'
-          - '49'
-          - '50'
-          - '51'
-          - '53'
-          - '54'
-          - '55'
-          - '56'
-
       override_geographies:
         required: false
         description: |
           Comma-separated geographies to limit run e.g. county,tract.
+          Will run all if null
+        type: string
+
+      override_states:
+        required: false
+        description: |
+          Comma-separated state codes to run e.g. 01,06.
           Will run all if null
         type: string
 
@@ -101,8 +50,31 @@ env:
   PYTHONUNBUFFERED: "1"
 
 jobs:
+  setup-jobs:
+    runs-on: ubuntu-24.04
+
+    outputs:
+      states: ${{ steps.create-state-jobs.outputs.param }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create state jobs
+        id: create-state-jobs
+        uses: ./.github/actions/parse-gh-input
+        with:
+          param_path: '.input.state'
+          param_override: '${{ inputs.override_states }}'
+
   run-job:
     runs-on: ubuntu-24.04
+    needs: setup-jobs
+    strategy:
+      # Don't fail all chunks if one fails
+      fail-fast: false
+      matrix:
+        state: ${{ fromJSON(needs.setup-jobs.outputs.states) }}
 
     steps:
       - name: Checkout
@@ -124,7 +96,7 @@ jobs:
         shell: bash
         working-directory: 'data'
         run: |
-          path=mode=${{ inputs.mode }}/year=${{ inputs.year }}/geography=state/state=${{ inputs.state }}
+          path=mode=${{ inputs.mode }}/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}
           aws s3 cp --quiet --endpoint-url \
             https://${{ vars.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com \
              s3://opentimes-resources/osrmnetwork/${path}/osrmnetwork.tar.zst \
@@ -178,15 +150,15 @@ jobs:
           # Start the Docker backend before running jobs
           docker run -d -p 5333:5000 -v "./build:/data" \
             osrm/osrm-backend osrm-routed --algorithm ch \
-            --max-table-size 100000000 /data/${{ inputs.state }}.osrm
+            --max-table-size 100000000 /data/${{ matrix.state }}.osrm
 
           geographies='${{ steps.create-geo-jobs.outputs.param }}'
           geographies_array=($(echo "$geographies" | jq -r '.[]'))
           for geo in "${geographies_array[@]}"; do
-            echo "Starting job with parameters: mode=${{ inputs.mode }}, year=${{ inputs.year }}, geography=${geo}, state=${{ inputs.state }}"
+            echo "Starting job with parameters: mode=${{ inputs.mode }}, year=${{ inputs.year }}, geography=${geo}, state=${{ matrix.state }}"
             uv run ./src/calculate_times.py \
               --mode ${{ inputs.mode }} --year ${{ inputs.year }} \
-              --geography "$geo" --state ${{ inputs.state }} \
+              --geography "$geo" --state ${{ matrix.state }} \
               --centroid-type weighted \
               --write-to-s3
           done
