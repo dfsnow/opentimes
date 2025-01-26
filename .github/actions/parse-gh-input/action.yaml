@@ -26,7 +26,7 @@ runs:
         x=$(yq e -o=json '${{ inputs.param_path }}' ./data/params.yaml | jq -c -s .[])
         echo "param=$x" >> $GITHUB_OUTPUT
 
-        # If override if x is set, use those instead
+        # If override param is set, use that instead
         x_parsed=($(echo "$x" | jq -r '.[]'))
         if [ -n "${{ inputs.param_override }}" ]; then
           override_parsed=($(echo "${{ inputs.param_override }}" | tr -d ' ' | tr ',' ' '))

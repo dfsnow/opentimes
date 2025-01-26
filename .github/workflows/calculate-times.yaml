@@ -87,6 +87,13 @@ on:
           - '55'
           - '56'
 
+      override_geographies:
+        required: false
+        description: |
+          Comma-separated geographies to limit run e.g. county,tract.
+          Will run all if null
+        type: string
+
 env:
   AWS_DEFAULT_REGION: us-east-1
   # See: https://github.com/aws/aws-cli/issues/5262#issuecomment-705832151
@@ -157,12 +164,24 @@ jobs:
           sudo swapon /swapfile
           sudo swapon --show
 
-      - name: Run job chunk
+      - name: Create jobs per geography
+        id: create-geo-jobs
+        uses: ./.github/actions/parse-gh-input
+        with:
+          param_path: '.input.census.geography.all'
+          param_override: '${{ inputs.override_geographies }}'
+
+      - name: Run job(s)
         shell: bash
         working-directory: 'data'
         run: |
-          uv run ./src/calculate_times.py \
-            --mode ${{ inputs.mode }} --year ${{ inputs.year }} \
-            --geography ${{ inputs.geography }} --state ${{ inputs.state }} \
-            --centroid-type ${{ inputs.centroid_type }} \
-            --chunk ${{ matrix.chunk }} --write-to-s3
+          geographies=${{ steps.create-geo-jobs.outputs.param }}
+          geographies_array=($(echo "$geographies" | jq -r '.[]'))
+          for geo in "${geographies_array[@]}"; do
+            echo "Starting job with parameters: mode=${{ inputs.mode }}, year=${{ inputs.year }}, geography=${geo}, state=${{ inputs.state }}"
+            uv run ./src/calculate_times.py \
+              --mode ${{ inputs.mode }} --year ${{ inputs.year }} \
+              --geography "$geo" --state ${{ inputs.state }} \
+              --centroid-type weighted \
+              --write-to-s3
+          done

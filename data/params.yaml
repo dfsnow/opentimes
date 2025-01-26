@@ -132,7 +132,7 @@ input:
       by_state:
         - county_subdivision
         - tract
-        - block_group  # not currently used, too time-intensive
+        - block_group
         - block  # only used to fetch TIGER files (not used for routing)
 
 output:
