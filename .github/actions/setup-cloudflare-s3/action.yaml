@@ -26,3 +26,13 @@ runs:
         echo "[cloudflare]" > ~/.aws/credentials
         echo "aws_access_key_id=${{ inputs.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}" >> ~/.aws/credentials
         echo "aws_secret_access_key=${{ inputs.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
+
+    # Cloudflare has some kind of dumb checksum issue with newer versions of the
+    # AWS CLI, so we need to install an older version
+    - name: Install AWS CLI
+      shell: bash
+      run: |
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.2.35.zip" -o "awscliv2.zip"
+        unzip -q awscliv2.zip
+        sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+        aws --version

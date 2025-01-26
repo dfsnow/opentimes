@@ -104,9 +104,7 @@ jobs:
         shell: bash
         working-directory: 'data'
         run: |
-          export AWS_MAX_ATTEMPTS=5
-          ls -lah ./intermediate/osrmnetwork/mode=${{ matrix.mode }}/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/osrmnetwork.tar.zst
-          aws s3 cp --endpoint-url \
+          aws s3 cp --quiet --endpoint-url \
             https://${{ vars.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com \
              ./intermediate/osrmnetwork/mode=${{ matrix.mode }}/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/osrmnetwork.tar.zst \
              s3://opentimes-resources/osrmnetwork/mode=${{ matrix.mode }}/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/osrmnetwork.tar.zst \
