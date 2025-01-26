@@ -103,7 +103,6 @@ env:
 jobs:
   run-job:
     runs-on: ubuntu-24.04
-    needs: setup-jobs
 
     steps:
       - name: Checkout
@@ -178,7 +177,7 @@ jobs:
         shell: bash
         working-directory: 'data'
         run: |
-          geographies=${{ steps.create-geo-jobs.outputs.param }}
+          geographies='${{ steps.create-geo-jobs.outputs.param }}'
           geographies_array=($(echo "$geographies" | jq -r '.[]'))
           for geo in "${geographies_array[@]}"; do
             echo "Starting job with parameters: mode=${{ inputs.mode }}, year=${{ inputs.year }}, geography=${geo}, state=${{ inputs.state }}"
