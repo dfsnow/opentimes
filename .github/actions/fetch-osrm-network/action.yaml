@@ -22,7 +22,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: ./data/intermediate/osrmnetwork
-        key: osrm-network-${{ inputs.year }}-${{ inputs.state }}-${{ inputs.mode }}-${{ hashFiles('./data/dvc.lock') }}
+        key: osrm-network-${{ inputs.mode }}-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}
 
     - name: Install DVC
       if: steps.cache-restore-network-input.outputs.cache-hit != 'true'
@@ -33,7 +33,7 @@ runs:
       shell: bash
       working-directory: 'data'
       run: |
-        path=year=${{ inputs.year }}/geography=state/state=${{ inputs.state }}/mode=${{ inputs.mode }}
+        path=mode=${{ inputs.mode }}/year=${{ inputs.year }}/geography=state/state=${{ inputs.state }}
         uv run dvc pull --no-run-cache \
           ./intermediate/osrmnetwork/"$path"/osrmnetwork.tar.zst
 
@@ -43,4 +43,4 @@ runs:
       uses: actions/cache/save@v4
       with:
         path: ./data/intermediate/osrmnetwork
-        key: osrm-network-${{ inputs.year }}-${{ inputs.state }}-${{ inputs.mode }}-${{ hashFiles('./data/dvc.lock') }}
+        key: osrm-network-${{ inputs.mode }}-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }}

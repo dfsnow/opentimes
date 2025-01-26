@@ -130,7 +130,7 @@ jobs:
         shell: bash
         working-directory: 'data'
         run: |
-          uv run dvc repro -s create_osrmnetwork_by_state@${{ inputs.year }}-${{ matrix.state }}-${{ matrix.mode }}
+          uv run dvc repro -s create_osrmnetwork_by_state@${{ matrix.mode }}-${{ inputs.year }}-${{ matrix.state }}
 
       - name: Write network files to S3
         shell: bash
@@ -138,6 +138,6 @@ jobs:
         run: |
           aws s3 cp --quiet --endpoint-url \
             https://${{ vars.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com \
-             ./intermediate/osrmnetwork/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/mode=${{ matrix.mode }}/osrmnetwork.tar.zst \
-             s3://opentimes-resources/osrmnetwork/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/mode=${{ matrix.mode }}/osrmnetwork.tar.zst \
+             ./intermediate/osrmnetwork/mode=${{ matrix.mode}}/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/osrmnetwork.tar.zst \
+             s3://opentimes-resources/osrmnetwork/mode=${{ matrix.mode }}/year=${{ inputs.year }}/geography=state/state=${{ matrix.state }}/osrmnetwork.tar.zst \
             --profile cloudflare
