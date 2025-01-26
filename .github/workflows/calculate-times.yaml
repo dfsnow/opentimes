@@ -6,6 +6,17 @@ run-name: calculate-times-${{ inputs.year }}-${{ inputs.mode }}-${{ inputs.state
 on:
   workflow_dispatch:
     inputs:
+      # Input values must match those in params.yaml
+      mode:
+        required: true
+        description: Mode of travel
+        default: 'auto'
+        type: choice
+        options:
+          - car
+          - bicycle
+          - foot
+
       year:
         required: true
         description: Census/OSM data year
@@ -17,17 +28,6 @@ on:
           - '2022'
           - '2023'
           - '2024'
-
-      # Input values must match those in params.yaml
-      mode:
-        required: true
-        description: Mode of travel
-        default: 'auto'
-        type: choice
-        options:
-          - car
-          - bicycle
-          - foot
 
       state:
         required: true
@@ -152,8 +152,8 @@ jobs:
       # Don't fetch tile data in setup-jobs because they're very large and
       # will churn the Actions cache. We want to wait to fetch it until jobs
       # have actually been picked up
-      - name: Fetch Valhalla tile data
-        uses: ./.github/actions/fetch-valhalla-tiles
+      - name: Fetch OSRM network data
+        uses: ./.github/actions/fetch-osrm-network
         with:
           year: ${{ inputs.year }}
           state: ${{ inputs.state }}
