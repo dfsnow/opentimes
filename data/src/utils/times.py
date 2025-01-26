@@ -335,37 +335,47 @@ class TravelTimeCalculator:
             and distances.
         """
 
-        # Helper to use the snapped lat/lon columns if specified
-        def _col_dict(x, snapped=self.config.params["times"]["use_snapped"]):
-            col_suffix = "_snapped" if snapped else ""
-            return {"lat": x[f"lat{col_suffix}"], "lon": x[f"lon{col_suffix}"]}
+        def _col_dict(x) -> dict:
+            """Helper to convert DataFrames to dicts for API requests."""
+            use_snapped = self.config.params["times"]["use_snapped"]
+            col_suffix = "_snapped" if use_snapped else ""
+            return {
+                "id": x["id"],
+                "lon": x[f"lon{col_suffix}"],
+                "lat": x[f"lat{col_suffix}"],
+            }
 
         # Convert origin and destination points to the style of an OSRM API
         # request: https://project-osrm.org/docs/v5.5.1/api/#table-service
         origins_list = origins.apply(_col_dict, axis=1).tolist()
         destinations_list = destinations.apply(_col_dict, axis=1).tolist()
         coords_set = {
-            f"{item['lon']},{item['lat']}"
+            (item["id"], item["lon"], item["lat"])
             for item in origins_list + destinations_list
         }
-        source_index = [
-            str(index)
-            for index, item in enumerate(origins_list)
-            if f"{item['lon']},{item['lat']}" in coords_set
+        coords_list = list(coords_set)
+
+        # Record the indices of the unique coordinate set relative to the
+        # original list orders so we can later recover GEOIDs
+        origins_index = [
+            coords_list.index((item["id"], item["lon"], item["lat"]))
+            for item in origins_list
+            if (item["id"], item["lon"], item["lat"]) in coords_set
         ]
-        destination_index = [
-            str(index)
-            for index, item in enumerate(destinations_list)
-            if f"{item['lon']},{item['lat']}" in coords_set
+        destinations_index = [
+            coords_list.index((item["id"], item["lon"], item["lat"]))
+            for item in destinations_list
+            if (item["id"], item["lon"], item["lat"]) in coords_set
         ]
         request_body = (
             DOCKER_ENDPOINT
             + f"/table/v1/{self.config.args.mode}/"
-            + ";".join([item for item in list(coords_set)])
-            + f"?sources={';'.join(source_index)}"
-            + f"&destinations={';'.join(destination_index)}"
+            + ";".join([f"{lon},{lat}" for _, lon, lat in coords_list])
+            + f"?sources={';'.join([str(i) for i in origins_index])}"
+            + f"&destinations={';'.join([str(i) for i in destinations_index])}"
         )
 
+        # Make the actual request to the OSRM API running in Docker
         response = r.get(request_body)
         response_data = response.json()
         if response.status_code != 200:
@@ -373,15 +383,14 @@ class TravelTimeCalculator:
 
         # Parse the response data and convert it to a DataFrame. Recover the
         # origin and destination indices and append them to the DataFrame
-        durations = response_data["durations"]
+        durations = [i for sl in response_data["durations"] for i in sl]
         origin_ids = origins["id"].repeat(len(destinations)).tolist()
         destination_ids = destinations["id"].tolist() * (len(origins))
-
         df = pd.DataFrame(
             {
                 "origin_id": origin_ids,
                 "destination_id": destination_ids,
-                "duration_sec": [i for sl in durations for i in sl],
+                "duration_sec": durations,
             }
         )
 
@@ -552,8 +561,8 @@ def snap_df_to_osm(df: pd.DataFrame, mode: str) -> pd.DataFrame:
     coords_list = df.apply(lambda x: f"{x['lon']},{x['lat']}", axis=1).tolist()
     request_endpoint = DOCKER_ENDPOINT + f"/nearest/v1/{mode}/"
 
-    # Snapped each input coordinate to the OSM grid. The nearest API only takes
-    # one coordinate pair at a time
+    # Snap each input coordinate to the OSM grid. The OSRM Nearest API only
+    # takes one coordinate pair at a time
     snapped_list = []
     for coord in coords_list:
         request_body = request_endpoint + coord
