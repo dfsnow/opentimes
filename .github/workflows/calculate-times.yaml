@@ -145,7 +145,7 @@ jobs:
         working-directory: 'data'
         run: |
           # Start the Docker backend before running jobs
-          docker run -d -p 5333:5000 -v "./build:/data" \
+          docker run --rm -d -p 5333:5000 -v "./build:/data" \
             osrm/osrm-backend osrm-routed --algorithm ch \
             --max-table-size 100000000 /data/${{ matrix.state }}.osrm
 
