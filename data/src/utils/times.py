@@ -122,22 +122,7 @@ class TravelTimePaths:
         """Creates all input paths and stores them in a dictionary."""
         return {
             "main": {"path": self._main_path},
-            "dirs": {
-                "osrm_network": Path(
-                    Path.cwd(),
-                    f"intermediate/osrmnetwork/mode={self.args.mode}",
-                    f"year={self.args.year}",
-                    f"geography=state/state={self.args.state}",
-                )
-            },
             "files": {
-                "osrm_network_file": Path(
-                    Path.cwd(),
-                    f"intermediate/osrmnetwork/mode={self.args.mode}",
-                    f"year={self.args.year}",
-                    f"geography=state/state={self.args.state}/",
-                    "osrmnetwork.tar.zst",
-                ),
                 "origins_file": Path(
                     Path.cwd(),
                     "intermediate/cenloc",

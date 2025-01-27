@@ -119,9 +119,6 @@ def main() -> None:
             "param_destination_buffer_m": params["input"][
                 "destination_buffer_m"
             ],
-            "file_input_osrm_network_md5": input_file_hashes[
-                "osrm_network_file"
-            ],
             "file_input_origins_md5": input_file_hashes["origins_file"],
             "file_input_destinations_md5": input_file_hashes[
                 "destinations_file"
