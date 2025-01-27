@@ -109,6 +109,24 @@ jobs:
           uv run dvc pull --no-run-cache \
             ./intermediate/osmextract/"$path".osm.pbf
 
+      - name: Fetch OSRM network data
+        id: fetch-osrm-data
+        shell: bash
+        working-directory: 'data'
+        run: |
+          path=s3://opentimes-resources/cache/osrmnetwork/mode=${{ inputs.mode }}/year=${{ matrix.year }}/geography=state/state=${{ matrix.state }}/osrmnetwork.tar.zst
+          if aws s3 ls "$path" --endpoint-url https://${{ vars.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com --profile cloudflare > /dev/null 2>&1; then
+            aws s3 cp --quiet --endpoint-url \
+              https://${{ vars.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com \
+              "$path" ./osrmnetwork.tar.zst --profile cloudflare
+            tar -xf ./osrmnetwork.tar.zst .
+            echo "OSRM data fetched from cache, skipping network build step"
+            echo "osrm_fetched=true" >> $GITHUB_ENV
+          else
+            echo "OSRM not in cache, running network build step"
+            echo "osrm_fetched=false" >> $GITHUB_ENV
+          fi
+
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
@@ -127,11 +145,19 @@ jobs:
           uv pip install ".[site,data]"
 
       - name: Create OSRM network files
+        if: ${{ env.osrm_fetched != 'true' }}
         shell: bash
         working-directory: 'data'
         run: |
           ./src/create_osrmnetwork.sh ${{ inputs.mode }} \
             ${{ matrix.year }} ${{ matrix.state }}
+
+          path=s3://opentimes-resources/cache/osrmnetwork/mode=${{ inputs.mode }}/year=${{ matrix.year }}/geography=state/state=${{ matrix.state }}/osrmnetwork.tar.zst
+          ZSTD_CLEVEL=19 sudo tar --zstd -cf ./osrmnetwork.tar.zst ./build
+          aws s3 cp --quiet --endpoint-url \
+            https://${{ vars.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com \
+             ./osrmnetwork.tar.zst "$path" --profile cloudflare
+          rm -f ./osrmnetwork.tar.zst
 
       - name: Create routing jobs per geography
         id: create-geo-jobs
@@ -139,6 +165,11 @@ jobs:
         with:
           param_path: '.input.census.geography.all'
           param_override: '${{ inputs.override_geographies }}'
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
 
       - name: Run routing jobs
         shell: bash
