@@ -76,7 +76,7 @@ def main() -> None:
     )
 
     # Loop through files and write to both local and remote paths
-    out_locations = ["local", "s3"] if args.write_to_s3 else ["local"]
+    out_locations = ["s3"] if args.write_to_s3 else ["local"]
     logger.info(
         "Calculated times between %s pairs (%s missing). "
         "Saving outputs to: %s",
@@ -98,11 +98,6 @@ def main() -> None:
         f: get_md5_hash(config.paths.input["files"][f])
         for f in config.paths.input["files"].keys()
     }
-    output_file_hashes = {
-        f: get_md5_hash(config.paths.output["local"][f])
-        for f in config.paths.output["local"].keys()
-        if f != "metadata_file"
-    }
 
     # Create a metadata DataFrame of all settings and data used for creating
     # inputs and generating times
@@ -113,23 +108,19 @@ def main() -> None:
             "calc_time_elapsed_sec": time.time() - script_start_time,
             "calc_n_origins": inputs.n_origins,
             "calc_n_destinations": inputs.n_destinations,
+            "calc_n_pairs": len(results_df),
+            "calc_n_missing_pairs": len(missing_pairs_df),
             "git_commit_sha_short": git_commit_sha_short,
             "git_commit_sha_long": git_commit_sha,
             "param_network_buffer_m": params["input"]["network_buffer_m"],
             "param_destination_buffer_m": params["input"][
                 "destination_buffer_m"
             ],
+            "param_max_split_size": params["times"]["max_split_size"],
+            "param_use_snapped": params["times"]["use_snapped"],
             "file_input_origins_md5": input_file_hashes["origins_file"],
             "file_input_destinations_md5": input_file_hashes[
                 "destinations_file"
-            ],
-            "file_output_times_md5": output_file_hashes["times_file"],
-            "file_output_origins_md5": output_file_hashes["origins_file"],
-            "file_output_destinations_md5": output_file_hashes[
-                "destinations_file"
-            ],
-            "file_output_missing_pairs_md5": output_file_hashes[
-                "missing_pairs_file"
             ],
         },
         index=[0],

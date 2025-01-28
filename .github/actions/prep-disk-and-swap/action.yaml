@@ -12,9 +12,7 @@ runs:
   steps:
     - name: Report disk space before modification
       shell: bash
-      run: |
-          echo "==> Available space before cleanup"
-          df -h
+      run: df -h
 
     - name: Remove pre-installed runner software
       shell: bash
@@ -22,17 +20,14 @@ runs:
         # From: https://github.com/AdityaGarg8/remove-unwanted-software/blob/master/action.yml
         sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup
         sudo apt-get remove -y '^aspnetcore-.*' '^dotnet-.*' '^llvm-.*' 'php.*' \
-          '^mongodb-.*' '^mysql-.*' azure-cli google-chrome-stable firefox \
-          google-cloud-sdk google-cloud-cli \
-          --fix-missing > /dev/null
+          '^mongodb-.*' '^mysql-.*' '^azure-.*' '^google-.*' '^firefox.*' \
+          --fix-missing > /dev/null || true
         sudo apt-get autoremove -y > /dev/null
         sudo apt-get clean > /dev/null
 
     - name: Report disk space after modification
       shell: bash
-      run: |
-          echo "==> Available space after cleanup"
-          df -h
+      run: df -h
 
     - name: Increase swapfile
       shell: bash

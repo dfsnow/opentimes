@@ -166,10 +166,8 @@ jobs:
           param_path: '.input.census.geography.all'
           param_override: '${{ inputs.override_geographies }}'
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        with:
-          limit-access-to-actor: true
+      - name: Increase swapfile to max size
+        uses: ./.github/actions/prep-disk-and-swap
 
       - name: Run routing jobs
         shell: bash
