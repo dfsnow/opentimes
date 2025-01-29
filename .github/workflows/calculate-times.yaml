@@ -178,8 +178,14 @@ jobs:
             osrm/osrm-backend osrm-routed --algorithm ch \
             --max-table-size 100000000 /data/${{ matrix.state }}.osrm
 
-          # Wait a bit before starting routing API requests
-          sleep 60
+          # Wait for OSRM to load all network data
+          for i in {1..60}; do
+            if docker logs osrm | grep -q "running and waiting for requests"; then
+              echo "OSRM is running and waiting for requests"
+              break
+            fi
+            sleep 5
+          done
 
           # Loop through geographies, chunking geographies with small units
           # (block groups) into smaller jobs

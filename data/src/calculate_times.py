@@ -57,7 +57,7 @@ def main() -> None:
 
     # Calculate times from all origins to all destinations and return a single
     # DataFrame. Assumes an OSRM service is running locally at localhost:5333
-    logger.info("Tiles loaded and coodinates ready, starting routing")
+    logger.info("Network loaded and coodinates ready, starting routing")
     tt_calc = TravelTimeCalculator(config, inputs)
     results_df = tt_calc.many_to_many()
     logger.info(

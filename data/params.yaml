@@ -26,7 +26,7 @@ actions:
 
   # The minimum number of destinations included in each job. For reference,
   # most states have around 10K Census tract destinations
-  destination_min_chunk_size: 30000
+  destination_min_chunk_size: 20000
 
 times:
   # Travel times output version. Follows SemVer (kind of):
