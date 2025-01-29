@@ -174,12 +174,12 @@ jobs:
         working-directory: 'data'
         run: |
           # Start the Docker backend before running jobs
-          docker run --rm -d -p 5333:5000 -v "./build:/data" \
+          docker run --rm --name osrm -d -p 5333:5000 -v "./build:/data" \
             osrm/osrm-backend osrm-routed --algorithm ch \
             --max-table-size 100000000 /data/${{ matrix.state }}.osrm
 
           # Wait a bit before starting routing API requests
-          sleep 10
+          sleep 60
 
           # Loop through geographies, chunking geographies with small units
           # (block groups) into smaller jobs
@@ -199,3 +199,16 @@ jobs:
                 --write-to-s3
             done
           done
+
+      - name: Write Docker logs on failure
+        if: failure()
+        shell: bash
+        working-directory: 'data'
+        run: docker logs osrm >& docker.log
+
+      - name: Upload Docker logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-logs
+          path: ./data/docker.log
