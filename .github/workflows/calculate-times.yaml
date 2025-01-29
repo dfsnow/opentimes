@@ -169,11 +169,6 @@ jobs:
       - name: Increase swapfile to max size
         uses: ./.github/actions/prep-disk-and-swap
 
-      - name: Wait to clear memory
-        if: ${{ env.osrm_fetched != 'true' }}
-        shell: bash
-        run: sleep 10
-
       - name: Run routing jobs
         shell: bash
         working-directory: 'data'
@@ -182,6 +177,9 @@ jobs:
           docker run --rm -d -p 5333:5000 -v "./build:/data" \
             osrm/osrm-backend osrm-routed --algorithm ch \
             --max-table-size 100000000 /data/${{ matrix.state }}.osrm
+
+          # Wait a bit before starting routing API requests
+          sleep 10
 
           geographies='${{ steps.create-geo-jobs.outputs.param }}'
           geographies_array=($(echo "$geographies" | jq -r '.[]'))
