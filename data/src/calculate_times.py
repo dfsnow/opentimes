@@ -27,6 +27,7 @@ def main() -> None:
     parser.add_argument("--geography", required=True, type=str)
     parser.add_argument("--state", required=True, type=str)
     parser.add_argument("--centroid-type", required=True, type=str)
+    parser.add_argument("--chunk", required=False, type=str)
     parser.add_argument("--write-to-s3", action="store_true", default=False)
     args = parser.parse_args()
     script_start_time = time.time()
@@ -35,15 +36,17 @@ def main() -> None:
     config = TravelTimeConfig(args, params=params, logger=logger)
     inputs = config.load_default_inputs()
 
+    chunk_msg = f", chunk: {config.args.chunk}" if config.args.chunk else ""
     logger.info(
         "Starting times calculation with parameters: version=%s, "
-        "mode=%s, year=%s, geography=%s, state=%s, centroid_type=%s",
+        "mode=%s, year=%s, geography=%s, state=%s, centroid_type=%s%s",
         config.params["times"]["version"],
         config.args.mode,
         config.args.year,
         config.args.geography,
         config.args.state,
         config.args.centroid_type,
+        chunk_msg,
     )
     logger.info(
         "Starting with %s origins to %s destinations (%s pairs)",
@@ -106,8 +109,11 @@ def main() -> None:
             "run_id": run_id,
             "calc_datetime_finished": pd.Timestamp.now(tz="UTC"),
             "calc_time_elapsed_sec": time.time() - script_start_time,
-            "calc_n_origins": inputs.n_origins,
-            "calc_n_destinations": inputs.n_destinations,
+            "calc_chunk_id": args.chunk,
+            "calc_chunk_n_origins": inputs.n_origins,
+            "calc_chunk_n_destinations": inputs.n_destinations,
+            "calc_n_origins": inputs.n_origins_full,
+            "calc_n_destinations": inputs.n_destinations_full,
             "calc_n_pairs": len(results_df),
             "calc_n_missing_pairs": len(missing_pairs_df),
             "git_commit_sha_short": git_commit_sha_short,
@@ -130,13 +136,14 @@ def main() -> None:
 
     logger.info(
         "Finished routing for version: %s, mode: %s, year: %s, "
-        "geography: %s, state: %s, centroid type: %s in %s",
+        "geography: %s, state: %s, centroid type: %s%s in %s",
         config.params["times"]["version"],
         config.args.mode,
         config.args.year,
         config.args.geography,
         config.args.state,
         config.args.centroid_type,
+        chunk_msg,
         format_time(time.time() - script_start_time),
     )
 

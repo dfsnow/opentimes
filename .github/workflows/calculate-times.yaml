@@ -181,13 +181,21 @@ jobs:
           # Wait a bit before starting routing API requests
           sleep 10
 
+          # Loop through geographies, chunking geographies with small units
+          # (block groups) into smaller jobs
           geographies='${{ steps.create-geo-jobs.outputs.param }}'
           geographies_array=($(echo "$geographies" | jq -r '.[]'))
           for geo in "${geographies_array[@]}"; do
-            echo "Starting job with parameters: mode=${{ inputs.mode }}, year=${{ matrix.year }}, geography=${geo}, state=${{ matrix.state }}"
-            uv run ./src/calculate_times.py \
+            chunks_array=($(uv run ./src/split_chunks.py \
               --mode ${{ inputs.mode }} --year ${{ matrix.year }} \
-              --geography "$geo" --state ${{ matrix.state }} \
-              --centroid-type weighted \
-              --write-to-s3
+              --geography "$geo" --state ${{ matrix.state }} | jq -r '.[]'))
+
+            for chunk in "${chunks_array[@]}"; do
+              echo "Starting job with parameters: mode=${{ inputs.mode }}, year=${{ matrix.year }}, geography=${geo}, state=${{ matrix.state }}, chunk=${chunk}"
+              uv run ./src/calculate_times.py \
+                --mode ${{ inputs.mode }} --year ${{ matrix.year }} \
+                --geography "$geo" --state ${{ matrix.state }} \
+                --centroid-type weighted --chunk "$chunk" \
+                --write-to-s3
+            done
           done

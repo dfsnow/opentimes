@@ -1,5 +1,6 @@
 import argparse
 import logging
+import re
 import time
 from pathlib import Path
 from typing import Any, Literal
@@ -28,11 +29,13 @@ class TravelTimeArgs:
         self.geography: str
         self.state: str
         self.centroid_type: str
+        self.chunk: str | None
         self.write_to_s3: bool
 
         self._args_to_attr(args)
         self._validate_mode(params, self.mode)
         self._validate_centroid_type(self.centroid_type)
+        self._validate_chunk(self.chunk)
 
     def _args_to_attr(self, args: argparse.Namespace) -> None:
         for k, v in vars(args).items():
@@ -50,6 +53,21 @@ class TravelTimeArgs:
                 "Invalid centroid_type, must be one "
                 f"of: {valid_centroid_types}"
             )
+
+    def _validate_chunk(self, chunk: str | None) -> None:
+        if chunk and not re.match(r"^\d+-\d+_\d+-\d+$", chunk):
+            raise ValueError(
+                "Invalid chunk argument. Must be four numbers "
+                "separated by dashes and an underscore (e.g., '01-02_00-10')."
+            )
+        if chunk:
+            for part in chunk.split("_"):
+                sub = part.split("-")
+                if len(sub[0]) != len(sub[1]):
+                    raise ValueError(
+                        "Invalid chunk argument. Both numbers must have "
+                        "the same number of digits (including zero-padding)."
+                    )
 
 
 class TravelTimePaths:
@@ -109,8 +127,12 @@ class TravelTimePaths:
 
     @property
     def _file_name(self) -> str:
-        """Generates file name."""
-        return "part-0.parquet"
+        """Generates file name based on chunk."""
+        return (
+            f"part-{self.args.chunk}.parquet"
+            if self.args.chunk
+            else "part-0.parquet"
+        )
 
     def _setup_paths(self) -> None:
         """Sets up all input and output paths."""
@@ -211,22 +233,70 @@ class TravelTimePaths:
 
 class TravelTimeInputs:
     """
-    Class to prep and hold input data for travel time calculations.
+    Class to hold input data and chunk settings for travel time calculations.
     """
 
     def __init__(
         self,
         origins: pd.DataFrame,
         destinations: pd.DataFrame,
+        chunk: str | None,
         max_split_size_origins: int,
         max_split_size_destinations: int,
     ) -> None:
         self.origins = origins
         self.destinations = destinations
+
+        # "full" is the original (before chunk subsetting) number of origins
+        self.n_origins_full: int = len(self.origins)
+        self.n_destinations_full: int = len(self.destinations)
+
+        self.chunk = chunk
+        self.o_chunk_start_idx: int
+        self.o_chunk_end_idx: int
+        self.d_chunk_start_idx: int
+        self.d_chunk_end_idx: int
+        self.o_chunk_size: int = int(10e7)
+        self.d_chunk_size: int = int(10e7)
+        self._set_chunk_attributes()
+        self._subset_origins()
+        self._subset_destinations()
+
         self.n_origins: int = len(self.origins)
         self.n_destinations: int = len(self.destinations)
-        self.max_split_size_origins = max_split_size_origins
-        self.max_split_size_destinations = max_split_size_destinations
+        self.max_split_size_origins = min(
+            max_split_size_origins, self.o_chunk_size
+        )
+        self.max_split_size_destinations = min(
+            max_split_size_destinations, self.d_chunk_size
+        )
+
+    def _set_chunk_attributes(self) -> None:
+        """Sets the origin chunk indices given the input chunk string."""
+        if self.chunk:
+            o_chunk, d_chunk = self.chunk.split("_")
+            o_chunk_start_idx, o_chunk_end_idx = o_chunk.split("-")
+            d_chunk_start_idx, d_chunk_end_idx = d_chunk.split("-")
+            self.o_chunk_start_idx = int(o_chunk_start_idx)
+            self.o_chunk_end_idx = int(o_chunk_end_idx)
+            self.o_chunk_size = int(o_chunk_end_idx) - int(o_chunk_start_idx)
+            self.d_chunk_start_idx = int(d_chunk_start_idx)
+            self.d_chunk_end_idx = int(d_chunk_end_idx)
+            self.d_chunk_size = int(d_chunk_end_idx) - int(d_chunk_start_idx)
+
+    def _subset_origins(self) -> None:
+        """Sets the origins chunk (if chunk is specified)."""
+        if self.chunk:
+            self.origins = self.origins.iloc[
+                self.o_chunk_start_idx : self.o_chunk_end_idx
+            ]
+
+    def _subset_destinations(self) -> None:
+        """Sets the destinations chunk (if chunk is specified)."""
+        if self.chunk:
+            self.destinations = self.destinations.iloc[
+                self.d_chunk_start_idx : self.d_chunk_end_idx
+            ]
 
 
 class TravelTimeConfig:
@@ -275,20 +345,27 @@ class TravelTimeConfig:
         origins = self._load_od_file("origins")
         destinations = self._load_od_file("destinations")
 
-        if snap:
-            self.logger.info(f"Snapping {len(origins)} origins to OSM network")
-            origins = snap_df_to_osm(origins, self.args.mode)
-            self.logger.info(
-                f"Snapping {len(destinations)} destinations to OSM network"
-            )
-            destinations = snap_df_to_osm(destinations, self.args.mode)
-
-        return TravelTimeInputs(
+        inputs = TravelTimeInputs(
             origins=origins,
             destinations=destinations,
+            chunk=self.args.chunk,
             max_split_size_origins=self.params["times"]["max_split_size"],
             max_split_size_destinations=self.params["times"]["max_split_size"],
         )
+
+        if snap:
+            self.logger.info(
+                f"Snapping {len(inputs.origins)} origins to OSM network"
+            )
+            inputs.origins = snap_df_to_osm(inputs.origins, self.args.mode)
+            self.logger.info(
+                f"Snapping {len(inputs.destinations)} destinations to OSM network"
+            )
+            inputs.destinations = snap_df_to_osm(
+                inputs.destinations, self.args.mode
+            )
+
+        return inputs
 
 
 class TravelTimeCalculator:
