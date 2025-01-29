@@ -187,7 +187,7 @@ jobs:
           geographies_array=($(echo "$geographies" | jq -r '.[]'))
           for geo in "${geographies_array[@]}"; do
             chunks_array=($(uv run ./src/split_chunks.py \
-              --mode ${{ inputs.mode }} --year ${{ matrix.year }} \
+              --year ${{ matrix.year }} \
               --geography "$geo" --state ${{ matrix.state }} | jq -r '.[]'))
 
             for chunk in "${chunks_array[@]}"; do
