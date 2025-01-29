@@ -169,7 +169,7 @@ jobs:
       - name: Increase swapfile to max size
         uses: ./.github/actions/prep-disk-and-swap
 
-      - name: Run routing jobs
+      - name: Start docker
         shell: bash
         working-directory: 'data'
         run: |
@@ -178,6 +178,15 @@ jobs:
             osrm/osrm-backend osrm-routed --algorithm ch \
             --max-table-size 100000000 /data/${{ matrix.state }}.osrm
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+
+      - name: Run routing jobs
+        shell: bash
+        working-directory: 'data'
+        run: |
           geographies='${{ steps.create-geo-jobs.outputs.param }}'
           geographies_array=($(echo "$geographies" | jq -r '.[]'))
           for geo in "${geographies_array[@]}"; do
