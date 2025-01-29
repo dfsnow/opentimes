@@ -169,6 +169,11 @@ jobs:
       - name: Increase swapfile to max size
         uses: ./.github/actions/prep-disk-and-swap
 
+      - name: Wait to clear memory
+        if: ${{ env.osrm_fetched != 'true' }}
+        shell: bash
+        run: sleep 10
+
       - name: Run routing jobs
         shell: bash
         working-directory: 'data'
