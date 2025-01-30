@@ -197,7 +197,7 @@ jobs:
               --geography "$geo" --state ${{ matrix.state }} | jq -r '.[]'))
 
             for chunk in "${chunks_array[@]}"; do
-              echo "Starting job with parameters: mode=${{ inputs.mode }}, year=${{ matrix.year }}, geography=${geo}, state=${{ matrix.state }}, chunk=${chunk}"
+              echo "Starting job with parameters: mode=${{ inputs.mode }}, year=${{ matrix.year }}, geography=${geo}, state=${{ matrix.state }}, centroid_type=weighted, chunk=${chunk}"
               uv run ./src/calculate_times.py \
                 --mode ${{ inputs.mode }} --year ${{ matrix.year }} \
                 --geography "$geo" --state ${{ matrix.state }} \

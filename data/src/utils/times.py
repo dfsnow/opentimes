@@ -1,7 +1,9 @@
 import argparse
 import logging
+import os
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, Literal
 
@@ -315,6 +317,7 @@ class TravelTimeConfig:
         args: argparse.Namespace,
         params: dict,
         logger: logging.Logger,
+        ncpu: int | None = None,
         verbose: bool = False,
     ) -> None:
         self.args = TravelTimeArgs(args, params)
@@ -328,6 +331,7 @@ class TravelTimeConfig:
             endpoint_url=self.params["s3"]["endpoint_url"],
         )
         self.logger = logger
+        self.ncpu = ncpu if ncpu else os.cpu_count()
         self.verbose = verbose
 
     def _load_od_file(self, path: str) -> pd.DataFrame:
@@ -597,24 +601,30 @@ class TravelTimeCalculator:
         n_oc = self.inputs.n_origins
         m_spl_d = self.inputs.max_split_size_destinations
         n_dc = self.inputs.n_destinations
-        for o in range(0, n_oc, max_spl_o):
-            for d in range(0, n_dc, m_spl_d):
-                results.append(
-                    self._binary_search(
-                        o_start_idx=o,
-                        d_start_idx=d,
-                        o_end_idx=min(o + max_spl_o, n_oc),
-                        d_end_idx=min(d + m_spl_d, n_dc),
-                        print_log=True,
-                        cur_depth=0,
-                        origins=self.inputs.origins,
-                        destinations=self.inputs.destinations,
+
+        with ThreadPoolExecutor(self.config.ncpu) as executor:
+            futures = []
+            for o in range(0, n_oc, max_spl_o):
+                for d in range(0, n_dc, m_spl_d):
+                    futures.append(
+                        executor.submit(
+                            self._binary_search,
+                            o_start_idx=o,
+                            d_start_idx=d,
+                            o_end_idx=min(o + max_spl_o, n_oc),
+                            d_end_idx=min(d + m_spl_d, n_dc),
+                            print_log=True,
+                            cur_depth=0,
+                            origins=self.inputs.origins,
+                            destinations=self.inputs.destinations,
+                        )
                     )
-                )
+            for future in futures:
+                results.extend(future.result())
 
         # Return empty result set if nothing is routable
         if len(results) == 0:
-            return pd.DataFrame(
+            results_df = pd.DataFrame(
                 columns=[
                     "origin_id",
                     "destination_id",
@@ -622,15 +632,14 @@ class TravelTimeCalculator:
                 ]
             )
         else:
-            return (
-                pd.concat(
-                    [df for sl in results for df in sl],
-                    ignore_index=True,
-                    copy=False,
-                )
+            results_df = (
+                pd.concat(results, ignore_index=True, copy=False)
                 .set_index(["origin_id", "destination_id"])
                 .sort_index()
             )
+
+        del results
+        return results_df
 
 
 def snap_df_to_osm(df: pd.DataFrame, mode: str) -> pd.DataFrame:
