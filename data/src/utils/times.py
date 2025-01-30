@@ -624,7 +624,9 @@ class TravelTimeCalculator:
         else:
             return (
                 pd.concat(
-                    [df for sl in results for df in sl], ignore_index=True
+                    [df for sl in results for df in sl],
+                    ignore_index=True,
+                    copy=False,
                 )
                 .set_index(["origin_id", "destination_id"])
                 .sort_index()
