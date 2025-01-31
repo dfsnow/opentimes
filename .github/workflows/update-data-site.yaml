@@ -4,10 +4,6 @@ name: update-data-site
 
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows: [create-public-files]
-    types:
-      - completed
 
 env:
   AWS_DEFAULT_REGION: us-east-1
