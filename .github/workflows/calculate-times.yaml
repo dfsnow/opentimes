@@ -140,6 +140,7 @@ jobs:
         id: install-python-dependencies
         shell: bash
         run: |
+          sudo apt-get install libgeos-dev
           uv python install
           uv venv
           uv pip install ".[site,data]"
@@ -205,16 +206,3 @@ jobs:
                 --write-to-s3
             done
           done
-
-      - name: Write Docker logs on failure
-        if: failure()
-        shell: bash
-        working-directory: 'data'
-        run: docker logs osrm >& docker.log
-
-      - name: Upload Docker logs on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: docker-logs
-          path: ./data/docker.log
