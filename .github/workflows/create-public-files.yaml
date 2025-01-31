@@ -1,18 +1,11 @@
 ---
 
 name: create-public-files
-run-name: create-public-files-${{ inputs.version }}
+run-name: create-public-files-${{ inputs.version }}-${{ inputs.mode }}
 
 on:
   workflow_dispatch:
     inputs:
-      # Input values must match those in params.yaml
-      dataset:
-        required: true
-        description: Comma-separated list of datasets
-        default: 'times,points,missing_pairs,metadata'
-        type: string
-
       version:
         required: true
         description: Version of data
@@ -21,20 +14,40 @@ on:
 
       mode:
         required: true
-        description: Comma-separated list of travel modes
-        default: 'auto,bicycle,pedestrian'
+        description: Mode of travel
+        default: 'car'
+        type: choice
+        options:
+          - car
+          - bicycle
+          - foot
+
+      override_years:
+        required: false
+        description: |
+          Comma-separated list of OSM data years to run e.g. 2020,2023.
+          Will run all (see params.yaml) if null
         type: string
 
-      year:
-        required: true
-        description: Comma-separated list of years
-        default: '2020,2021,2022,2023,2024'
+      override_states:
+        required: false
+        description: |
+          Comma-separated state codes to run e.g. 01,06.
+          Will run all (see params.yaml) if null
         type: string
 
-      geography:
-        required: true
-        description: Comma-separated list of Census geographies
-        default: 'state,county,county_subdivision,tract,zcta'
+      override_datasets:
+        required: false
+        description: |
+          Comma-separated list datasets to publish e.g. times,metadata.
+          Will run all (see params.yaml) if null
+        type: string
+
+      override_geographies:
+        required: false
+        description: |
+          Comma-separated geographies to limit run e.g. county,tract.
+          Will run all (see params.yaml) if null
         type: string
 
 env:
@@ -48,34 +61,51 @@ jobs:
     runs-on: ubuntu-24.04
 
     outputs:
-      modes: ${{ steps.parse-inputs.outputs.modes }}
-      years: ${{ steps.parse-inputs.outputs.years }}
-      geographies: ${{ steps.parse-inputs.outputs.geographies }}
-
-    steps:
-      - name: Parse inputs
-        id: parse-inputs
-        shell: bash
-        run: |
-           echo "modes=$(echo '${{ inputs.mode }}' | jq -R -c 'split(",")')" >> "$GITHUB_OUTPUT"
-           echo "years=$(echo '${{ inputs.year }}' | jq -R -c 'split(",")')" >> "$GITHUB_OUTPUT"
-           echo "geographies=$(echo '${{ inputs.geography }}' | jq -R -c 'split(",")')" >> "$GITHUB_OUTPUT"
-
-  create-files:
-    runs-on: ubuntu-24.04
-    needs: setup-jobs
-    name: create-file-${{ inputs.version }}-${{ matrix.mode }}-${{ matrix.year }}-${{ matrix.geography }}
-    strategy:
-      # Don't fail all chunks if one fails
-      fail-fast: false
-      matrix:
-        mode: ${{ fromJSON(needs.setup-jobs.outputs.modes) }}
-        year: ${{ fromJSON(needs.setup-jobs.outputs.years) }}
-        geography: ${{ fromJSON(needs.setup-jobs.outputs.geographies) }}
+      years: ${{ steps.create-year-jobs.outputs.param }}
+      states: ${{ steps.create-state-jobs.outputs.param }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Create year jobs
+        id: create-year-jobs
+        uses: ./.github/actions/parse-gh-input
+        with:
+          param_path: '.input.year'
+          param_override: '${{ inputs.override_years }}'
+
+      - name: Create state jobs
+        id: create-state-jobs
+        uses: ./.github/actions/parse-gh-input
+        with:
+          param_path: '.input.state'
+          param_override: '${{ inputs.override_states }}'
+
+  create-files:
+    runs-on: ubuntu-24.04
+    needs: setup-jobs
+    strategy:
+      # Don't fail all chunks if one fails
+      fail-fast: false
+      matrix:
+        year: ${{ fromJSON(needs.setup-jobs.outputs.years) }}
+        state: ${{ fromJSON(needs.setup-jobs.outputs.states) }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Cloudflare credentials
+        uses: ./.github/actions/setup-cloudflare-s3
+        with:
+          CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
+          CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
+
+      - name: Remove unnecessary software and increase swap space
+        uses: ./.github/actions/prep-disk-and-swap
+        with:
+          swap_override: 50000
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
@@ -90,25 +120,44 @@ jobs:
         id: install-python-dependencies
         shell: bash
         run: |
+          sudo apt-get install libgeos-dev
           uv python install
           uv venv
           uv pip install ".[site,data]"
 
-      - name: Setup Cloudflare credentials
-        uses: ./.github/actions/setup-cloudflare-s3
+      - name: Create file jobs per dataset
+        id: create-dataset-jobs
+        uses: ./.github/actions/parse-gh-input
         with:
-          CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
-          CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
+          param_path: '.output.dataset'
+          param_override: '${{ inputs.override_datasets }}'
+
+      - name: Create file jobs per geography
+        id: create-geo-jobs
+        uses: ./.github/actions/parse-gh-input
+        with:
+          param_path: '.input.census.geography.all'
+          param_override: '${{ inputs.override_geographies }}'
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
 
       - name: Create public files
-        id: create-public-files
         working-directory: 'data'
         shell: bash
         run: |
-          datasets_parsed=($(echo "${{ inputs.dataset }}" | tr -d ' ' | tr ',' ' '))
-          for dataset in "${datasets_parsed[@]}"; do
-            uv run ./src/create_public_files.py \
-              --dataset "$dataset" --version ${{ inputs.version }} \
-              --mode ${{ matrix.mode }} --year ${{ matrix.year }} \
-              --geography ${{ matrix.geography }}
+          geographies='${{ steps.create-geo-jobs.outputs.param }}'
+          geographies_array=($(echo "$geographies" | jq -r '.[]'))
+          datasets='${{ steps.create-dataset-jobs.outputs.param }}'
+          datasets_array=($(echo "$datasets" | jq -r '.[]'))
+
+          for geo in "${geographies_array[@]}"; do
+            for dataset in "${datasets_array[@]}"; do
+              uv run ./src/create_public_files.py \
+                --dataset "$dataset" --version ${{ inputs.version }} \
+                --mode ${{ inputs.mode }} --year ${{ matrix.year }} \
+                --geography "$geo" --state ${{ matrix.state }}
+            done
           done

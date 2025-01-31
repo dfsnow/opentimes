@@ -158,3 +158,10 @@ output:
   compression:
     type: zstd
     level: 12
+
+  # List of OpenTimes table names
+  dataset:
+    - times
+    - points
+    - missing_pairs
+    - metadata
