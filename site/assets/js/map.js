@@ -11,8 +11,8 @@
 import { asyncBufferFromUrl, byteLengthFromUrl, parquetMetadataAsync, parquetRead } from "hyparquet";
 import { compressors } from "hyparquet-compressors";
 
-const BASE_URL = "https://data.opentimes.org/times/version=0.0.1/mode=auto/year=2024/geography=tract",
-  BIG_STATES = ["06", "36"],
+const BASE_URL = "https://data.opentimes.org/times/version=0.0.1/mode=car/year=2024/geography=tract",
+  BIG_STATES = [],
   ZOOM_THRESHOLDS = [6, 8];
 
 // eslint-disable-next-line one-var
@@ -444,7 +444,7 @@ class ParquetProcessor {
   }
 
   async runQuery(map, state, id) {
-    const queryUrl = `${this.baseUrl}/state=${state}/times-0.0.1-auto-2024-tract-${state}`;
+    const queryUrl = `${this.baseUrl}/state=${state}/times-0.0.1-car-2024-tract-${state}`;
 
     let urlsArray = [];
     if (BIG_STATES.includes(state)) {
