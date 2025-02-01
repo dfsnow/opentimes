@@ -62,6 +62,11 @@ def create_public_files(
     filename = f"{dataset}-{version}-{mode}-{year}-{geography}-{state}"
     partitions = "/*" * DATASET_DICT[version][dataset]["partition_levels"]
 
+    # It's vital to use only a single thread here because doing so maintains
+    # the order of records when writing Parquet row groups. Ordered records
+    # means each origin and all its destinations are usually contained within
+    # a single row group (which makes the files very fast to query)
+    con.execute("SET threads=1;")
     con.sql(
         f"""
         COPY (
@@ -79,7 +84,6 @@ def create_public_files(
                 AND year = '{year}'
                 AND geography = '{geography}'
                 AND state = '{state}'
-            ORDER BY {", ".join(DATASET_DICT[version][dataset]["order_by_columns"])}
         )
         TO 'r2://{params["s3"]["public_bucket"]}/{dataset}/version={version}/mode={mode}/year={year}/geography={geography}/state={state}'
         (

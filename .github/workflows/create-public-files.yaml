@@ -102,11 +102,6 @@ jobs:
           CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
           CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
 
-      - name: Remove unnecessary software and increase swap space
-        uses: ./.github/actions/prep-disk-and-swap
-        with:
-          swap_override: 50000
-
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
@@ -138,11 +133,6 @@ jobs:
         with:
           param_path: '.input.census.geography.all'
           param_override: '${{ inputs.override_geographies }}'
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        with:
-          limit-access-to-actor: true
 
       - name: Create public files
         working-directory: 'data'
