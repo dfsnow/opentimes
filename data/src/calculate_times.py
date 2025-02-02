@@ -1,5 +1,4 @@
 import argparse
-import json
 import os
 import time
 import uuid
@@ -7,12 +6,10 @@ from pathlib import Path
 
 import pandas as pd
 import yaml
-from utils.constants import DOCKER_ENDPOINT_SECOND_PASS
 from utils.logging import create_logger
 from utils.times import (
     TravelTimeCalculator,
     TravelTimeConfig,
-    snap_df_to_osm,
 )
 from utils.utils import format_time, get_md5_hash
 
@@ -58,38 +55,22 @@ def main() -> None:
         len(inputs.origins) * inputs.n_destinations,
     )
 
-    # Use the Vahalla Locate API to append coordinates that are snapped to OSM
-    if config.params["times"]["use_snapped"]:
-        logger.info("Snapping coordinates to OSM network")
-        inputs.origins = snap_df_to_osm(inputs.origins, config.args.mode)
-        inputs.destinations = snap_df_to_osm(
-            inputs.destinations, config.args.mode
-        )
-
-    # Calculate times for each chunk and return a single DataFrame. Assumes
-    # there are Valhalla services running locally at localhost:8002 (and :8003
-    # if second-pass is enabled)
-    logger.info("Tiles loaded and coodinates ready, starting routing")
+    # Calculate times from all origins to all destinations and return a single
+    # DataFrame. Assumes an OSRM service is running locally at localhost:5333
+    logger.info("Network loaded and coodinates ready, starting routing")
     tt_calc = TravelTimeCalculator(config, inputs)
-    if config.args.mode not in config.params["times"]["two_pass"]:
-        logger.info("Skipping second pass for %s mode", config.args.mode)
-        results_df = tt_calc.many_to_many(
-            endpoint=DOCKER_ENDPOINT_SECOND_PASS, second_pass=False
-        )
-    else:
-        results_df = tt_calc.many_to_many()
-
+    results_df = tt_calc.many_to_many()
     logger.info(
         "Finished calculating times for %s pairs in %s",
         len(results_df),
         format_time(time.time() - script_start_time),
     )
 
-    # Extract missing pairs to a separate DataFrame and sort all outputs
+    # Extract any missing pairs to a separate DataFrame and sort all outputs
     # for efficient compression
     missing_pairs_df = results_df[results_df["duration_sec"].isnull()]
     missing_pairs_df = (
-        missing_pairs_df.drop(columns=["duration_sec", "distance_km"])
+        missing_pairs_df.drop(columns=["duration_sec"])
         .sort_index()
         .reset_index()
     )
@@ -98,7 +79,7 @@ def main() -> None:
     )
 
     # Loop through files and write to both local and remote paths
-    out_locations = ["local", "s3"] if args.write_to_s3 else ["local"]
+    out_locations = ["s3"] if args.write_to_s3 else ["local"]
     logger.info(
         "Calculated times between %s pairs (%s missing). "
         "Saving outputs to: %s",
@@ -120,18 +101,9 @@ def main() -> None:
         f: get_md5_hash(config.paths.input["files"][f])
         for f in config.paths.input["files"].keys()
     }
-    output_file_hashes = {
-        f: get_md5_hash(config.paths.output["local"][f])
-        for f in config.paths.output["local"].keys()
-        if f != "metadata_file"
-    }
 
     # Create a metadata DataFrame of all settings and data used for creating
     # inputs and generating times
-    with open(Path.cwd() / "valhalla.json", "r") as f:
-        valhalla_data = json.load(f)
-    with open(Path.cwd() / "valhalla_sp.json", "r") as f:
-        valhalla_data_sp = json.load(f)
     metadata_df = pd.DataFrame(
         {
             "run_id": run_id,
@@ -141,34 +113,21 @@ def main() -> None:
             "calc_chunk_n_origins": inputs.n_origins,
             "calc_chunk_n_destinations": inputs.n_destinations,
             "calc_n_origins": inputs.n_origins_full,
-            "calc_n_destinations": inputs.n_destinations,
+            "calc_n_destinations": inputs.n_destinations_full,
+            "calc_n_pairs": len(results_df),
+            "calc_n_missing_pairs": len(missing_pairs_df),
             "git_commit_sha_short": git_commit_sha_short,
             "git_commit_sha_long": git_commit_sha,
             "param_network_buffer_m": params["input"]["network_buffer_m"],
             "param_destination_buffer_m": params["input"][
                 "destination_buffer_m"
             ],
-            "file_input_valhalla_tiles_md5": input_file_hashes[
-                "valhalla_tiles_file"
-            ],
+            "param_max_split_size": params["times"]["max_split_size"],
+            "param_use_snapped": params["times"]["use_snapped"],
             "file_input_origins_md5": input_file_hashes["origins_file"],
             "file_input_destinations_md5": input_file_hashes[
                 "destinations_file"
             ],
-            "file_output_times_md5": output_file_hashes["times_file"],
-            "file_output_origins_md5": output_file_hashes["origins_file"],
-            "file_output_destinations_md5": output_file_hashes[
-                "destinations_file"
-            ],
-            "file_output_missing_pairs_md5": output_file_hashes[
-                "missing_pairs_file"
-            ],
-            "valhalla_config_data": json.dumps(
-                valhalla_data, separators=(",", ":")
-            ),
-            "valhalla_config_data_second_pass": json.dumps(
-                valhalla_data_sp, separators=(",", ":")
-            ),
         },
         index=[0],
     )

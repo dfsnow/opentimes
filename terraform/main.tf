@@ -4,6 +4,10 @@ terraform {
       source  = "cloudflare/cloudflare"
       version = "~> 4.44.0"
     }
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
   }
 
   required_version = ">= 1.6.6"
@@ -22,6 +26,18 @@ terraform {
     endpoint                    = "https://${var.cloudflare_account_id}.r2.cloudflarestorage.com"
 
     /* Set AWS_PROFILE to "cloudflare" before running commands */
+  }
+}
+
+provider "aws" {
+  region = "us-east-1"
+
+  skip_credentials_validation = true
+  skip_region_validation      = true
+  skip_requesting_account_id  = true
+
+  endpoints {
+    s3 = "https://${var.cloudflare_account_id}.r2.cloudflarestorage.com"
   }
 }
 

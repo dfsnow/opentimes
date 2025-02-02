@@ -1,7 +1,6 @@
-# Local endpoints for Docker containers running Valhalla service. See the
+# Local endpoints for Docker containers running OSRM service. See the
 # Compose file for endpoint setup
-DOCKER_ENDPOINT_FIRST_PASS = "http://127.0.0.1:8002"
-DOCKER_ENDPOINT_SECOND_PASS = "http://127.0.0.1:8003"
+DOCKER_ENDPOINT = "http://127.0.0.1:5333"
 
 # This is a dictionary that determines the construction of the public
 # OpenTimes files. partition_levels is the number of directories present in
@@ -18,7 +17,6 @@ DATASET_DICT: dict = {
                 "origin_id",
                 "destination_id",
                 "duration_sec",
-                "distance_km",
             ],
             "order_by_columns": [
                 "origin_id",
@@ -31,8 +29,11 @@ DATASET_DICT: dict = {
                 "centroid_type",
                 "point_type",
                 "id",
-                "lat",
                 "lon",
+                "lat",
+                "lon_snapped",
+                "lat_snapped",
+                "is_snapped",
             ],
             "order_by_columns": [
                 "id",
@@ -62,21 +63,19 @@ DATASET_DICT: dict = {
                 "calc_chunk_n_destinations",
                 "calc_n_origins",
                 "calc_n_destinations",
+                "calc_n_pairs",
+                "calc_n_missing_pairs",
                 "git_commit_sha_short",
                 "git_commit_sha_long",
                 "param_network_buffer_m",
                 "param_destination_buffer_m",
-                "file_input_valhalla_tiles_md5",
+                "param_max_split_size",
+                "param_use_snapped",
                 "file_input_origins_md5",
                 "file_input_destinations_md5",
-                "file_output_times_md5",
-                "file_output_origins_md5",
-                "file_output_destinations_md5",
-                "file_output_missing_pairs_md5",
-                "valhalla_config_data",
             ],
             "order_by_columns": [
-                "calc_chunk_id",
+                "calc_datetime_finished",
             ],
         },
     }

@@ -9,7 +9,6 @@ with open(Path.cwd() / "params.yaml") as file:
 
 
 def split_chunks(
-    mode: str,
     year: str,
     geography: str,
     state: str,
@@ -29,8 +28,6 @@ def split_chunks(
     pull from the params.yaml file.
 
     Args:
-        mode: Travel mode. Determines the chunk settings pulled
-            from params.yaml.
         year: The year of the input origins data.
         geography: The geography type of the origins data.
         state: The two-digit state FIPS code of the origins data.
@@ -66,7 +63,7 @@ def split_chunks(
             else origin_n_chunks
         ),
         origin_min_chunk_size=int(
-            params["actions"]["origin_min_chunk_size"][mode]
+            params["actions"]["origin_min_chunk_size"]
             if not origin_min_chunk_size
             else origin_min_chunk_size
         ),
@@ -77,7 +74,7 @@ def split_chunks(
             else destination_n_chunks
         ),
         destination_min_chunk_size=int(
-            params["actions"]["destination_min_chunk_size"][mode]
+            params["actions"]["destination_min_chunk_size"]
             if not destination_min_chunk_size
             else destination_min_chunk_size
         ),
@@ -88,7 +85,6 @@ def split_chunks(
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--mode", required=True, type=str)
     parser.add_argument("--year", required=True, type=str)
     parser.add_argument("--geography", required=True, type=str)
     parser.add_argument("--state", required=True, type=str)
@@ -114,7 +110,6 @@ def main() -> None:
     )
     args = parser.parse_args()
     split_chunks(
-        args.mode,
         args.year,
         args.geography,
         args.state,
