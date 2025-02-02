@@ -126,47 +126,7 @@ stages:
       year: ${input.year}
       state: ${input.state}
     # See: https://docs.conveyal.com/prepare-inputs#preparing-the-osm-data
-    cmd: '
-      OUT_DIR=./intermediate/osmextract/year=${item.year}/geography=state/state=${item.state} &&
-      mkdir -p $OUT_DIR &&
-      osmium extract
-        --strategy complete_ways
-        -p intermediate/osmclip/year=${item.year}/geography=state/state=${item.state}/${item.state}.geojson
-        ./input/osm/year=${item.year}/us-${item.year}.osm.pbf --overwrite
-        -o "$OUT_DIR"/tmp.osm.pbf &&
-      osmium tags-filter "$OUT_DIR"/tmp.osm.pbf
-        w/highway w/public_transport=platform
-        w/railway=platform w/park_ride r/type=restriction --overwrite
-        -o "$OUT_DIR"/${item.state}.osm.pbf &&
-      rm $OUT_DIR/tmp.osm.pbf
-      '
+    cmd: "./src/extract_osm.sh ${item.year} ${item.state}"
     outs:
       - ./intermediate/osmextract/year=${item.year}/geography=state/state=${item.state}/${item.state}.osm.pbf:
-          persist: true
-
-  create_valhalla_tiles:
-    deps:
-      - ./intermediate/osmextract/year=${item.year}/geography=state/state=${item.state}/${item.state}.osm.pbf
-    matrix:
-      year: ${input.year}
-      state: ${input.state}
-    # Here we're using compose to run containerized valhalla to prep tiles.
-    # This horrible bash will output a nice tarball of routing tiles, elevation,
-    # etc. to the target DVC directory. The obscene conditional is because
-    # sometimes the elevation_data dir may not exist i.e. for Alaska
-    cmd: '
-      BUILD_DIR=build &&
-      OUT_DIR=intermediate/valhalla_tiles/year=${item.year}/geography=state/state=${item.state} &&
-      rm -rf ./"$BUILD_DIR"/* &&
-      mkdir -p $OUT_DIR &&
-      ln ./intermediate/osmextract/year=${item.year}/geography=state/state=${item.state}/${item.state}.osm.pbf
-        ./"$BUILD_DIR"/${item.state}.osm.pbf &&
-      docker compose run --rm valhalla-build &&
-      tar --zstd --ignore-failed-read -cf "$BUILD_DIR"/valhalla_tiles.tar.zst -C "$BUILD_DIR"
-        elevation_data admin_data timezone_data tiles.tar traffic.tar default_speeds.json
-        file_hashes.txt duplicateways.txt &&
-      mv "$BUILD_DIR"/valhalla_tiles.tar.zst "$OUT_DIR"
-      '
-    outs:
-      - ./intermediate/valhalla_tiles/year=${item.year}/geography=state/state=${item.state}/valhalla_tiles.tar.zst:
           persist: true

@@ -32,6 +32,7 @@ jobs:
         id: install-python-dependencies
         shell: bash
         run: |
+          sudo apt-get install libgeos-dev
           uv python install
           uv venv
           uv pip install ".[site,data]"

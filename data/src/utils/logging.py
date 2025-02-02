@@ -3,13 +3,13 @@ import logging
 
 def create_logger(name: str) -> logging.Logger:
     """
-    Set up a Python logger with the same format as Valhalla logs.
+    Set up a Python logger with the same format as OSRM logs.
 
     Args:
         name: Module name to use for the logger.
 
     Returns:
-        logging.Logger: Generic logger with the same log format as Valhalla.
+        logging.Logger: Generic logger with the same log format as OSRM.
     """
 
     logger = logging.getLogger(name)

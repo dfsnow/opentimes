@@ -13,27 +13,20 @@ s3:
 # Parameters used to control the chunking of work on GitHub Actions
 actions:
   # The max number of origin splits to create for a workflow. This multiplied
-  # by destination_n_chunks is the maximum total number of jobs for a workflow.
-  # GitHub allows up to 256, so the two n_chunks params should always equal
-  # that number when multiplied
+  # by destination_n_chunks is the maximum total number of splits for a
+  # given geography
   origin_n_chunks: 64
 
   # The minimum number of origins to include in a job. Higher = fewer jobs
   # that take longer. Lower = more jobs that finish quicker
-  origin_min_chunk_size:
-    auto: 1000
-    bicycle: 800
-    pedestrian: 800
+  origin_min_chunk_size: 5000
 
   # The max number of destination splits to create for a workflow
   destination_n_chunks: 4
 
   # The minimum number of destinations included in each job. For reference,
   # most states have around 10K Census tract destinations
-  destination_min_chunk_size:
-    auto: 20000
-    bicycle: 10000
-    pedestrian: 10000
+  destination_min_chunk_size: 20000
 
 times:
   # Travel times output version. Follows SemVer (kind of):
@@ -42,29 +35,21 @@ times:
   # 3. PATCH version increments for backwards-compatible data updates
   version: '0.0.1'
 
-  # Valhalla costing models to calculate times for, see:
-  # https://valhalla.github.io/valhalla/api/turn-by-turn/api-reference/#costing-models
+  # OSRM profiles to calculate times for using the default settings of each one
+  # https://github.com/Project-OSRM/osrm-backend/blob/master/docs/profiles.md
   mode:
-    - auto
+    - car
     - bicycle
-    - pedestrian
-    #- multimodal
+    - foot
 
-  # Costing modes in this list will do a first pass with cheaper/faster matrix
-  # API settings. Otherwise, skip straight to a more expensive second pass
-  two_pass:
-    - auto
+  # Maximum size of chunk of origins AND destinations to process in a single
+  # call to OSRM. Useful for limiting total OSRM memory consumption
+  max_split_size: 5000
 
-  # Maximum size of chunk of origins AND destinations to process in a single call to
-  # Valhalla. This is necessary because larger matrices will cause it to choke
-  max_split_size: 100
-
-  # Coordinates are snapped to the OSM street network before time calculation.
-  # Setting this to true will use the snapped coordinates directly in the
-  # matrix API calls
+  # Use coordinates snapped to the OSM street network as origin/destinations
   use_snapped: true
 
-  # If Vahalla fails on the first pass, the time calculator begins a recursive
+  # If OSRM fails on the first pass, the time calculator begins a recursive
   # binary search to try to "go around" and origin-destination pairs causing
   # the failure. The full depth search can take a long time; this parameter
   # trades off search time and completeness
@@ -165,7 +150,7 @@ input:
       by_state:
         - county_subdivision
         - tract
-        - block_group  # not currently used, too time-intensive
+        - block_group
         - block  # only used to fetch TIGER files (not used for routing)
 
 output:
@@ -173,3 +158,10 @@ output:
   compression:
     type: zstd
     level: 12
+
+  # List of OpenTimes table names
+  dataset:
+    - times
+    - points
+    - missing_pairs
+    - metadata

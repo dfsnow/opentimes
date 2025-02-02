@@ -1,0 +1,45 @@
+---
+
+name: Parse GitHub Actions workflow input
+description: Convert strings to matrix-compatible JSON
+
+inputs:
+  param_path:
+    description: yq path to the verification parameter in params.yaml
+    required: true
+  param_override:
+    description: Comma-separated list overriding the parameter
+    required: true
+
+outputs:
+  param:
+    description: Parsed parameter value
+    value: ${{ steps.parse-input.outputs.param }}
+
+runs:
+  using: composite
+  steps:
+    - name: Parse input
+      id: parse-input
+      shell: bash
+      run: |
+        x=$(yq e -o=json '${{ inputs.param_path }}' ./data/params.yaml | jq -c -s .[])
+        echo "param=$x" >> $GITHUB_OUTPUT
+
+        # If override param is set, use that instead
+        x_parsed=($(echo "$x" | jq -r '.[]'))
+        if [ -n "${{ inputs.param_override }}" ]; then
+          override_parsed=($(echo "${{ inputs.param_override }}" | tr -d ' ' | tr ',' ' '))
+          for y in "${override_parsed[@]}"; do
+            if [[ ! " ${x_parsed[@]} " =~ " ${y} " ]]; then
+              echo "Error: Override param ${y} is not in the params for this workflow"
+              echo "Params include: ${x_parsed[@]}"
+              exit 1
+            fi
+          done
+          x_json=$(printf '%s\n' "${override_parsed[@]}" | jq -c -R . | jq -c -s .)
+          echo "Creating jobs for params: ${override_parsed[@]}"
+          echo "param=$x_json" >> $GITHUB_OUTPUT
+        else
+          echo "Creating jobs for params: ${x_parsed[@]}"
+        fi

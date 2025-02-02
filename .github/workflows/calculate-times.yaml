@@ -1,118 +1,40 @@
 ---
 
 name: calculate-times
-run-name: calculate-times-${{ inputs.mode }}-${{ inputs.year }}-${{ inputs.geography }}-${{ inputs.state }}-${{ inputs.centroid_type }}
+run-name: calculate-times-${{ inputs.mode }}
 
 on:
   workflow_dispatch:
     inputs:
-      # Input values match those in params.yaml
       mode:
         required: true
         description: Mode of travel
-        default: 'auto'
+        default: 'car'
         type: choice
         options:
-          - auto
+          - car
           - bicycle
-          - pedestrian
+          - foot
 
-      year:
-        required: true
-        description: Census/OSM data year
-        default: '2020'
-        type: choice
-        options:
-          - '2020'
-          - '2021'
-          - '2022'
-          - '2023'
-          - '2024'
-
-      geography:
-        required: true
-        description: Census data geography
-        default: county
-        type: choice
-        options:
-          - state
-          - county
-          - county_subdivision
-          - tract
-          - zcta
-
-      state:
-        required: true
-        description: Target Census state
-        default: '01'
-        type: choice
-        options:
-          - '01'
-          - '02'
-          - '04'
-          - '05'
-          - '06'
-          - '08'
-          - '09'
-          - '10'
-          - '11'
-          - '12'
-          - '13'
-          - '15'
-          - '16'
-          - '17'
-          - '18'
-          - '19'
-          - '20'
-          - '21'
-          - '22'
-          - '23'
-          - '24'
-          - '25'
-          - '26'
-          - '27'
-          - '28'
-          - '29'
-          - '30'
-          - '31'
-          - '32'
-          - '33'
-          - '34'
-          - '35'
-          - '36'
-          - '37'
-          - '38'
-          - '39'
-          - '40'
-          - '41'
-          - '42'
-          - '44'
-          - '45'
-          - '46'
-          - '47'
-          - '48'
-          - '49'
-          - '50'
-          - '51'
-          - '53'
-          - '54'
-          - '55'
-          - '56'
-
-      centroid_type:
-        required: true
-        description: Whether or not to use population-weighted locations
-        default: weighted
-        type: choice
-        options:
-          - weighted
-          - unweighted
-
-      override_chunks:
+      override_years:
         required: false
         description: |
-          Comma-separated chunks to run e.g. 0-5_000-100,6-11_000-100.
-          Will run all chunks if null
+          Comma-separated list of OSM data years to run e.g. 2020,2023.
+          Will run all (see params.yaml) if null
+        type: string
+
+      override_states:
+        required: false
+        description: |
+          Comma-separated state codes to run e.g. 01,06.
+          Will run all (see params.yaml) if null
+        type: string
+
+      override_geographies:
+        required: false
+        description: |
+          Comma-separated geographies to limit run e.g. county,tract.
+          Will run all (see params.yaml) if null
         type: string
 
 env:
@@ -122,88 +44,30 @@ env:
   PYTHONUNBUFFERED: "1"
 
 jobs:
-  # Using the location data, split the origins into N jobs (max 256)
   setup-jobs:
     runs-on: ubuntu-24.04
+
     outputs:
-      chunks: ${{ steps.create-job-chunks.outputs.chunks }}
+      years: ${{ steps.create-year-jobs.outputs.param }}
+      states: ${{ steps.create-state-jobs.outputs.param }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Cloudflare credentials
-        uses: ./.github/actions/setup-cloudflare-s3
+      - name: Create year jobs
+        id: create-year-jobs
+        uses: ./.github/actions/parse-gh-input
         with:
-          CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
-          CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
+          param_path: '.input.year'
+          param_override: '${{ inputs.override_years }}'
 
-      - name: Fetch GitHub user and group ID
-        shell: bash
-        id: fetch-ids
-        run: |
-          echo "USER_ID=$(id -u)" >> $GITHUB_ENV
-          echo "GROUP_ID=$(id -g)" >> $GITHUB_ENV
-
-      - name: Build Dockerized dependencies
-        uses: ./.github/actions/build-docker
+      - name: Create state jobs
+        id: create-state-jobs
+        uses: ./.github/actions/parse-gh-input
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Load Docker image
-        run: |
-          docker load --input /tmp/opentimes.tar
-          docker image ls -a
-
-      - name: Fetch locations data
-        uses: ./.github/actions/fetch-locations
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          enable-cache: true
-          cache-suffix: "site-data"
-          cache-dependency-glob: |
-            pyproject.toml
-            uv.lock
-
-      - name: Install Python dependencies
-        id: install-python-dependencies
-        shell: bash
-        run: |
-          uv python install
-          uv venv
-          uv pip install ".[site,data]"
-
-      - name: Create job chunks
-        id: create-job-chunks
-        working-directory: 'data'
-        shell: bash
-        run: |
-          export USER_ID=${{ env.USER_ID }}
-          export GROUP_ID=${{ env.GROUP_ID }}
-          uv run ./src/split_chunks.py \
-            --mode ${{ inputs.mode }} --year ${{ inputs.year }} \
-            --geography ${{ inputs.geography }} \
-            --state ${{ inputs.state }} > chunks.txt
-          echo "chunks=$(cat chunks.txt)" >> $GITHUB_OUTPUT
-
-          # If override chunks are set, use those instead
-          chunks_parsed=($(cat chunks.txt | jq -r '.[]'))
-          if [ -n "${{ inputs.override_chunks }}" ]; then
-            override_chunks_parsed=($(echo "${{ inputs.override_chunks }}" | tr -d ' ' | tr ',' ' '))
-            for chunk in "${override_chunks_parsed[@]}"; do
-              if [[ ! " ${chunks_parsed[@]} " =~ " ${chunk} " ]]; then
-                echo "Error: Override chunk ${chunk} is not in the chunks for this origin"
-                echo "Chunks include: ${chunks_parsed[@]}"
-                exit 1
-              fi
-            done
-            chunks_json=$(printf '%s\n' "${override_chunks_parsed[@]}" | jq -c -R . | jq -c -s .)
-            echo "Creating jobs for chunks: ${override_chunks_parsed[@]}"
-            echo "chunks=$chunks_json" > $GITHUB_OUTPUT
-          else
-            echo "Creating jobs for chunks: ${chunks_parsed[@]}"
-          fi
+          param_path: '.input.state'
+          param_override: '${{ inputs.override_states }}'
 
   run-job:
     runs-on: ubuntu-24.04
@@ -212,7 +76,8 @@ jobs:
       # Don't fail all chunks if one fails
       fail-fast: false
       matrix:
-        chunk: ${{ fromJSON(needs.setup-jobs.outputs.chunks) }}
+        year: ${{ fromJSON(needs.setup-jobs.outputs.years) }}
+        state: ${{ fromJSON(needs.setup-jobs.outputs.states) }}
 
     steps:
       - name: Checkout
@@ -224,35 +89,43 @@ jobs:
           CLOUDFLARE_S3_API_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_S3_API_ACCESS_KEY_ID }}
           CLOUDFLARE_S3_API_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_S3_API_SECRET_ACCESS_KEY }}
 
+      - name: Remove unnecessary software and increase swap space
+        uses: ./.github/actions/prep-disk-and-swap
+        with:
+          # Increase swapfile size to 10 GB
+          swap_override: 10737418240
+
+      - name: Install DVC
+        uses: ./.github/actions/setup-dvc
+
       - name: Fetch locations data
         uses: ./.github/actions/fetch-locations
 
-      # Don't fetch tile data in setup-jobs because they're very large and
-      # will churn the Actions cache. We want to wait to fetch it until jobs
-      # have actually been picked up
-      - name: Fetch Valhalla tile data
-        uses: ./.github/actions/fetch-valhalla-tiles
-        with:
-          year: ${{ inputs.year }}
-          state: ${{ inputs.state }}
-
-      - name: Fetch GitHub user and group ID
+      - name: Fetch OSM extract data
         shell: bash
-        id: fetch-ids
+        working-directory: 'data'
         run: |
-          echo "USER_ID=$(id -u)" >> $GITHUB_ENV
-          echo "GROUP_ID=$(id -g)" >> $GITHUB_ENV
+          path=year=${{ matrix.year }}/geography=state/state=${{ matrix.state }}/${{ matrix.state }}
+          uv run dvc pull --no-run-cache \
+            ./intermediate/osmextract/"$path".osm.pbf
 
-      - name: Fetch Docker image
-        uses: actions/download-artifact@v4
-        with:
-          name: opentimes-docker-${{ hashFiles('./data/Dockerfile', './pyproject.toml') }}
-          path: /tmp
-
-      - name: Load Docker image
+      - name: Fetch OSRM network data
+        id: fetch-osrm-data
+        shell: bash
+        working-directory: 'data'
         run: |
-          docker load --input /tmp/opentimes.tar
-          docker image ls -a
+          path=s3://opentimes-resources/cache/osrmnetwork/mode=${{ inputs.mode }}/year=${{ matrix.year }}/geography=state/state=${{ matrix.state }}/osrmnetwork.tar.zst
+          if aws s3 ls "$path" --endpoint-url https://${{ vars.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com --profile cloudflare > /dev/null 2>&1; then
+            aws s3 cp --quiet --endpoint-url \
+              https://${{ vars.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com \
+              "$path" ./osrmnetwork.tar.zst --profile cloudflare
+            tar -xf ./osrmnetwork.tar.zst .
+            echo "OSRM data fetched from cache, skipping network build step"
+            echo "osrm_fetched=true" >> $GITHUB_ENV
+          else
+            echo "OSRM not in cache, running network build step"
+            echo "osrm_fetched=false" >> $GITHUB_ENV
+          fi
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
@@ -267,70 +140,69 @@ jobs:
         id: install-python-dependencies
         shell: bash
         run: |
+          sudo apt-get install libgeos-dev
           uv python install
           uv venv
           uv pip install ".[site,data]"
 
-      - name: Extract tiles
+      - name: Create OSRM network files
+        if: ${{ env.osrm_fetched != 'true' }}
         shell: bash
         working-directory: 'data'
         run: |
-          tile_path="year=${{ inputs.year }}/geography=state/state=${{ inputs.state }}"
-          ln ./intermediate/valhalla_tiles/"$tile_path"/valhalla_tiles.tar.zst ./build/
-          tar -xf ./build/valhalla_tiles.tar.zst -C ./build
-          rm -f ./build/valhalla_tiles.tar.zst
+          ./src/create_osrmnetwork.sh ${{ inputs.mode }} \
+            ${{ matrix.year }} ${{ matrix.state }}
 
-      # In rare cases the runner gets killed due to OoM errors. This bumps swap
-      # to 90% of the space remaining on disk
-      - name: Increase swapfile
-        run: |
-          space_left=$(df /dev/root -B 1 --output=avail | grep -v Avail)
-          space_mult=0.9
-          space_alloc=$(echo "${space_left}*${space_mult}" | bc)
-          space_alloc_rnd=$(printf %.0f $(echo ${space_alloc}))
-          sudo swapoff -a
-          sudo fallocate -l ${space_alloc_rnd} /swapfile
-          sudo chmod 600 /swapfile
-          sudo mkswap /swapfile
-          sudo swapon /swapfile
-          sudo swapon --show
+          path=s3://opentimes-resources/cache/osrmnetwork/mode=${{ inputs.mode }}/year=${{ matrix.year }}/geography=state/state=${{ matrix.state }}/osrmnetwork.tar.zst
+          ZSTD_CLEVEL=19 sudo tar --zstd -cf ./osrmnetwork.tar.zst ./build
+          aws s3 cp --quiet --endpoint-url \
+            https://${{ vars.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com \
+             ./osrmnetwork.tar.zst "$path" --profile cloudflare
+          rm -f ./osrmnetwork.tar.zst
 
-      - name: Run job chunk
+      - name: Create routing jobs per geography
+        id: create-geo-jobs
+        uses: ./.github/actions/parse-gh-input
+        with:
+          param_path: '.input.census.geography.all'
+          param_override: '${{ inputs.override_geographies }}'
+
+      - name: Increase swapfile to max size
+        uses: ./.github/actions/prep-disk-and-swap
+
+      - name: Run routing jobs
         shell: bash
         working-directory: 'data'
         run: |
-          export USER_ID=${{ env.USER_ID }}
-          export GROUP_ID=${{ env.GROUP_ID }}
-          docker compose up --quiet-pull valhalla-run-fp valhalla-run-sp -d
-          uv run ./src/calculate_times.py \
-            --mode ${{ inputs.mode }} --year ${{ inputs.year }} \
-            --geography ${{ inputs.geography }} --state ${{ inputs.state }} \
-            --centroid-type ${{ inputs.centroid_type }} \
-            --chunk ${{ matrix.chunk }} --write-to-s3
+          # Start the Docker backend before running jobs
+          docker run --rm --name osrm -d -p 5333:5000 -v "./build:/data" \
+            osrm/osrm-backend osrm-routed --algorithm ch \
+            --max-table-size 100000000 /data/${{ matrix.state }}.osrm
 
-      # Clear the cache if we're one of the last running jobs. Using this instead
-      # of a separate workflow step because the steps often come last in the job
-      # queue and then won't run when many workflows are queued at the same time
-      - name: Clear workflow cache
-        if: always()
-        continue-on-error: true
-        shell: bash
-        run: |
-          endpoint='repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs --paginate -q'
-          total_jobs=$(gh api $endpoint '.total_count')
-          complete_jobs=$(gh api $endpoint '.jobs[] | select(.status == "completed")' | wc -l)
-          in_progress_jobs=$(gh api $endpoint '.jobs[] | select(.status == "in_progress")' | wc -l)
+          # Wait for OSRM to load all network data
+          for i in {1..60}; do
+            if docker logs osrm | grep -q "running and waiting for requests"; then
+              echo "OSRM is running and waiting for requests"
+              break
+            fi
+            sleep 5
+          done
 
-          n_remaining=$((total_jobs - complete_jobs))
-          all_statuses=$((complete_jobs + in_progress_jobs))
-          echo "Total number of jobs: $total_jobs"
-          echo "Number of jobs complete: $total_jobs"
-          echo "Number of jobs remaining: $n_remaining"
-          echo "Number of jobs run/running: $all_statuses"
-          if [ "$n_remaining" -lt 2 ] && [ "$total_jobs" -eq "$all_statuses" ]; then
-            echo "Less than 5 jobs still running. Clearing workflow cache!"
-            gh cache delete \
-              valhalla-tiles-${{ inputs.year }}-${{ inputs.state }}-${{ hashFiles('./data/dvc.lock') }} || true
-          fi
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Loop through geographies, chunking geographies with small units
+          # (block groups) into smaller jobs
+          geographies='${{ steps.create-geo-jobs.outputs.param }}'
+          geographies_array=($(echo "$geographies" | jq -r '.[]'))
+          for geo in "${geographies_array[@]}"; do
+            chunks_array=($(uv run ./src/split_chunks.py \
+              --year ${{ matrix.year }} \
+              --geography "$geo" --state ${{ matrix.state }} | jq -r '.[]'))
+
+            for chunk in "${chunks_array[@]}"; do
+              echo "Starting job with parameters: mode=${{ inputs.mode }}, year=${{ matrix.year }}, geography=${geo}, state=${{ matrix.state }}, centroid_type=weighted, chunk=${chunk}"
+              uv run ./src/calculate_times.py \
+                --mode ${{ inputs.mode }} --year ${{ matrix.year }} \
+                --geography "$geo" --state ${{ matrix.state }} \
+                --centroid-type weighted --chunk "$chunk" \
+                --write-to-s3
+            done
+          done
