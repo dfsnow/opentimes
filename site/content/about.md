@@ -178,7 +178,7 @@ if you're switching between states you're more likely to encounter a cold cache.
 
 #### How is this project funded?
 
-It's not. I pay out of pocket for the (currently) small hosting costs.
+It's not. I pay out of pocket for the (small) hosting costs.
 
 </details>
 
