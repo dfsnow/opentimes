@@ -15,10 +15,10 @@ See the [Data]({{< ref "data" >}}) section to learn how to download the data.
 
 ### Goals
 
-The primary goal of OpenTimes is to enable research by providing easily
-accessible and free bulk travel data. The target audience is academics, urban
-planners, or really anyone who needs to quantify spatial access to resources
-(i.e. how many grocery stores someone can reach in an hour).
+The primary goal of OpenTimes is to enable research by providing easily accessible
+and free bulk travel time data _between Census geographies_. The target audience
+includes academics, urban planners, and anyone who needs to quantify spatial
+access to resources (e.g., how many parks someone can reach in an hour).
 
 The secondary goal of OpenTimes is to provide a free alternative to paid
 travel time/distance matrix products such as
@@ -26,7 +26,7 @@ travel time/distance matrix products such as
 [Esri's Network Analyst](https://www.esri.com/en-us/arcgis/products/arcgis-network-analyst/overview) tool,
 and [TravelTime](https://traveltime.com). However, note that OpenTimes is not
 exactly analogous to these services, which are often doing different and/or more
-sophisticated things (i.e. incorporating traffic, leveraging historical times,
+sophisticated things (e.g. incorporating traffic, leveraging historical times,
 performing live routing, etc.).
 
 ---
