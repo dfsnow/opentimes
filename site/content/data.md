@@ -167,8 +167,8 @@ Some notes on using DuckDB:
   clause of your query. Similarly, specify only the columns you _need_ in
   `SELECT`. Doing both of these will greatly increase query speed.
 - The OpenTimes data is pretty big — roughly 140 billion rows and 500GB
-  _compressed_. You can try to query the whole thing at once, but you'll
-  probably crash DuckDB first. Be warned.
+  _compressed_. If you try to `SELECT *` the whole `times` table you'll
+  probably crash DuckDB. Be warned.
 - Conversely, querying individual pairs using DuckDB is highly performant. If
   you specify all partition keys, an origin ID, and a destination ID, you'll
   usually get a response in a few seconds.
@@ -193,13 +193,15 @@ OpenTimes data covers and includes times from:
   - ZCTAs (ZIP codes)
 
 All routing is performed from each origin in a state to all destinations
-in the same state *plus a 300km buffer around the state*. Routing only occurs
+in the same state _plus a 300km buffer around the state_. Routing only occurs
 between geographies of the same type i.e. tracts route to tracts, counties to
 counties, etc.
 
 Data is updated once new Census geographies are released (usually fall of
 a given year). Yearly updates are considered a [SemVer](https://semver.org)
 minor version. Small data corrections and tweaks are typically patch versions.
+
+---
 
 ## Limitations
 
@@ -222,6 +224,8 @@ but still has major limitations:
   it. This limit is self-imposed in order to make routing work on GitHub
   Actions (only a tiny portion of the national OSRM graph can fit in runner
   memory).
+
+---
 
 ## Database structure
 
