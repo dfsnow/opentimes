@@ -40,7 +40,7 @@ files. Individual Parquet files can be downloaded with a click. They can also
 be read directly into your software of choice using open-source libraries:
 
 ```r
-# Using R's arrow implmentation
+# Using R's arrow implementation
 library(arrow)
 
 times <- read_parquet(paste0(
@@ -129,7 +129,39 @@ times = conn.execute("""
 
 ```
 
-Some notes on this method:
+To get the start and end coordinates of every pair, you can run a query like:
+
+```sql
+SELECT
+    po.lon_snapped AS origin_x,
+    po.lat_snapped AS origin_y,
+    pd.lon_snapped AS destination_x,
+    pd.lat_snapped AS destination_y,
+    t.duration_sec
+FROM opentimes.public.times t
+LEFT JOIN opentimes.public.points po
+    ON t.origin_id = po.id
+    AND po.mode = t.mode
+    AND po.year = t.year
+    AND po.geography = t.geography
+    AND po.state = t.state
+    AND po.point_type = 'origin'
+LEFT JOIN opentimes.public.points pd
+    ON t.destination_id = pd.id
+    AND pd.mode = t.mode
+    AND pd.year = t.year
+    AND pd.geography = t.geography
+    AND pd.state = t.state
+    AND pd.point_type = 'destination'
+WHERE t.version = '0.0.1'
+    AND t.mode = 'car'
+    AND t.year = '2024'
+    AND t.geography = 'tract'
+    AND t.state = '17'
+    AND t.origin_id LIKE '17031%'"
+```
+
+Some notes on using DuckDB:
 
 - Use as many [partition keys](#partitioning) as possible in the `WHERE`
   clause of your query. Similarly, specify only the columns you _need_ in
@@ -145,29 +177,59 @@ Some notes on this method:
 
 ## Coverage
 
-- years, geos, states,
+OpenTimes data covers and includes times from:
 
-- Census hierarchy (mermaid)
-- missing points
-- states
-- 300km buffer
-- Snapped to network
+- All 50 states plus Washington D.C.
+- All years after 2020 (inclusive). I thought it was unlikely that people
+  would need historical data.
+- The following Census geographies
+  (see [this map](https://www2.census.gov/geo/pdfs/reference/geodiagram.pdf)
+  for the relationship hierarchy):
+  - States
+  - Counties
+  - County subdivisions
+  - Tracts
+  - Block groups
+  - ZCTAs (ZIP codes)
 
-## caveats and limitations
+All routing is performed from each origin in a state to all destinations
+in the same state *plus a 300km buffer around the state*. Routing only occurs
+between geographies of the same type i.e. tracts route to tracts, counties to
+counties, etc.
 
-- No traffic
-- No transit
-- Some holes
-- Limited distance
+Data is updated once new Census geographies are released (usually fall of
+a given year). Yearly updates are considered a [SemVer](https://semver.org)
+minor version. Small data corrections and tweaks are typically patch versions.
 
-when updated?
+## Limitations
+
+OpenTimes is relatively _complete_ (i.e. there are few missing pairs),
+but still has major limitations:
+
+- It doesn't include traffic data. Traffic is basically assumed to be
+  free-flowing at the maximum speed limit allowed by OpenStreetMap tags. As
+  a result, times tend to be optimistic (greatly so in cities). Traffic data
+  is expensive, usually proprietary, and hard-to-come-by, so this isn't likely
+  to be fixed soon.
+- OSRM routing is imprecise compared to something like Google Maps or even
+  [Valhalla](https://github.com/valhalla/valhalla). It doesn't have
+  elevation handling, accurate turn penalties, administrative boundaries, or
+  a whole host of other accuracy-increasing measures.
+- No transit times are included. I couldn't find a routing engine fast enough
+  to do continent-scale transit routing. This may change in the future if
+  Valhalla adds multi-modal support to their Matrix API.
+- Travel distances are limited to within a state plus a 300km buffer around
+  it. This limit is self-imposed in order to make routing work on GitHub
+  Actions (only a tiny portion of the national OSRM graph can fit in runner
+  memory).
 
 ## Database structure
 
 ### Tables
 
 OpenTimes is made up of four tables, each of which is stored in a separate set
-of static files.
+of static files. Each table contains the columns specified below, in addition
+to the [partition columns](#partitioning) shared by all tables.
 
 #### 1. times
 

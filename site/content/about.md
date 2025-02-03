@@ -34,7 +34,7 @@ performing live routing, etc.).
 ## FAQs
 
 This section focuses on the what, why, and how of the OpenTimes project. For
-more specific questions about the data (i.e. its coverage, construction, and
+more specific questions about the data (i.e. its coverage, structure, and
 limitations), see the [Data]({{< ref "data" >}}) section.
 
 <details>
@@ -63,7 +63,7 @@ want to go (i.e. towns and cities).
 
 Currently, driving, walking, and biking are included. I plan to add transit
 once [Valhalla](https://github.com/valhalla/valhalla) (an alternative to the main
-OSRM routing engine OpenTimes uses) adds multi-modal costing to their matrix API.
+OSRM routing engine OpenTimes uses) adds multi-modal costing to their Matrix API.
 
 #### Are the travel times accurate?
 
@@ -115,7 +115,8 @@ The total size of all input and intermediate data is around 300 GB.
 All travel time calculations require some sort of routing software to
 determine the optimal path between two locations. OpenTimes uses
 [Open Source Routing Machine (OSRM)](https://project-osrm.org) because it's
-the only routing engine that can quickly handle continent-scale calculations.
+the only routing engine that can generate continent-scale distance matrices at
+a reasonable speed (Valhalla and R5 are too slow).
 
 U.S. states are used as the unit of work. For each state, I load all the input
 data (road network, points, etc.) for the state plus a 300km buffer around
