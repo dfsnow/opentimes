@@ -16,4 +16,6 @@
 <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#000000">
 
 {{- $main := resources.Get "css/main.scss" | toCSS | minify | fingerprint -}}
+{{- $syntax := resources.Get "css/syntax.css" | toCSS | minify | fingerprint -}}
 <link rel="stylesheet" href="{{- $main.RelPermalink -}}" integrity="{{- $main.Data.Integrity -}}">
+<link rel="stylesheet" href="{{- $syntax.RelPermalink -}}" integrity="{{- $syntax.Data.Integrity -}}">
