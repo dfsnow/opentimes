@@ -344,22 +344,15 @@ to see the full file structure.
 
 All tables use the following partition keys, in order:
 
-- `version` - The OpenTimes data release version.
-  Follows [Semantic Versioning](https://semver.org).
-- `mode` - Travel mode. Currently one of `"car"`, `"bicycle"`, or `"foot"`,
-  where each corresponds to one of the default Open Source Routing Machine (OSRM)
-  [profiles](https://github.com/project-osrm/osrm-backend/blob/master/profiles/car.lua).
-- `year` - Census geography and OpenStreetMap data year. Origin and destinations
-  points are pulled from the TIGER/Line files. OSM data is
-  from archived [Geofabrik North America extracts](https://download.geofabrik.de/north-america.html#).
-- `geography` - Census geography type. See [Coverage](#coverage).
-- `state` - Census state-level [FIPS code](https://en.wikipedia.org/wiki/Federal_Information_Processing_Standard_state_code).
-  Includes all 50 states and Washington D.C.
-- `centroid_type` - Census geography centroid type, one of `"weighted"`
-  or `"unweighted"`. Currently only weighted centroids are used.
-- `chunk_id` - Not technically a partition key. This value is derived from the
-  filename of each Parquet file after it is written to a staging bucket. Can be
-  ignored for most use cases.
+| Partition Key   | Description                                                                                                                                                                                                                         |
+|:----------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `version`       | The OpenTimes data release version. Follows [Semantic Versioning](https://semver.org).                                                                                                                                              |
+| `mode`          | Travel mode. Currently one of `"car"`, `"bicycle"`, or `"foot"`, where each corresponds to one of the default Open Source Routing Machine [profiles](https://github.com/project-osrm/osrm-backend/blob/master/profiles/car.lua).    |
+| `year`          | Census geography and OpenStreetMap data year. Origin and destinations points are pulled from the TIGER/Line files. OSM data is from archived [Geofabrik North America extracts](https://download.geofabrik.de/north-america.html#). |
+| `geography`     | Census geography type. See [Coverage](#coverage).                                                                                                                                                                                   |
+| `state`         | Census state-level [FIPS code](https://en.wikipedia.org/wiki/Federal_Information_Processing_Standard_state_code). Includes all 50 states and Washington D.C.                                                                        |
+| `centroid_type` | Census geography centroid type, one of `"weighted"` or `"unweighted"`. Currently only weighted centroids are used.                                                                                                                  |
+| `chunk_id`      | Not technically a partition key. This value is derived from the filename of each Parquet file after it is written to a staging bucket. It is included in most tables but can be ignored for most use cases.                         |
 
 Specifying partition key values when reading or joining files is highly
 recommended, as most query engines
