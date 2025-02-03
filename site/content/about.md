@@ -24,7 +24,7 @@ The secondary goal of OpenTimes is to provide a free alternative to paid
 travel time/distance matrix products such as
 [Google's Distance Matrix API](https://developers.google.com/maps/documentation/distance-matrix/overview),
 [Esri's Network Analyst](https://www.esri.com/en-us/arcgis/products/arcgis-network-analyst/overview) tool,
-and [traveltime.com](https://traveltime.com). However, note that OpenTimes is not
+and [TravelTime](https://traveltime.com). However, note that OpenTimes is not
 exactly analogous to these services, which are often doing different and/or more
 sophisticated things (i.e. incorporating traffic, leveraging historical times,
 performing live routing, etc.).

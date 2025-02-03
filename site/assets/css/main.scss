@@ -125,6 +125,16 @@ ol {
   box-sizing: border-box;
 }
 
+.hover-icon {
+  svg {
+    fill: var(--icon-color);
+  }
+
+  svg:hover {
+    fill: var(--text-color);
+  }
+}
+
 .content {
   position: relative;
   margin: auto;
@@ -196,15 +206,19 @@ ol {
       font-weight: bold;
     }
   }
-}
 
-.hover-icon {
-  svg {
-    fill: var(--icon-color);
-  }
+  .mermaid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    border: none;
+    padding: 0;
 
-  svg:hover {
-    fill: var(--text-color);
+    svg {
+      width: 100%;
+      margin: auto;
+    }
   }
 }
 
