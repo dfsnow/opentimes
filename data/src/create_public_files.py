@@ -72,7 +72,7 @@ def create_public_files(
         COPY (
             SELECT
                 {", ".join(DATASET_DICT[version][dataset]["public_file_columns"])},
-                regexp_extract(filename, 'part-(\\d+-\\d+)\\.parquet', 1) AS chunk_id
+                regexp_extract(filename, 'part-(\\d+-\\d+_\\d+-\\d+)\\.parquet', 1) AS chunk_id
             FROM read_parquet(
                 'r2://{params["s3"]["data_bucket"]}/{dataset}{partitions}/*.parquet',
                 hive_partitioning = true,
