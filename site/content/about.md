@@ -68,7 +68,7 @@ OSRM routing engine OpenTimes uses) adds multi-modal costing to their Matrix API
 #### Are the travel times accurate?
 
 Kind of. They're accurate relative to the other times in this database
-(i.e. the are internally consistent), but may not align perfectly with
+(i.e. they are internally consistent), but may not align perfectly with
 real-world travel times. Driving times tend to be especially optimistic
 (faster than the real world). My hope is to continually improve the accuracy
 of the times through successive versions.
@@ -93,7 +93,7 @@ rather than fixing individual times.
 <details>
 <summary>Technology</summary>
 
-For more a more in-depth technical overview of the project, visit the OpenTimes
+For a more in-depth technical overview of the project, visit the OpenTimes
 [GitHub](https://github.com/dfsnow/opentimes) page.
 
 #### What input data is used?
@@ -229,7 +229,7 @@ I spent some time during graduate school as an RA at the
 calculate lots of travel times. OpenTimes is sort of the spiritual successor to
 that work.
 
-I built most of OpenTimes during a 6-week programming retreat at the
+I built most of OpenTimes during a six-week programming retreat at the
 [Recurse Center](https://www.recurse.com/scout/click?t=e5f3c6558aa58965ec2efe48b1b486af),
 which I highly recommend.
 
