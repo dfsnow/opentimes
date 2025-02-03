@@ -51,14 +51,9 @@ a {
 
 table {
   border-collapse: collapse;
-  margin: 0 auto;
-
-  &:not(.rating-table) {
-    display: block;
-    max-width: fit-content;
-    overflow-x: auto;
-    white-space: nowrap;
-  }
+  margin: 1.5em auto;
+  table-layout: fixed;
+  overflow-x: auto;
 
   td,
   th {

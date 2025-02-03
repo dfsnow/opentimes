@@ -4,36 +4,37 @@ title = "About"
 
 # What is OpenTimes?
 
-OpenTimes lets you download bulk travel data for free and with no limits.
-It is a database of around 20 billion point-to-point travel times and
-distances between United States Census geographies.
+OpenTimes is a database of pre-computed, point-to-point travel times between
+United States Census geographies. It lets you download bulk travel time data
+for free and with no limits.
 
 All times are calculated using open-source software from publicly available
 data. The OpenTimes data pipelines, infrastructure, packages, and website
 are all open-source and available on [GitHub](https://github.com/dfsnow/opentimes).
+See the [Data]({{< ref "data" >}}) section to learn how to download the data.
 
 ### Goals
 
-The primary goal of OpenTimes is to enable research by providing an
-accessible and free source of bulk travel data. The target audience
-is academics, urban planners, or really anyone who needs to quantify spatial
-access to resources (i.e. how many grocery stores someone can reach in an hour).
+The primary goal of OpenTimes is to enable research by providing easily
+accessible and free bulk travel data. The target audience is academics, urban
+planners, or really anyone who needs to quantify spatial access to resources
+(i.e. how many grocery stores someone can reach in an hour).
 
-The secondary goal is to provide a free alternative to paid
+The secondary goal of OpenTimes is to provide a free alternative to paid
 travel time/distance matrix products such as
 [Google's Distance Matrix API](https://developers.google.com/maps/documentation/distance-matrix/overview),
 [Esri's Network Analyst](https://www.esri.com/en-us/arcgis/products/arcgis-network-analyst/overview) tool,
 and [traveltime.com](https://traveltime.com). However, note that OpenTimes is not
 exactly analogous to these services, which are often doing different and/or more
-sophisticated things (i.e. incorporating traffic and/or historical times,
+sophisticated things (i.e. incorporating traffic, leveraging historical times,
 performing live routing, etc.).
 
 ---
 
 ## FAQs
 
-This section focuses on the what, why, and how of the overall project. For
-more specific questions about the data (i.e. its coverage, construction, and
+This section focuses on the what, why, and how of the OpenTimes project. For
+more specific questions about the data (i.e. its coverage, structure, and
 limitations), see the [Data]({{< ref "data" >}}) section.
 
 <details>
@@ -42,11 +43,11 @@ limitations), see the [Data]({{< ref "data" >}}) section.
 #### What is a travel time?
 
 In this case, a travel time is just how long it takes to get from location A
-to location B when following a road or path network. Think the Google Maps or
+to location B while following a road or path network. Think Google Maps or
 your favorite smartphone mapping service. OpenTimes provides billions of these
-times, all pre-calculated from public data. It also provides the distance
-traveled for each time, though unlike a smartphone map, it does not provide
-the route itself.
+times, all pre-calculated from public data. However, unlike a smartphone map,
+OpenTimes does not provide the route itself, only the time between the two
+points.
 
 #### What are the times between?
 
@@ -60,14 +61,14 @@ want to go (i.e. towns and cities).
 
 #### What travel modes are included?
 
-Currently, driving, walking, and biking are included. I plan to include transit
-once [Valhalla](https://github.com/valhalla/valhalla) (the routing engine
-OpenTimes uses) incorporates multi-modal costing into their matrix API.
+Currently, driving, walking, and biking are included. I plan to add transit
+once [Valhalla](https://github.com/valhalla/valhalla) (an alternative to the main
+OSRM routing engine OpenTimes uses) adds multi-modal costing to their Matrix API.
 
 #### Are the travel times accurate?
 
 Kind of. They're accurate relative to the other times in this database
-(i.e. the are internally consistent), but may not align perfectly with
+(i.e. they are internally consistent), but may not align perfectly with
 real-world travel times. Driving times tend to be especially optimistic
 (faster than the real world). My hope is to continually improve the accuracy
 of the times through successive versions.
@@ -92,40 +93,35 @@ rather than fixing individual times.
 <details>
 <summary>Technology</summary>
 
-For more a more in-depth technical overview of the project, visit the OpenTimes
+For a more in-depth technical overview of the project, visit the OpenTimes
 [GitHub](https://github.com/dfsnow/opentimes) page.
 
 #### What input data is used?
 
-OpenTimes currently uses three major data inputs:
+OpenTimes currently uses two major data inputs:
 
 1. OpenStreetMap data. Specifically, the yearly
   North America extracts from
   [Geofabrik](https://download.geofabrik.de/north-america.html#).
-2. Elevation data. Automatically downloaded by
-  [Valhalla](https://github.com/valhalla/valhalla). Uses the
-  public [Amazon Terrain Tiles](https://registry.opendata.aws/terrain-tiles/).
-3. Origin and destination points. Derived from the centroids of
+2. Census data. Specifically,
   [U.S. Census TIGER/Line](https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html)
-  data.
+  shapefiles, which are used to construct origin and destination points.
 
 Input and intermediate data are built and cached by [DVC](https://dvc.org).
-The total size of all input and intermediate data is around 750 GB.
-In the future, OpenTimes will also use [GTFS data](https://gtfs.org)
-for public transit routing.
+The total size of all input and intermediate data is around 300 GB.
 
 #### How do you calculate the travel times?
 
-All travel time calculations require some sort of routing engine to
+All travel time calculations require some sort of routing software to
 determine the optimal path between two locations. OpenTimes uses
-[Valhalla](https://github.com/valhalla/valhalla) because it's fast,
-has decent Python bindings, can switch settings on the fly, and has a
-low memory/resource footprint.
+[Open Source Routing Machine (OSRM)](https://project-osrm.org) because it's
+the only routing engine that can generate continent-scale distance matrices at
+a reasonable speed (Valhalla and R5 are too slow).
 
 U.S. states are used as the unit of work. For each state, I load all the input
-data (road network, elevation, etc.) for the state plus a 300km buffer around
-it. I then use the Valhalla
-[Matrix API](https://valhalla.github.io/valhalla/api/matrix/api-reference/)
+data (road network, points, etc.) for the state plus a 300km buffer around
+it. I then use the OSRM
+[Table API](https://project-osrm.org/docs/v5.5.1/api/#table-service)
 to route from each origin in the state to all destinations in the state
 plus the buffer area.
 
@@ -133,23 +129,21 @@ plus the buffer area.
 
 Travel times are notoriously compute-intensive to calculate at scale, since
 they basically require running a shortest path algorithm many times over a
-very large network. However, they're also fairly easy to parallelize since
-each origin can be its own job, independent from the other origins.
+huge network. However, travel time calculations are also fairly easy to
+parallelize, since each origin can be its own discrete job.
 
-I use a combination of GitHub Actions and a beefy home server to calculate
-the times for OpenTimes. On GitHub Actions, I use a workflow-per-state model,
-where each state runs in a
-[parameterized workflow](https://github.com/dfsnow/opentimes/actions/workflows/calculate-times.yaml)
-that splits the work into many smaller jobs that run in parallel. This works
-surprisingly well and lets me calculate tract-level times for the entire U.S.
-in about a day.
+I use GitHub Actions to parallelize the calculations by
+creating a
+[job for each state and year](https://github.com/dfsnow/opentimes/actions/runs/13094249792).
+This works surprisingly well and lets me calculate tract-level times for the
+entire U.S. in about 12 hours.
 
 #### How is the data served?
 
 Data is served via Parquet files sitting in a public Cloudflare R2 bucket. You
 can access a list of all the files [here](https://data.opentimes.org).
 Files can be downloaded directly, queried with DuckDB or Arrow, or accessed
-via the provided R or Python wrapper packages.
+via the (forthcoming) R or Python wrapper packages.
 
 To learn more about how to access the data, see the dedicated
 [Data]({{< ref "data" >}}) section.
@@ -175,19 +169,17 @@ the map fill using the returned destination IDs and times.
 
 #### Why is the homepage slow sometimes?
 
-The Parquet files that it queries are supposed to be cached by Cloudflare's
-CDN. However, Cloudflare really doesn't seem to like very large files sitting
-in its caches, so they're constantly evicting them.
+The big Parquet files that it queries are supposed to be cached by Cloudflare's
+CDN. However, Cloudflare doesn't like large files sitting in its caches,
+so the files are constantly getting evicted.
 
 If you click the map and it's slow, it's likely that you're hitting a cold cache.
-Click again and it should be much faster. Also, each state has its own file, so
+Click again and it should be much faster. Each state has its own file, so
 if you're switching between states you're more likely to encounter a cold cache.
 
 #### How is this project funded?
 
-I pay out of pocket for the (currently) small hosting costs. I'm not currently
-seeking funding or sponsors, though I may in the future in order to buy
-things like traffic data.
+It's not. I pay out of pocket for the (small) hosting costs.
 
 </details>
 
@@ -219,7 +211,7 @@ OpenTimes uses the [MIT](https://www.tldrlegal.com/license/mit-license) license.
 Input data is from [OpenStreetMap](https://www.openstreetmap.org) and the
 [U.S. Census](https://www.census.gov). The basemap on the homepage is
 from [OpenFreeMap](https://openfreemap.org). Times are calculated using
-[Valhalla](https://github.com/valhalla/valhalla).
+[OSRM](https://project-osrm.org).
 
 </details>
 
@@ -237,7 +229,7 @@ I spent some time during graduate school as an RA at the
 calculate lots of travel times. OpenTimes is sort of the spiritual successor to
 that work.
 
-I built OpenTimes during a 6-week programming retreat at the
+I built most of OpenTimes during a six-week programming retreat at the
 [Recurse Center](https://www.recurse.com/scout/click?t=e5f3c6558aa58965ec2efe48b1b486af),
 which I highly recommend.
 
@@ -256,5 +248,5 @@ A few reasons:
   routing engines, spatial analysis tools, and web mapping libraries has exploded
   in the last decade, but bulk travel times are still difficult to get and/or expensive.
 - It's a fun technical challenge to calculate and serve billions of records.
-- I was inspired by the [OpenFreeMap](https://openfreemap.org) project and wanted to use
-  my own domain knowledge to do something similar.
+- I was inspired by the [OpenFreeMap](https://openfreemap.org) project and
+  wanted to use my own domain knowledge to do something similar.
