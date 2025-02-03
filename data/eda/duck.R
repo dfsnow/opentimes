@@ -22,10 +22,11 @@ ttm <- dbGetQuery(
   conn = con,
   "
   SELECT *
-  FROM opentimes.times
+  FROM opentimes.public.times
   WHERE version = '0.0.1'
       AND mode = 'car'
       AND year = '2024'
+      AND geography = 'tract'
       AND origin_id = '02020000101'
   "
 )
