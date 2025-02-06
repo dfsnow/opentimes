@@ -2,12 +2,10 @@ import argparse
 from pathlib import Path
 
 import requests as r
+from utils.constants import TIGER_BASE_URL
 from utils.logging import create_logger
 
 logger = create_logger(__name__)
-
-# Base URL for TIGER/Line shapefiles
-BASE_URL = "https://www2.census.gov/geo/tiger/TIGER"
 
 # Dictionary translation of common geography names to TIGER equivalents
 TIGER_GEO_NAMES = {
@@ -54,7 +52,7 @@ def fetch_shapefile(
     tiger_geo_name = TIGER_GEO_NAMES[geography]
     file_prefix = f"tl_{year}_{'us' if not state else state}"
     remote_file_name = f"{file_prefix}_{tiger_geo_name}.zip"
-    url = f"{BASE_URL}{year}/{tiger_geo_name.upper()}/{remote_file_name}"
+    url = f"{TIGER_BASE_URL}{year}/{tiger_geo_name.upper()}/{remote_file_name}"
 
     try:
         response = r.get(url, stream=True)
