@@ -44,8 +44,8 @@ be read directly into your software of choice using open-source libraries:
 library(arrow)
 
 times <- read_parquet(paste0(
-  "https://data.opentimes.org/times/version=0.0.1/mode=car/year=2024/",
-  "geography=tract/state=17/times-0.0.1-car-2024-tract-17-0.parquet"
+  "https://data.opentimes.org/times/version=0.0.1/mode=car/year=2024",
+  "/geography=tract/state=17/times-0.0.1-car-2024-tract-17-0.parquet"
 ))
 ```
 
