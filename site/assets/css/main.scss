@@ -371,6 +371,20 @@ blockquote,
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
   min-width: 90px;
 
+  #mode-dropdown {
+    width: 100%;
+  }
+
+  #legend-title > h3 {
+    margin-top: 0;
+    margin-bottom: 0.6em;
+  }
+
+  #mode-title > h3 {
+    margin-top: 0.6em;
+    margin-bottom: 0.2em;
+  }
+
   div {
     position: relative;
     display: flex;
@@ -380,11 +394,6 @@ blockquote,
       width: 20px;
       height: 20px;
       margin-right: 10px;
-    }
-
-    h3 {
-      margin-top: 0;
-      margin-bottom: 0.6em;
     }
 
     &:last-child {
@@ -399,6 +408,10 @@ blockquote,
   min-height: 30px;
 
   >div:not(:last-child) {
+    display: none;
+  }
+
+  >select {
     display: none;
   }
 }

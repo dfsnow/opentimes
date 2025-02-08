@@ -84,10 +84,14 @@ class ColorScale {
   draw(map) {
     const legendTitle = document.createElement("div"),
       modeTitle = document.createElement("div");
-    legendTitle.innerHTML = "<h3>Travel time</h3>";
-    modeTitle.innerHTML = "<h3>Travel mode</h3>";
-    this.scaleContainer.append(legendTitle);
 
+    legendTitle.id = "legend-title";
+    legendTitle.innerHTML = "<h3>Travel time</h3>";
+
+    modeTitle.id = "mode-title";
+    modeTitle.innerHTML = "<h3>Travel mode</h3>";
+
+    this.scaleContainer.append(legendTitle);
     this.colors.forEach(({ color, label }) => {
       const colorBox = document.createElement("div"),
         item = document.createElement("div"),
@@ -98,9 +102,9 @@ class ColorScale {
       this.scaleContainer.append(item);
     });
 
-    this.scaleContainer.append(this.toggleButton);
     this.scaleContainer.append(modeTitle);
     this.scaleContainer.append(this.modeDropdown);
+    this.scaleContainer.append(this.toggleButton);
     map.getContainer().append(this.scaleContainer);
   }
 
