@@ -15,6 +15,7 @@ const TIMES_DEFAULT_MODE = "car",
   TIMES_GEOGRAPHY = "tract",
   TIMES_VERSION = "0.0.1",
   TIMES_YEAR = "2024",
+  URL_TILES = `https://data.opentimes.org/tiles/version=${TIMES_VERSION}/year=${TIMES_YEAR}/geography=${TIMES_GEOGRAPHY}/tiles-${TIMES_VERSION}-${TIMES_YEAR}-${TIMES_GEOGRAPHY}.pmtiles`,
   ZOOM_THRESHOLDS = [6, 8];
 
 let baseUrl = `https://data.opentimes.org/times/version=${TIMES_VERSION}/mode=${TIMES_DEFAULT_MODE}/year=${TIMES_YEAR}/geography=${TIMES_GEOGRAPHY}`,
@@ -243,14 +244,14 @@ class Map {
         this.map.addSource("protomap", {
           promoteId: "id",
           type: "vector",
-          url: "pmtiles://https://data.opentimes.org/tiles/tracts_2024.pmtiles",
+          url: `pmtiles://${URL_TILES}`
         });
 
         this.map.addControl(new maplibregl.NavigationControl(), "bottom-right");
         this.addMapLayers(this.map);
         resolve(this.map);
 
-        this.tractIdDisplay = this.createTractIdDisplay();
+        this.geoIdDisplay = this.createGeoIdDisplay();
         this.addHandlers();
       });
     });
@@ -260,14 +261,17 @@ class Map {
     this.map.on("mousemove", (feat) => {
       const features = this.map.queryRenderedFeatures(
         feat.point,
-        { layers: ["tracts_fill"] }
+        { layers: ["geo_fill"] }
       );
       // eslint-disable-next-line one-var
-      const [feature] = features;
+      const [feature] = features,
+        geoName = TIMES_GEOGRAPHY.replace("_", " ").split(" ").
+          map(word => word.charAt(0).toUpperCase() +
+          word.slice(1).toLowerCase()).join(" ");
       if (feature) {
         this.map.getCanvas().style.cursor = "pointer";
-        this.tractIdDisplay.style.display = "block";
-        this.tractIdDisplay.textContent = `Tract ID: ${feature.properties.id}`;
+        this.geoIdDisplay.style.display = "block";
+        this.geoIdDisplay.textContent = `${geoName} ID: ${feature.properties.id}`;
         if (this.hoveredPolygonId !== null) {
           this.map.setFeatureState(
             { id: this.hoveredPolygonId, source: "protomap", sourceLayer: "tracts" },
@@ -281,8 +285,8 @@ class Map {
         );
       } else {
         this.map.getCanvas().style.cursor = "";
-        this.tractIdDisplay.style.display = "none";
-        this.tractIdDisplay.textContent = "";
+        this.geoIdDisplay.style.display = "none";
+        this.geoIdDisplay.textContent = "";
       }
     });
 
@@ -302,7 +306,7 @@ class Map {
       if (this.isProcessing) {
         return;
       }
-      const features = this.map.queryRenderedFeatures( feat.point, { layers: ["tracts_fill"] }),
+      const features = this.map.queryRenderedFeatures( feat.point, { layers: ["geo_fill"] }),
         urlParams = new URLSearchParams(window.location.search);
       if (features.length > 0) {
         this.spinner.show();
@@ -325,9 +329,11 @@ class Map {
     });
 
     this.map.on("moveend", () => {
-      const idParam = new URLSearchParams(window.location.search).get("id");
+      urlParams = new URLSearchParams(window.location.search);
+      idParam = urlParams.get("id");
       if (idParam) {
-        window.history.replaceState({}, "", `?id=${idParam}${window.location.hash}`);
+        urlParams.set("id", idParam);
+        window.history.replaceState({}, "", `${window.location.pathname}?${urlParams}${window.location.hash}`);
       } else {
         window.history.replaceState({}, "", `${window.location.hash}`);
       }
@@ -363,16 +369,16 @@ class Map {
     }
     this.map.addLayer({
       filter: ["==", ["geometry-type"], "Polygon"],
-      id: "tracts_fill",
+      id: "geo_fill",
       paint: {
         "fill-color": [
           "case",
-          ["==", ["feature-state", "tractColor"], "color_1"], "rgba(253, 231, 37, 0.4)",
-          ["==", ["feature-state", "tractColor"], "color_2"], "rgba(122, 209, 81, 0.4)",
-          ["==", ["feature-state", "tractColor"], "color_3"], "rgba(34, 168, 132, 0.4)",
-          ["==", ["feature-state", "tractColor"], "color_4"], "rgba(42, 120, 142, 0.4)",
-          ["==", ["feature-state", "tractColor"], "color_5"], "rgba(65, 68, 135, 0.4)",
-          ["==", ["feature-state", "tractColor"], "color_6"], "rgba(68, 1, 84, 0.4)",
+          ["==", ["feature-state", "geoColor"], "color_1"], "rgba(253, 231, 37, 0.4)",
+          ["==", ["feature-state", "geoColor"], "color_2"], "rgba(122, 209, 81, 0.4)",
+          ["==", ["feature-state", "geoColor"], "color_3"], "rgba(34, 168, 132, 0.4)",
+          ["==", ["feature-state", "geoColor"], "color_4"], "rgba(42, 120, 142, 0.4)",
+          ["==", ["feature-state", "geoColor"], "color_5"], "rgba(65, 68, 135, 0.4)",
+          ["==", ["feature-state", "geoColor"], "color_6"], "rgba(68, 1, 84, 0.4)",
           "rgba(255, 255, 255, 0.0)"
         ],
       },
@@ -383,7 +389,7 @@ class Map {
 
     this.map.addLayer({
       filter: ["==", ["geometry-type"], "Polygon"],
-      id: "tracts_line",
+      id: "geo_line",
       paint: {
         "line-color": "#333",
         "line-opacity": [
@@ -405,7 +411,7 @@ class Map {
     }, firstSymbolId);
   }
 
-  createTractIdDisplay() {
+  createGeoIdDisplay() {
     const display = document.createElement("div");
     display.id = "map-info";
     // Initially hidden
@@ -418,7 +424,7 @@ class Map {
     previousResults.forEach(row =>
       this.map.setFeatureState(
         { id: row.id, source: "protomap", sourceLayer: "tracts" },
-        { tractColor: this.colorScale.getColorScale(row.duration, this.map.getZoom()) }
+        { geoColor: this.colorScale.getColorScale(row.duration, this.map.getZoom()) }
       )
     );
   }
@@ -427,7 +433,7 @@ class Map {
     previousResults.forEach(row =>
       this.map.setFeatureState(
         { id: row.id, source: "protomap", sourceLayer: "tracts" },
-        { tractColor: "none" }
+        { geoColor: "none" }
       )
     );
   }
@@ -468,7 +474,7 @@ class ParquetProcessor {
       if (row[0] === id) {
         map.map.setFeatureState(
           { id: row[1], source: "protomap", sourceLayer: "tracts" },
-          { tractColor: map.colorScale.getColorScale(row[2], map.map.getZoom()) }
+          { geoColor: map.colorScale.getColorScale(row[2], map.map.getZoom()) }
         );
         results.push({ duration: row[2], id: row[1] });
       }
@@ -476,7 +482,7 @@ class ParquetProcessor {
   }
 
   async runQuery(map, queryBaseUrl, mode, state, id) {
-    const queryUrl = `${queryBaseUrl}/state=${state}/times-${TIMES_VERSION}-${mode}-${TIMES_YEAR}-tract-${state}`,
+    const queryUrl = `${queryBaseUrl}/state=${state}/times-${TIMES_VERSION}-${mode}-${TIMES_YEAR}-${TIMES_GEOGRAPHY}-${state}`,
       urlsArray = [`${queryUrl}-0.parquet`];
 
     map.wipeMapPreviousState(this.previousResults);
@@ -547,7 +553,6 @@ class ParquetProcessor {
       return rowGroupMetadata;
     });
 
-
     // Async query the rowgroups relevant to the input ID
     // eslint-disable-next-line one-var
     let rowGroupItems = await Promise.all(rowGroupResults);
@@ -574,7 +579,10 @@ class ParquetProcessor {
     if (id && /^\d{11}$/u.test(id)) {
       return true;
     }
-    console.warn("Invalid ID input. Please enter a valid 11-digit tract ID.");
+    const geoName = TIMES_GEOGRAPHY.replace("_", " ").split(" ").
+      map(word => word.charAt(0).toUpperCase() +
+      word.slice(1).toLowerCase()).join(" ");
+    console.warn(`Invalid ID input. Please enter a valid Census ${geoName} ID.`);
     return false;
   }
 }
