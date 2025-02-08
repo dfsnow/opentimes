@@ -329,7 +329,7 @@ class Map {
     });
 
     this.map.on("moveend", () => {
-      urlParams = new URLSearchParams(window.location.search);
+      const urlParams = new URLSearchParams(window.location.search);
       idParam = urlParams.get("id");
       if (idParam) {
         urlParams.set("id", idParam);
