@@ -16,7 +16,11 @@ const TIMES_DEFAULT_MODE = "car",
   TIMES_VERSION = "0.0.1",
   TIMES_YEAR = "2024",
   URL_TILES = `https://data.opentimes.org/tiles/version=${TIMES_VERSION}/year=${TIMES_YEAR}/geography=${TIMES_GEOGRAPHY}/tiles-${TIMES_VERSION}-${TIMES_YEAR}-${TIMES_GEOGRAPHY}.pmtiles`,
-  ZOOM_THRESHOLDS = [6, 8];
+  ZOOM_THRESHOLDS = {
+    "bicycle": [8, 9.5],
+    "car": [6, 8],
+    "foot": [9, 10.5]
+  };
 
 let baseUrl = `https://data.opentimes.org/times/version=${TIMES_VERSION}/mode=${TIMES_DEFAULT_MODE}/year=${TIMES_YEAR}/geography=${TIMES_GEOGRAPHY}`,
   idParam = null,
@@ -34,13 +38,13 @@ const debounce = function debounce(func, wait) {
 };
 
 class ColorScale {
-  constructor(zoomLower, zoomUpper) {
+  constructor() {
     this.scaleContainer = this.createScaleContainer();
     this.toggleButton = this.createToggleButton();
     this.modeDropdown = this.createModeDropdown();
     this.colors = this.getColors();
-    this.zoomLower = zoomLower;
-    this.zoomUpper = zoomUpper;
+    this.zoomLower = null;
+    this.zoomUpper = null;
   }
 
   createModeDropdown() {
@@ -158,6 +162,11 @@ class ColorScale {
     items.forEach((item, index) => {
       item.textContent = labels[index];
     });
+  }
+
+  updateZoomThresholds(lower, upper) {
+    this.zoomLower = lower;
+    this.zoomUpper = upper;
   }
 }
 
@@ -342,7 +351,7 @@ class Map {
     this.map.on("zoom", debounce(() => {
       const currentZoomLevel = this.map.getZoom();
       if (this.previousZoomLevel !== null) {
-        const crossedThreshold = ZOOM_THRESHOLDS.some(
+        const crossedThreshold = ZOOM_THRESHOLDS[modeParam].some(
           (threshold) =>
             (this.previousZoomLevel < threshold && currentZoomLevel >= threshold) ||
             (this.previousZoomLevel >= threshold && currentZoomLevel < threshold)
@@ -588,7 +597,7 @@ class ParquetProcessor {
 }
 
 (() => {
-  const colorScale = new ColorScale(ZOOM_THRESHOLDS[0], ZOOM_THRESHOLDS[1]),
+  const colorScale = new ColorScale(),
     processor = new ParquetProcessor(),
     spinner = new Spinner(),
     // eslint-disable-next-line sort-vars
@@ -602,6 +611,11 @@ class ParquetProcessor {
     idParam = urlParams.get("id");
     baseUrl = `https://data.opentimes.org/times/version=${TIMES_VERSION}/mode=${selectedMode}/year=${TIMES_YEAR}/geography=${TIMES_GEOGRAPHY}`;
     modeParam = selectedMode;
+    colorScale.updateZoomThresholds(
+      ZOOM_THRESHOLDS[modeParam][0],
+      ZOOM_THRESHOLDS[modeParam][1]
+    );
+    colorScale.updateLabels(map.map.getZoom());
 
     urlParams.set("mode", selectedMode);
     window.history.replaceState({}, "", `${window.location.pathname}?${urlParams}${window.location.hash}`);
@@ -622,6 +636,11 @@ class ParquetProcessor {
     idParam = urlParams.get("id");
     modeParam = urlParams.get("mode") || TIMES_DEFAULT_MODE;
     baseUrl = `https://data.opentimes.org/times/version=${TIMES_VERSION}/mode=${modeParam}/year=${TIMES_YEAR}/geography=${TIMES_GEOGRAPHY}`;
+    colorScale.updateZoomThresholds(
+      ZOOM_THRESHOLDS[modeParam][0],
+      ZOOM_THRESHOLDS[modeParam][1]
+    );
+    colorScale.updateLabels(map.map.getZoom());
 
     if (idParam) {
       spinner.show();
