@@ -25,8 +25,8 @@ those counties (in seconds).
 | 17031     | 18089          | 3463         |
 | ...       | ...            | ...          |
 
-OpenTimes is basically just a few hundred billion records that look exactly
-like this, compressed and stored in a way that makes them easy-to-use and
+OpenTimes is essentially just a few hundred billion records that look exactly
+like this, compressed and stored in a way that makes them easy to use and
 cheap to serve.
 
 ---
@@ -177,13 +177,12 @@ Some notes on using DuckDB:
 
 ## Coverage
 
-OpenTimes data covers and includes times from:
+OpenTimes data covers and includes times for:
 
 - All 50 states plus Washington D.C.
-- All years after 2020 (inclusive). I thought it was unlikely that people
-  would need historical data.
+- All years after 2020 (inclusive)
 - The following Census geographies
-  (see [this map](https://www2.census.gov/geo/pdfs/reference/geodiagram.pdf)
+  (see [this image](https://www2.census.gov/geo/pdfs/reference/geodiagram.pdf)
   for the relationship hierarchy):
   - States
   - Counties
