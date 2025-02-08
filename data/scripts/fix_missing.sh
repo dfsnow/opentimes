@@ -15,7 +15,7 @@ do
     ./src/create_osrmnetwork.sh foot "$year" "$state"
 
     docker run --rm --name osrm -d -p 5333:5000 -v "./build:/data" \
-        osrm/osrm-backend osrm-routed --algorithm ch \
+        osrm/osrm-backend:v5.25.0 osrm-routed --algorithm ch \
         --max-table-size 100000000 /data/"$state".osrm
 
     # Wait for OSRM to load all network data

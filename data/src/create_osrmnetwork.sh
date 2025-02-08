@@ -17,9 +17,9 @@ rm -rf ./"$BUILD_DIR"/*
 mkdir -p ./"$OUT_DIR"
 ln ./"$IN_FILE" ./"$BUILD_DIR"/"$state".osm.pbf
 
-docker run --rm -t -v ./"$BUILD_DIR":/data osrm/osrm-backend \
+docker run --rm -t -v ./"$BUILD_DIR":/data osrm/osrm-backend:v5.25.0 \
     osrm-extract -p /opt/"$mode".lua /data/"$state".osm.pbf
-docker run --rm -t -v ./"$BUILD_DIR":/data osrm/osrm-backend \
+docker run --rm -t -v ./"$BUILD_DIR":/data osrm/osrm-backend:v5.25.0 \
     osrm-contract /data/"$state".osrm
 
 rm ./"$BUILD_DIR"/"$state".osm.pbf
