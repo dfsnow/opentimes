@@ -11,9 +11,15 @@
 import { asyncBufferFromUrl, byteLengthFromUrl, parquetMetadataAsync, parquetRead } from "hyparquet";
 import { compressors } from "hyparquet-compressors";
 
-const BASE_URL = "https://data.opentimes.org/times/version=0.0.1/mode=car/year=2024/geography=tract",
-  BIG_STATES = [],
+const TIMES_DEFAULT_MODE = "car",
+  TIMES_GEOGRAPHY = "tract",
+  TIMES_VERSION = "0.0.1",
+  TIMES_YEAR = "2024",
   ZOOM_THRESHOLDS = [6, 8];
+
+let baseUrl = `https://data.opentimes.org/times/version=${TIMES_VERSION}/mode=${TIMES_DEFAULT_MODE}/year=${TIMES_YEAR}/geography=${TIMES_GEOGRAPHY}`,
+  idParam = null,
+  modeParam = "car";
 
 // eslint-disable-next-line one-var
 const debounce = function debounce(func, wait) {
@@ -30,9 +36,28 @@ class ColorScale {
   constructor(zoomLower, zoomUpper) {
     this.scaleContainer = this.createScaleContainer();
     this.toggleButton = this.createToggleButton();
+    this.modeDropdown = this.createModeDropdown();
     this.colors = this.getColors();
     this.zoomLower = zoomLower;
     this.zoomUpper = zoomUpper;
+  }
+
+  createModeDropdown() {
+    const dropdown = document.createElement("select"),
+      modes = ["car", "bicycle", "foot"],
+      urlParams = new URLSearchParams(window.location.search);
+
+    dropdown.id = "mode-dropdown";
+    modes.forEach(mode => {
+      const option = document.createElement("option");
+      option.value = mode;
+      option.textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
+      dropdown.appendChild(option);
+    });
+
+    modeParam = urlParams.get("mode") || TIMES_DEFAULT_MODE;
+    dropdown.value = modeParam;
+    return dropdown;
   }
 
   createScaleContainer() {
@@ -57,8 +82,10 @@ class ColorScale {
   }
 
   draw(map) {
-    const legendTitle = document.createElement("div");
-    legendTitle.innerHTML = "<h3>Travel time<br>(driving)</h3>";
+    const legendTitle = document.createElement("div"),
+      modeTitle = document.createElement("div");
+    legendTitle.innerHTML = "<h3>Travel time</h3>";
+    modeTitle.innerHTML = "<h3>Travel mode</h3>";
     this.scaleContainer.append(legendTitle);
 
     this.colors.forEach(({ color, label }) => {
@@ -72,6 +99,8 @@ class ColorScale {
     });
 
     this.scaleContainer.append(this.toggleButton);
+    this.scaleContainer.append(modeTitle);
+    this.scaleContainer.append(this.modeDropdown);
     map.getContainer().append(this.scaleContainer);
   }
 
@@ -85,7 +114,6 @@ class ColorScale {
       { color: "var(--map-color-6)", label: "75-90 min" },
     ];
   }
-
 
   getColorScale(duration, zoom) {
     const colors = ["color_1", "color_2", "color_3", "color_4", "color_5", "color_6"],
@@ -270,22 +298,23 @@ class Map {
       if (this.isProcessing) {
         return;
       }
-      const features = this.map.queryRenderedFeatures(
-        feat.point,
-        { layers: ["tracts_fill"] }
-      );
+      const features = this.map.queryRenderedFeatures( feat.point, { layers: ["tracts_fill"] }),
+        urlParams = new URLSearchParams(window.location.search);
       if (features.length > 0) {
         this.spinner.show();
         this.isProcessing = true;
         const [feature] = features;
         await this.processor.runQuery(
           this,
+          baseUrl,
+          modeParam,
           feature.properties.state,
           feature.properties.id,
         );
 
-        // Update the URL with ID
-        window.history.replaceState({}, "", `?id=${feature.properties.id}${window.location.hash}`);
+        // Update the URL with parameters
+        urlParams.set("id", feature.properties.id);
+        window.history.replaceState({}, "", `${window.location.pathname}?${urlParams}${window.location.hash}`);
         this.isProcessing = false;
         this.spinner.hide();
       }
@@ -401,8 +430,7 @@ class Map {
 }
 
 class ParquetProcessor {
-  constructor(url) {
-    this.baseUrl = url;
+  constructor() {
     this.previousResults = [];
     this.byteLengthCache = {};
     this.metadataCache = {};
@@ -443,15 +471,9 @@ class ParquetProcessor {
     });
   }
 
-  async runQuery(map, state, id) {
-    const queryUrl = `${this.baseUrl}/state=${state}/times-0.0.1-car-2024-tract-${state}`;
-
-    let urlsArray = [];
-    if (BIG_STATES.includes(state)) {
-      urlsArray = [`${queryUrl}-0.parquet`, `${queryUrl}-1.parquet`];
-    } else {
+  async runQuery(map, queryBaseUrl, mode, state, id) {
+    const queryUrl = `${queryBaseUrl}/state=${state}/times-${TIMES_VERSION}-${mode}-${TIMES_YEAR}-tract-${state}`,
       urlsArray = [`${queryUrl}-0.parquet`];
-    }
 
     map.wipeMapPreviousState(this.previousResults);
     this.previousResults = await this.updateMapOnQuery(map, urlsArray, id);
@@ -555,25 +577,47 @@ class ParquetProcessor {
 
 (() => {
   const colorScale = new ColorScale(ZOOM_THRESHOLDS[0], ZOOM_THRESHOLDS[1]),
-    processor = new ParquetProcessor(BASE_URL),
+    processor = new ParquetProcessor(),
     spinner = new Spinner(),
     // eslint-disable-next-line sort-vars
     map = new Map(colorScale, spinner, processor);
 
   colorScale.draw(map.map);
+  colorScale.modeDropdown.addEventListener("change", async (event) => {
+    const selectedMode = event.target.value,
+      urlParams = new URLSearchParams(window.location.search);
+
+    idParam = urlParams.get("id");
+    baseUrl = `https://data.opentimes.org/times/version=${TIMES_VERSION}/mode=${selectedMode}/year=${TIMES_YEAR}/geography=${TIMES_GEOGRAPHY}`;
+    modeParam = selectedMode;
+
+    urlParams.set("mode", selectedMode);
+    window.history.replaceState({}, "", `${window.location.pathname}?${urlParams}${window.location.hash}`);
+
+    if (idParam) {
+      spinner.show();
+      await processor.runQuery(map, baseUrl, selectedMode, idParam.substring(0, 2), idParam);
+    }
+
+    spinner.hide();
+  });
 
   // Wait for the map to fully load before running a query
   map.map.on("load", async () => {
     // Load the previous map click if there was one
-    const idParam = new URLSearchParams(window.location.search).get("id");
+    const urlParams = new URLSearchParams(window.location.search);
+
+    idParam = urlParams.get("id");
+    modeParam = urlParams.get("mode") || TIMES_DEFAULT_MODE;
+    baseUrl = `https://data.opentimes.org/times/version=${TIMES_VERSION}/mode=${modeParam}/year=${TIMES_YEAR}/geography=${TIMES_GEOGRAPHY}`;
+
     if (idParam) {
       spinner.show();
-      await processor.runQuery(map, idParam.substring(0, 2), idParam);
+      await processor.runQuery(map, baseUrl, modeParam, idParam.substring(0, 2), idParam);
     }
 
     // Remove the hash if map is at starting location
-    if (window.location.hash === "#10/40.75/-74") {
-      console.log(window.location.hash);
+    if (window.location.hash === "#10/40.75/-74" && idParam === null && modeParam === TIMES_DEFAULT_MODE) {
       window.history.replaceState({}, "", window.location.pathname + window.location.search);
     }
 
