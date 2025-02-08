@@ -182,7 +182,7 @@ OpenTimes data covers and includes times for:
 - All 50 states plus Washington D.C.
 - All years after 2020 (inclusive)
 - The following Census geographies
-  (see [this image](https://www2.census.gov/geo/pdfs/reference/geodiagram.pdf)
+  (see [this chart](https://www2.census.gov/geo/pdfs/reference/geodiagram.pdf)
   for the relationship hierarchy):
   - States
   - Counties

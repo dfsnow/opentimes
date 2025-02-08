@@ -13,6 +13,7 @@ import { compressors } from "hyparquet-compressors";
 
 const TIMES_DEFAULT_MODE = "car",
   TIMES_GEOGRAPHY = "tract",
+  TIMES_MODES = ["car", "bicycle", "foot"],
   TIMES_VERSION = "0.0.1",
   TIMES_YEAR = "2024",
   URL_TILES = `https://data.opentimes.org/tiles/version=${TIMES_VERSION}/year=${TIMES_YEAR}/geography=${TIMES_GEOGRAPHY}/tiles-${TIMES_VERSION}-${TIMES_YEAR}-${TIMES_GEOGRAPHY}.pmtiles`,
@@ -28,14 +29,30 @@ let baseUrl = `https://data.opentimes.org/times/version=${TIMES_VERSION}/mode=${
 
 // eslint-disable-next-line one-var
 const debounce = function debounce(func, wait) {
-  let timeout = null;
-  return function debouncedFunction(...args) {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => {
-      func(...args);
-    }, wait);
+    let timeout = null;
+    return function debouncedFunction(...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        func(...args);
+      }, wait);
+    };
+  },
+
+  validIdInput = function validIdInput(id) {
+    if (id && /^\d{5,12}$/u.test(id)) {
+      return true;
+    }
+    console.warn("Invalid ID input. Please enter a valid Census GEOID.");
+    return false;
+  },
+
+  validModeInput = function validModeInput(mode) {
+    if (TIMES_MODES.includes(mode)) {
+      return true;
+    }
+    console.warn(`Invalid travel mode. Must be one of: ${TIMES_MODES.join(", ")}.`);
+    return false;
   };
-};
 
 class ColorScale {
   constructor() {
@@ -49,11 +66,10 @@ class ColorScale {
 
   createModeDropdown() {
     const dropdown = document.createElement("select"),
-      modes = ["car", "bicycle", "foot"],
       urlParams = new URLSearchParams(window.location.search);
 
     dropdown.id = "mode-dropdown";
-    modes.forEach(mode => {
+    TIMES_MODES.forEach(mode => {
       const option = document.createElement("option");
       option.value = mode;
       option.textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
@@ -274,7 +290,7 @@ class Map {
       );
       // eslint-disable-next-line one-var
       const [feature] = features,
-        geoName = TIMES_GEOGRAPHY.replace("_", " ").split(" ").
+        geoName = TIMES_GEOGRAPHY.split("_").
           map(word => word.charAt(0).toUpperCase() +
           word.slice(1).toLowerCase()).join(" ");
       if (feature) {
@@ -357,7 +373,7 @@ class Map {
             (this.previousZoomLevel >= threshold && currentZoomLevel < threshold)
         );
 
-        if (crossedThreshold) {
+        if (crossedThreshold && !this.isProcessing) {
           this.updateMapFill(this.processor.previousResults);
           this.colorScale.updateLabels(currentZoomLevel);
         }
@@ -495,7 +511,7 @@ class ParquetProcessor {
       urlsArray = [`${queryUrl}-0.parquet`];
 
     map.wipeMapPreviousState(this.previousResults);
-    this.previousResults = await this.updateMapOnQuery(map, urlsArray, id);
+    this.previousResults = await this.updateMapOnQuery(map, urlsArray, mode, id);
   }
 
   async readAndUpdateMap(map, id, file, metadata, rowGroup, results) {
@@ -512,9 +528,9 @@ class ParquetProcessor {
     );
   }
 
-  async updateMapOnQuery(map, urls, id) {
+  async updateMapOnQuery(map, urls, mode, id) {
     const results = [];
-    if (!this.validIdInput(id)) {
+    if (!(validIdInput(id) && validModeInput(mode))) {
       return results;
     }
 
@@ -583,17 +599,6 @@ class ParquetProcessor {
     }));
     return results;
   }
-
-  validIdInput(id) {
-    if (id && /^\d{11}$/u.test(id)) {
-      return true;
-    }
-    const geoName = TIMES_GEOGRAPHY.replace("_", " ").split(" ").
-      map(word => word.charAt(0).toUpperCase() +
-      word.slice(1).toLowerCase()).join(" ");
-    console.warn(`Invalid ID input. Please enter a valid Census ${geoName} ID.`);
-    return false;
-  }
 }
 
 (() => {
@@ -632,19 +637,24 @@ class ParquetProcessor {
   map.map.on("load", async () => {
     // Load the previous map click if there was one
     const urlParams = new URLSearchParams(window.location.search);
+    let validMode = true;
 
     idParam = urlParams.get("id");
     modeParam = urlParams.get("mode") || TIMES_DEFAULT_MODE;
+    validMode = validModeInput(modeParam);
     baseUrl = `https://data.opentimes.org/times/version=${TIMES_VERSION}/mode=${modeParam}/year=${TIMES_YEAR}/geography=${TIMES_GEOGRAPHY}`;
-    colorScale.updateZoomThresholds(
-      ZOOM_THRESHOLDS[modeParam][0],
-      ZOOM_THRESHOLDS[modeParam][1]
-    );
-    colorScale.updateLabels(map.map.getZoom());
 
-    if (idParam) {
-      spinner.show();
-      await processor.runQuery(map, baseUrl, modeParam, idParam.substring(0, 2), idParam);
+    if (validMode) {
+      colorScale.updateZoomThresholds(
+        ZOOM_THRESHOLDS[modeParam][0],
+        ZOOM_THRESHOLDS[modeParam][1]
+      );
+      colorScale.updateLabels(map.map.getZoom());
+
+      if (idParam) {
+        spinner.show();
+        await processor.runQuery(map, baseUrl, modeParam, idParam.substring(0, 2), idParam);
+      }
     }
 
     // Remove the hash if map is at starting location
