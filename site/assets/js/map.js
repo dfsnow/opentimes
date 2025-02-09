@@ -10,29 +10,86 @@
 /* eslint-disable class-methods-use-this */
 import { asyncBufferFromUrl, byteLengthFromUrl, parquetMetadataAsync, parquetRead } from "hyparquet";
 import { compressors } from "hyparquet-compressors";
+import maplibregl from "maplibre-gl";
+import { Protocol } from "pmtiles";
 
-const BASE_URL = "https://data.opentimes.org/times/version=0.0.1/mode=car/year=2024/geography=tract",
-  BIG_STATES = [],
-  ZOOM_THRESHOLDS = [6, 8];
+const TIMES_DEFAULT_MODE = "car",
+  TIMES_GEOGRAPHY = "tract",
+  TIMES_MODES = ["car", "bicycle", "foot"],
+  TIMES_VERSION = "0.0.1",
+  TIMES_YEAR = "2024",
+  URL_TILES = `https://data.opentimes.org/tiles/version=${TIMES_VERSION}/year=${TIMES_YEAR}/geography=${TIMES_GEOGRAPHY}/tiles-${TIMES_VERSION}-${TIMES_YEAR}-${TIMES_GEOGRAPHY}.pmtiles`,
+  ZOOM_THRESHOLDS = {
+    "bicycle": [8, 9.5],
+    "car": [6, 8],
+    "foot": [9, 10.5]
+  };
+
+let baseUrl = `https://data.opentimes.org/times/version=${TIMES_VERSION}/mode=${TIMES_DEFAULT_MODE}/year=${TIMES_YEAR}/geography=${TIMES_GEOGRAPHY}`,
+  idParam = null,
+  modeParam = "car";
 
 // eslint-disable-next-line one-var
 const debounce = function debounce(func, wait) {
-  let timeout = null;
-  return function debouncedFunction(...args) {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => {
-      func(...args);
-    }, wait);
+    let timeout = null;
+    return function debouncedFunction(...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        func(...args);
+      }, wait);
+    };
+  },
+
+  validIdInput = function validIdInput(id) {
+    if (id && /^\d{5,12}$/u.test(id)) {
+      return true;
+    }
+    console.warn("Invalid ID input. Please enter a valid Census GEOID.");
+    return false;
+  },
+
+  validModeInput = function validModeInput(mode) {
+    if (TIMES_MODES.includes(mode)) {
+      return true;
+    }
+    console.warn(`Invalid travel mode. Must be one of: ${TIMES_MODES.join(", ")}.`);
+    return false;
   };
-};
 
 class ColorScale {
-  constructor(zoomLower, zoomUpper) {
+  constructor() {
     this.scaleContainer = this.createScaleContainer();
     this.toggleButton = this.createToggleButton();
+    this.modeDropdown = this.createModeDropdown();
     this.colors = this.getColors();
-    this.zoomLower = zoomLower;
-    this.zoomUpper = zoomUpper;
+    this.zoomLower = null;
+    this.zoomUpper = null;
+  }
+
+  createModeDropdown() {
+    const container = document.createElement("div"),
+      dropdown = document.createElement("select"),
+      label = document.createElement("label"),
+      urlParams = new URLSearchParams(window.location.search);
+
+    container.id = "mode-dropdown";
+    dropdown.id = "mode-dropdown-select";
+    label.setAttribute("for", "mode-dropdown-select");
+    label.textContent = "Travel mode";
+    TIMES_MODES.forEach(mode => {
+      const option = document.createElement("option");
+      option.value = mode;
+      option.textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
+      dropdown.appendChild(option);
+    });
+
+    modeParam = urlParams.get("mode") || TIMES_DEFAULT_MODE;
+    dropdown.value = modeParam;
+
+    container.appendChild(label);
+    container.appendChild(dropdown);
+
+    return container;
   }
 
   createScaleContainer() {
@@ -58,9 +115,10 @@ class ColorScale {
 
   draw(map) {
     const legendTitle = document.createElement("div");
-    legendTitle.innerHTML = "<h3>Travel time<br>(driving)</h3>";
-    this.scaleContainer.append(legendTitle);
+    legendTitle.id = "legend-title";
+    legendTitle.innerHTML = "<h2>Travel time</h2>";
 
+    this.scaleContainer.append(legendTitle);
     this.colors.forEach(({ color, label }) => {
       const colorBox = document.createElement("div"),
         item = document.createElement("div"),
@@ -71,6 +129,7 @@ class ColorScale {
       this.scaleContainer.append(item);
     });
 
+    this.scaleContainer.append(this.modeDropdown);
     this.scaleContainer.append(this.toggleButton);
     map.getContainer().append(this.scaleContainer);
   }
@@ -85,7 +144,6 @@ class ColorScale {
       { color: "var(--map-color-6)", label: "75-90 min" },
     ];
   }
-
 
   getColorScale(duration, zoom) {
     const colors = ["color_1", "color_2", "color_3", "color_4", "color_5", "color_6"],
@@ -125,6 +183,11 @@ class ColorScale {
     items.forEach((item, index) => {
       item.textContent = labels[index];
     });
+  }
+
+  updateZoomThresholds(lower, upper) {
+    this.zoomLower = lower;
+    this.zoomUpper = upper;
   }
 }
 
@@ -187,14 +250,13 @@ class Map {
   }
 
   init() {
-    const protocol = new pmtiles.Protocol();
+    const protocol = new Protocol();
     maplibregl.addProtocol("pmtiles", protocol.tile);
 
     this.map = new maplibregl.Map({
       center: [-74.0, 40.75],
       container: "map",
       doubleClickZoom: false,
-      hash: true,
       maxBounds: [
         [-175.0, -9.0],
         [-20.0, 72.1],
@@ -205,20 +267,23 @@ class Map {
       style: "https://tiles.openfreemap.org/styles/positron",
       zoom: 10,
     });
+    this.hash = new maplibregl.Hash();
+    this.hash.addTo(this.map);
+    this.hash._onHashChange();
 
     return new Promise((resolve) => {
       this.map.on("load", () => {
         this.map.addSource("protomap", {
           promoteId: "id",
           type: "vector",
-          url: "pmtiles://https://data.opentimes.org/tiles/tracts_2024.pmtiles",
+          url: `pmtiles://${URL_TILES}`
         });
 
         this.map.addControl(new maplibregl.NavigationControl(), "bottom-right");
         this.addMapLayers(this.map);
         resolve(this.map);
 
-        this.tractIdDisplay = this.createTractIdDisplay();
+        this.geoIdDisplay = this.createGeoIdDisplay();
         this.addHandlers();
       });
     });
@@ -228,14 +293,17 @@ class Map {
     this.map.on("mousemove", (feat) => {
       const features = this.map.queryRenderedFeatures(
         feat.point,
-        { layers: ["tracts_fill"] }
+        { layers: ["geo_fill"] }
       );
       // eslint-disable-next-line one-var
-      const [feature] = features;
+      const [feature] = features,
+        geoName = TIMES_GEOGRAPHY.split("_").
+          map(word => word.charAt(0).toUpperCase() +
+          word.slice(1).toLowerCase()).join(" ");
       if (feature) {
         this.map.getCanvas().style.cursor = "pointer";
-        this.tractIdDisplay.style.display = "block";
-        this.tractIdDisplay.textContent = `Tract ID: ${feature.properties.id}`;
+        this.geoIdDisplay.style.display = "block";
+        this.geoIdDisplay.textContent = `${geoName} ID: ${feature.properties.id}`;
         if (this.hoveredPolygonId !== null) {
           this.map.setFeatureState(
             { id: this.hoveredPolygonId, source: "protomap", sourceLayer: "tracts" },
@@ -249,8 +317,8 @@ class Map {
         );
       } else {
         this.map.getCanvas().style.cursor = "";
-        this.tractIdDisplay.style.display = "none";
-        this.tractIdDisplay.textContent = "";
+        this.geoIdDisplay.style.display = "none";
+        this.geoIdDisplay.textContent = "";
       }
     });
 
@@ -270,31 +338,38 @@ class Map {
       if (this.isProcessing) {
         return;
       }
-      const features = this.map.queryRenderedFeatures(
-        feat.point,
-        { layers: ["tracts_fill"] }
-      );
+      const features = this.map.queryRenderedFeatures( feat.point, { layers: ["geo_fill"] }),
+        urlParams = new URLSearchParams(window.location.search);
       if (features.length > 0) {
         this.spinner.show();
         this.isProcessing = true;
         const [feature] = features;
         await this.processor.runQuery(
           this,
+          baseUrl,
+          modeParam,
           feature.properties.state,
           feature.properties.id,
         );
 
-        // Update the URL with ID
-        window.history.replaceState({}, "", `?id=${feature.properties.id}${window.location.hash}`);
+        // Update the URL with parameters
+        urlParams.set("id", feature.properties.id);
+        window.history.replaceState({}, "", `${window.location.pathname}?${urlParams}${window.location.hash}`);
         this.isProcessing = false;
         this.spinner.hide();
       }
     });
 
     this.map.on("moveend", () => {
-      const idParam = new URLSearchParams(window.location.search).get("id");
+
+      // Only update/add the location hash after the first movement
+      this.hash._updateHash();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      idParam = urlParams.get("id");
       if (idParam) {
-        window.history.replaceState({}, "", `?id=${idParam}${window.location.hash}`);
+        urlParams.set("id", idParam);
+        window.history.replaceState({}, "", `${window.location.pathname}?${urlParams}${window.location.hash}`);
       } else {
         window.history.replaceState({}, "", `${window.location.hash}`);
       }
@@ -303,13 +378,13 @@ class Map {
     this.map.on("zoom", debounce(() => {
       const currentZoomLevel = this.map.getZoom();
       if (this.previousZoomLevel !== null) {
-        const crossedThreshold = ZOOM_THRESHOLDS.some(
+        const crossedThreshold = ZOOM_THRESHOLDS[modeParam].some(
           (threshold) =>
             (this.previousZoomLevel < threshold && currentZoomLevel >= threshold) ||
             (this.previousZoomLevel >= threshold && currentZoomLevel < threshold)
         );
 
-        if (crossedThreshold) {
+        if (crossedThreshold && !this.isProcessing) {
           this.updateMapFill(this.processor.previousResults);
           this.colorScale.updateLabels(currentZoomLevel);
         }
@@ -330,16 +405,16 @@ class Map {
     }
     this.map.addLayer({
       filter: ["==", ["geometry-type"], "Polygon"],
-      id: "tracts_fill",
+      id: "geo_fill",
       paint: {
         "fill-color": [
           "case",
-          ["==", ["feature-state", "tractColor"], "color_1"], "rgba(253, 231, 37, 0.4)",
-          ["==", ["feature-state", "tractColor"], "color_2"], "rgba(122, 209, 81, 0.4)",
-          ["==", ["feature-state", "tractColor"], "color_3"], "rgba(34, 168, 132, 0.4)",
-          ["==", ["feature-state", "tractColor"], "color_4"], "rgba(42, 120, 142, 0.4)",
-          ["==", ["feature-state", "tractColor"], "color_5"], "rgba(65, 68, 135, 0.4)",
-          ["==", ["feature-state", "tractColor"], "color_6"], "rgba(68, 1, 84, 0.4)",
+          ["==", ["feature-state", "geoColor"], "color_1"], "rgba(253, 231, 37, 0.4)",
+          ["==", ["feature-state", "geoColor"], "color_2"], "rgba(122, 209, 81, 0.4)",
+          ["==", ["feature-state", "geoColor"], "color_3"], "rgba(34, 168, 132, 0.4)",
+          ["==", ["feature-state", "geoColor"], "color_4"], "rgba(42, 120, 142, 0.4)",
+          ["==", ["feature-state", "geoColor"], "color_5"], "rgba(65, 68, 135, 0.4)",
+          ["==", ["feature-state", "geoColor"], "color_6"], "rgba(68, 1, 84, 0.4)",
           "rgba(255, 255, 255, 0.0)"
         ],
       },
@@ -350,7 +425,7 @@ class Map {
 
     this.map.addLayer({
       filter: ["==", ["geometry-type"], "Polygon"],
-      id: "tracts_line",
+      id: "geo_line",
       paint: {
         "line-color": "#333",
         "line-opacity": [
@@ -372,7 +447,7 @@ class Map {
     }, firstSymbolId);
   }
 
-  createTractIdDisplay() {
+  createGeoIdDisplay() {
     const display = document.createElement("div");
     display.id = "map-info";
     // Initially hidden
@@ -385,7 +460,7 @@ class Map {
     previousResults.forEach(row =>
       this.map.setFeatureState(
         { id: row.id, source: "protomap", sourceLayer: "tracts" },
-        { tractColor: this.colorScale.getColorScale(row.duration, this.map.getZoom()) }
+        { geoColor: this.colorScale.getColorScale(row.duration, this.map.getZoom()) }
       )
     );
   }
@@ -394,15 +469,14 @@ class Map {
     previousResults.forEach(row =>
       this.map.setFeatureState(
         { id: row.id, source: "protomap", sourceLayer: "tracts" },
-        { tractColor: "none" }
+        { geoColor: "none" }
       )
     );
   }
 }
 
 class ParquetProcessor {
-  constructor(url) {
-    this.baseUrl = url;
+  constructor() {
     this.previousResults = [];
     this.byteLengthCache = {};
     this.metadataCache = {};
@@ -436,25 +510,26 @@ class ParquetProcessor {
       if (row[0] === id) {
         map.map.setFeatureState(
           { id: row[1], source: "protomap", sourceLayer: "tracts" },
-          { tractColor: map.colorScale.getColorScale(row[2], map.map.getZoom()) }
+          { geoColor: map.colorScale.getColorScale(row[2], map.map.getZoom()) }
         );
         results.push({ duration: row[2], id: row[1] });
       }
     });
   }
 
-  async runQuery(map, state, id) {
-    const queryUrl = `${this.baseUrl}/state=${state}/times-0.0.1-car-2024-tract-${state}`;
-
-    let urlsArray = [];
-    if (BIG_STATES.includes(state)) {
-      urlsArray = [`${queryUrl}-0.parquet`, `${queryUrl}-1.parquet`];
-    } else {
+  async runQuery(map, queryBaseUrl, mode, state, id) {
+    const queryUrl = `${queryBaseUrl}/state=${state}/times-${TIMES_VERSION}-${mode}-${TIMES_YEAR}-${TIMES_GEOGRAPHY}-${state}`,
       urlsArray = [`${queryUrl}-0.parquet`];
-    }
+    let filteredPreviousResults = null,
+      resultIds = null,
+      results = null;
 
-    map.wipeMapPreviousState(this.previousResults);
-    this.previousResults = await this.updateMapOnQuery(map, urlsArray, id);
+    results = await this.updateMapOnQuery(map, urlsArray, mode, id);
+    resultIds = new Set(results.map(item => item.id));
+
+    filteredPreviousResults = this.previousResults.filter(item => !resultIds.has(item.id));
+    map.wipeMapPreviousState(filteredPreviousResults);
+    this.previousResults = results;
   }
 
   async readAndUpdateMap(map, id, file, metadata, rowGroup, results) {
@@ -471,9 +546,9 @@ class ParquetProcessor {
     );
   }
 
-  async updateMapOnQuery(map, urls, id) {
+  async updateMapOnQuery(map, urls, mode, id) {
     const results = [];
-    if (!this.validIdInput(id)) {
+    if (!(validIdInput(id) && validModeInput(mode))) {
       return results;
     }
 
@@ -521,7 +596,6 @@ class ParquetProcessor {
       return rowGroupMetadata;
     });
 
-
     // Async query the rowgroups relevant to the input ID
     // eslint-disable-next-line one-var
     let rowGroupItems = await Promise.all(rowGroupResults);
@@ -543,38 +617,62 @@ class ParquetProcessor {
     }));
     return results;
   }
-
-  validIdInput(id) {
-    if (id && /^\d{11}$/u.test(id)) {
-      return true;
-    }
-    console.warn("Invalid ID input. Please enter a valid 11-digit tract ID.");
-    return false;
-  }
 }
 
 (() => {
-  const colorScale = new ColorScale(ZOOM_THRESHOLDS[0], ZOOM_THRESHOLDS[1]),
-    processor = new ParquetProcessor(BASE_URL),
+  const colorScale = new ColorScale(),
+    processor = new ParquetProcessor(),
     spinner = new Spinner(),
     // eslint-disable-next-line sort-vars
     map = new Map(colorScale, spinner, processor);
 
   colorScale.draw(map.map);
+  colorScale.modeDropdown.addEventListener("change", async (event) => {
+    const selectedMode = event.target.value,
+      urlParams = new URLSearchParams(window.location.search);
+
+    idParam = urlParams.get("id");
+    baseUrl = `https://data.opentimes.org/times/version=${TIMES_VERSION}/mode=${selectedMode}/year=${TIMES_YEAR}/geography=${TIMES_GEOGRAPHY}`;
+    modeParam = selectedMode;
+    colorScale.updateZoomThresholds(
+      ZOOM_THRESHOLDS[modeParam][0],
+      ZOOM_THRESHOLDS[modeParam][1]
+    );
+    colorScale.updateLabels(map.map.getZoom());
+
+    urlParams.set("mode", selectedMode);
+    window.history.replaceState({}, "", `${window.location.pathname}?${urlParams}${window.location.hash}`);
+
+    if (idParam) {
+      spinner.show();
+      await processor.runQuery(map, baseUrl, selectedMode, idParam.substring(0, 2), idParam);
+    }
+
+    spinner.hide();
+  });
 
   // Wait for the map to fully load before running a query
   map.map.on("load", async () => {
     // Load the previous map click if there was one
-    const idParam = new URLSearchParams(window.location.search).get("id");
-    if (idParam) {
-      spinner.show();
-      await processor.runQuery(map, idParam.substring(0, 2), idParam);
-    }
+    const urlParams = new URLSearchParams(window.location.search);
+    let validMode = true;
 
-    // Remove the hash if map is at starting location
-    if (window.location.hash === "#10/40.75/-74") {
-      console.log(window.location.hash);
-      window.history.replaceState({}, "", window.location.pathname + window.location.search);
+    idParam = urlParams.get("id");
+    modeParam = urlParams.get("mode") || TIMES_DEFAULT_MODE;
+    validMode = validModeInput(modeParam);
+    baseUrl = `https://data.opentimes.org/times/version=${TIMES_VERSION}/mode=${modeParam}/year=${TIMES_YEAR}/geography=${TIMES_GEOGRAPHY}`;
+
+    if (validMode) {
+      colorScale.updateZoomThresholds(
+        ZOOM_THRESHOLDS[modeParam][0],
+        ZOOM_THRESHOLDS[modeParam][1]
+      );
+      colorScale.updateLabels(map.map.getZoom());
+
+      if (idParam) {
+        spinner.show();
+        await processor.runQuery(map, baseUrl, modeParam, idParam.substring(0, 2), idParam);
+      }
     }
 
     spinner.hide();

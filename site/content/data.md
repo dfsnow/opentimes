@@ -25,8 +25,8 @@ those counties (in seconds).
 | 17031     | 18089          | 3463         |
 | ...       | ...            | ...          |
 
-OpenTimes is basically just a few hundred billion records that look exactly
-like this, compressed and stored in a way that makes them easy-to-use and
+OpenTimes is essentially just a few hundred billion records that look exactly
+like this, compressed and stored in a way that makes them easy to use and
 cheap to serve.
 
 ---
@@ -44,8 +44,8 @@ be read directly into your software of choice using open-source libraries:
 library(arrow)
 
 times <- read_parquet(paste0(
-  "https://data.opentimes.org/times/version=0.0.1/mode=car/year=2024/",
-  "geography=tract/state=17/times-0.0.1-car-2024-tract-17-0.parquet"
+  "https://data.opentimes.org/times/version=0.0.1/mode=car/year=2024",
+  "/geography=tract/state=17/times-0.0.1-car-2024-tract-17-0.parquet"
 ))
 ```
 
@@ -177,13 +177,12 @@ Some notes on using DuckDB:
 
 ## Coverage
 
-OpenTimes data covers and includes times from:
+OpenTimes data covers and includes times for:
 
 - All 50 states plus Washington D.C.
-- All years after 2020 (inclusive). I thought it was unlikely that people
-  would need historical data.
+- All years after 2020 (inclusive)
 - The following Census geographies
-  (see [this map](https://www2.census.gov/geo/pdfs/reference/geodiagram.pdf)
+  (see [this chart](https://www2.census.gov/geo/pdfs/reference/geodiagram.pdf)
   for the relationship hierarchy):
   - States
   - Counties

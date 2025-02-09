@@ -1,18 +1,20 @@
 /* eslint-disable no-undef */
-const openDetailsOnLoad = () => {
-  const target = window.location.hash,
-    // eslint-disable-next-line sort-vars
-    elTarget = document.querySelector(target);
+const openDetailsOnLoad = function openDetailsOnLoad() {
+  const target = window.location.hash;
+  let qTarget = null;
+  if (target) {
+    qTarget = document.querySelector(target);
+  }
 
-  if (!elTarget) { return; }
-  let elDetails = elTarget.closest("details");
-  while (elDetails) {
-    if (elDetails.matches("details")) { elDetails.open = true; }
-    elDetails = elDetails.parentElement;
+  if (!qTarget) { return; }
+  let qDetails = qTarget.closest("details");
+  while (qDetails) {
+    if (qDetails.matches("details")) { qDetails.open = true; }
+    qDetails = qDetails.parentElement;
   }
 
   // Scroll to the target element
-  elTarget.scrollIntoView();
+  qTarget.scrollIntoView();
 };
 
 window.addEventListener("load", openDetailsOnLoad);
