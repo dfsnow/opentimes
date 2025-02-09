@@ -18,6 +18,7 @@ venv/
 *.osm
 *.parquet
 *.pbf
+*.pmtiles
 *.pyc
 *.tar
 *.tif

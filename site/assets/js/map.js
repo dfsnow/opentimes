@@ -31,14 +31,14 @@ let baseUrl = `https://data.opentimes.org/times/version=${TIMES_VERSION}/mode=${
 
 // eslint-disable-next-line one-var
 const debounce = function debounce(func, wait) {
-    let timeout = null;
-    return function debouncedFunction(...args) {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        func(...args);
-      }, wait);
-    };
-  },
+  let timeout = null;
+  return function debouncedFunction(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      func(...args);
+    }, wait);
+  };
+},
 
   validIdInput = function validIdInput(id) {
     if (id && /^\d{5,12}$/u.test(id)) {
@@ -299,20 +299,20 @@ class Map {
       const [feature] = features,
         geoName = TIMES_GEOGRAPHY.split("_").
           map(word => word.charAt(0).toUpperCase() +
-          word.slice(1).toLowerCase()).join(" ");
+            word.slice(1).toLowerCase()).join(" ");
       if (feature) {
         this.map.getCanvas().style.cursor = "pointer";
         this.geoIdDisplay.style.display = "block";
         this.geoIdDisplay.textContent = `${geoName} ID: ${feature.properties.id}`;
         if (this.hoveredPolygonId !== null) {
           this.map.setFeatureState(
-            { id: this.hoveredPolygonId, source: "protomap", sourceLayer: "tracts" },
+            { id: this.hoveredPolygonId, source: "protomap", sourceLayer: "geometry" },
             { hover: false }
           );
         }
         this.hoveredPolygonId = feature.properties.id;
         this.map.setFeatureState(
-          { id: this.hoveredPolygonId, source: "protomap", sourceLayer: "tracts" },
+          { id: this.hoveredPolygonId, source: "protomap", sourceLayer: "geometry" },
           { hover: true }
         );
       } else {
@@ -326,7 +326,7 @@ class Map {
     this.map.on("mouseleave", () => {
       if (this.hoveredPolygonId !== null) {
         this.map.setFeatureState(
-          { id: this.hoveredPolygonId, source: "protomap", sourceLayer: "tracts" },
+          { id: this.hoveredPolygonId, source: "protomap", sourceLayer: "geometry" },
           { hover: false }
         );
       }
@@ -338,17 +338,18 @@ class Map {
       if (this.isProcessing) {
         return;
       }
-      const features = this.map.queryRenderedFeatures( feat.point, { layers: ["geo_fill"] }),
+      const features = this.map.queryRenderedFeatures(feat.point, { layers: ["geo_fill"] }),
         urlParams = new URLSearchParams(window.location.search);
       if (features.length > 0) {
         this.spinner.show();
         this.isProcessing = true;
-        const [feature] = features;
+        const [feature] = features,
+          state = feature.properties.id.substring(0, 2);
         await this.processor.runQuery(
           this,
           baseUrl,
           modeParam,
-          feature.properties.state,
+          state,
           feature.properties.id,
         );
 
@@ -419,7 +420,7 @@ class Map {
         ],
       },
       source: "protomap",
-      "source-layer": "tracts",
+      "source-layer": "geometry",
       type: "fill",
     }, firstSymbolId);
 
@@ -442,7 +443,7 @@ class Map {
         ]
       },
       source: "protomap",
-      "source-layer": "tracts",
+      "source-layer": "geometry",
       type: "line",
     }, firstSymbolId);
   }
@@ -459,7 +460,7 @@ class Map {
   updateMapFill(previousResults) {
     previousResults.forEach(row =>
       this.map.setFeatureState(
-        { id: row.id, source: "protomap", sourceLayer: "tracts" },
+        { id: row.id, source: "protomap", sourceLayer: "geometry" },
         { geoColor: this.colorScale.getColorScale(row.duration, this.map.getZoom()) }
       )
     );
@@ -468,7 +469,7 @@ class Map {
   wipeMapPreviousState(previousResults) {
     previousResults.forEach(row =>
       this.map.setFeatureState(
-        { id: row.id, source: "protomap", sourceLayer: "tracts" },
+        { id: row.id, source: "protomap", sourceLayer: "geometry" },
         { geoColor: "none" }
       )
     );
@@ -509,7 +510,7 @@ class ParquetProcessor {
     data.forEach(row => {
       if (row[0] === id) {
         map.map.setFeatureState(
-          { id: row[1], source: "protomap", sourceLayer: "tracts" },
+          { id: row[1], source: "protomap", sourceLayer: "geometry" },
           { geoColor: map.colorScale.getColorScale(row[2], map.map.getZoom()) }
         );
         results.push({ duration: row[2], id: row[1] });

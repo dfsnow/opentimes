@@ -63,18 +63,12 @@ def fetch_cb_shapefile(
         year: The year of the TIGER/Line data.
         geography: The Census geography type of the shapefile.
     """
-    version = params["times"]["version"]
     states = params["input"]["state"]
 
     output_dir = (
-        Path.cwd()
-        / "output"
-        / "tiles"
-        / f"version={version}"
-        / f"year={year}"
-        / f"geography={geography}"
+        Path.cwd() / "input" / "cb" / f"year={year}" / f"geography={geography}"
     )
-    output_file = output_dir / f"tiles-{version}-{year}-{geography}.geojson"
+    output_file = output_dir / f"{geography}.geojson"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     gdf_list = []
@@ -96,7 +90,11 @@ def fetch_cb_shapefile(
                     gdf_list.append(gdf)
 
     gdf_concat = pd.concat(gdf_list, ignore_index=True)
-    gdf_concat.to_file(output_file)
+    gdf_concat = gdf_concat.to_crs(epsg=4326)
+    gdf_concat = gdf_concat[["geoid", "geometry"]].rename(
+        columns={"geoid": "id"}
+    )
+    gdf_concat.to_file(output_file, layer="geometry")
 
 
 def main() -> None:
