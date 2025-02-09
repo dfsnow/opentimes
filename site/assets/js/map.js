@@ -520,9 +520,16 @@ class ParquetProcessor {
   async runQuery(map, queryBaseUrl, mode, state, id) {
     const queryUrl = `${queryBaseUrl}/state=${state}/times-${TIMES_VERSION}-${mode}-${TIMES_YEAR}-${TIMES_GEOGRAPHY}-${state}`,
       urlsArray = [`${queryUrl}-0.parquet`];
+    let filteredPreviousResults = null,
+      resultIds = null,
+      results = null;
 
-    map.wipeMapPreviousState(this.previousResults);
-    this.previousResults = await this.updateMapOnQuery(map, urlsArray, mode, id);
+    results = await this.updateMapOnQuery(map, urlsArray, mode, id);
+    resultIds = new Set(results.map(item => item.id));
+
+    filteredPreviousResults = this.previousResults.filter(item => !resultIds.has(item.id));
+    map.wipeMapPreviousState(filteredPreviousResults);
+    this.previousResults = results;
   }
 
   async readAndUpdateMap(map, id, file, metadata, rowGroup, results) {
