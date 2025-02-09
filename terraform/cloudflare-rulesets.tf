@@ -1,7 +1,7 @@
-resource "cloudflare_ruleset" "cache_data_subdomain" {
+resource "cloudflare_ruleset" "cache_all" {
   zone_id     = cloudflare_zone.opentimes-org.id
-  name        = "Cache data files for data subdomain"
-  description = "Cache all data files for data.opentimes.org"
+  name        = "Cache all files"
+  description = "Cache all data files"
   kind        = "zone"
   phase       = "http_request_cache_settings"
 
@@ -23,8 +23,33 @@ resource "cloudflare_ruleset" "cache_data_subdomain" {
       origin_error_page_passthru = false
       cache                      = true
     }
-    expression  = "(http.request.full_uri wildcard \"https://data.opentimes.org/*\")"
-    description = "Cache data files for data subdomain"
+    expression = true
+    description = "Cache all files"
+    enabled     = true
+  }
+}
+
+resource "cloudflare_ruleset" "compress_all_but_parquet" {
+  zone_id     = cloudflare_zone.opentimes-org.id
+  name        = "Compress all but Parquet"
+  description = "Parquet requires HEAD requests"
+  kind        = "zone"
+  phase       = "http_response_compression"
+  rules {
+    action = "compress_response"
+    action_parameters {
+      algorithms {
+        name = "zstd"
+      }
+      algorithms {
+        name = "brotli"
+      }
+      algorithms {
+        name = "gzip"
+      }
+    }
+    expression  = "(http.request.full_uri wildcard \"https://*opentimes.org/*\" and http.request.method ne \"HEAD\")"
+    description = "Compress all except HEAD"
     enabled     = true
   }
 }

@@ -79,7 +79,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "opentimes-resources-lifecycle"
       prefix = "cache/"
     }
     expiration {
-      days = 3
+      days = 2
     }
   }
 
