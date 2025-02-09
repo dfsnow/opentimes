@@ -1,24 +1,16 @@
-/* eslint-disable no-useless-assignment */
-/* eslint-disable no-console */
-/* eslint-disable max-params */
-/* eslint-disable max-lines */
-/* eslint-disable max-statements */
-/* eslint-disable max-lines-per-function */
-/* eslint-disable max-classes-per-file */
-/* eslint-disable no-magic-numbers */
-/* eslint-disable no-undef */
-/* eslint-disable class-methods-use-this */
+/* eslint-disable no-useless-assignment, no-console, max-params, max-lines, max-statements, max-lines-per-function */
+/* eslint-disable max-classes-per-file, no-magic-numbers, no-undef, class-methods-use-this, sort-vars, no-underscore-dangle */
 import { asyncBufferFromUrl, byteLengthFromUrl, parquetMetadataAsync, parquetRead } from "hyparquet";
+import { Protocol } from "pmtiles";
 import { compressors } from "hyparquet-compressors";
 import maplibregl from "maplibre-gl";
-import { Protocol } from "pmtiles";
 
 const TIMES_DEFAULT_MODE = "car",
   TIMES_GEOGRAPHY = "tract",
   TIMES_MODES = ["car", "bicycle", "foot"],
   TIMES_VERSION = "0.0.1",
   TIMES_YEAR = "2024",
-  URL_TILES = `https://data.opentimes.org/tiles/version=${TIMES_VERSION}/year=${TIMES_YEAR}/geography=${TIMES_GEOGRAPHY}/tiles-${TIMES_VERSION}-${TIMES_YEAR}-${TIMES_GEOGRAPHY}.pmtiles`,
+  URL_TILES = `https://data.opentimes.org/tiles/version=${TIMES_VERSION}/year=${TIMES_YEAR}/geography=${TIMES_GEOGRAPHY}/tiles-${TIMES_VERSION}-${TIMES_YEAR}-${TIMES_GEOGRAPHY}`,
   ZOOM_THRESHOLDS = {
     "bicycle": [8, 9.5],
     "car": [6, 8],
@@ -239,11 +231,12 @@ class Spinner {
 }
 
 class Map {
-  constructor(colorScale, spinner, processor) {
+  constructor(colorScale, spinner, processor, tileIndex) {
     this.init();
     this.colorScale = colorScale;
     this.spinner = spinner;
     this.processor = processor;
+    this.index = tileIndex;
     this.hoveredPolygonId = null;
     this.previousZoomLevel = null;
     this.isProcessing = false;
@@ -276,7 +269,7 @@ class Map {
         this.map.addSource("protomap", {
           promoteId: "id",
           type: "vector",
-          url: `pmtiles://${URL_TILES}`
+          url: `pmtiles://${URL_TILES}.pmtiles`
         });
 
         this.map.addControl(new maplibregl.NavigationControl(), "bottom-right");
@@ -299,20 +292,20 @@ class Map {
       const [feature] = features,
         geoName = TIMES_GEOGRAPHY.split("_").
           map(word => word.charAt(0).toUpperCase() +
-          word.slice(1).toLowerCase()).join(" ");
+            word.slice(1).toLowerCase()).join(" ");
       if (feature) {
         this.map.getCanvas().style.cursor = "pointer";
         this.geoIdDisplay.style.display = "block";
         this.geoIdDisplay.textContent = `${geoName} ID: ${feature.properties.id}`;
         if (this.hoveredPolygonId !== null) {
           this.map.setFeatureState(
-            { id: this.hoveredPolygonId, source: "protomap", sourceLayer: "tracts" },
+            { id: this.hoveredPolygonId, source: "protomap", sourceLayer: "geometry" },
             { hover: false }
           );
         }
         this.hoveredPolygonId = feature.properties.id;
         this.map.setFeatureState(
-          { id: this.hoveredPolygonId, source: "protomap", sourceLayer: "tracts" },
+          { id: this.hoveredPolygonId, source: "protomap", sourceLayer: "geometry" },
           { hover: true }
         );
       } else {
@@ -326,7 +319,7 @@ class Map {
     this.map.on("mouseleave", () => {
       if (this.hoveredPolygonId !== null) {
         this.map.setFeatureState(
-          { id: this.hoveredPolygonId, source: "protomap", sourceLayer: "tracts" },
+          { id: this.hoveredPolygonId, source: "protomap", sourceLayer: "geometry" },
           { hover: false }
         );
       }
@@ -338,17 +331,18 @@ class Map {
       if (this.isProcessing) {
         return;
       }
-      const features = this.map.queryRenderedFeatures( feat.point, { layers: ["geo_fill"] }),
+      const features = this.map.queryRenderedFeatures(feat.point, { layers: ["geo_fill"] }),
         urlParams = new URLSearchParams(window.location.search);
       if (features.length > 0) {
         this.spinner.show();
         this.isProcessing = true;
-        const [feature] = features;
+        const [feature] = features,
+          state = feature.properties.id.substring(0, 2);
         await this.processor.runQuery(
           this,
           baseUrl,
           modeParam,
-          feature.properties.state,
+          state,
           feature.properties.id,
         );
 
@@ -419,7 +413,7 @@ class Map {
         ],
       },
       source: "protomap",
-      "source-layer": "tracts",
+      "source-layer": "geometry",
       type: "fill",
     }, firstSymbolId);
 
@@ -442,7 +436,7 @@ class Map {
         ]
       },
       source: "protomap",
-      "source-layer": "tracts",
+      "source-layer": "geometry",
       type: "line",
     }, firstSymbolId);
   }
@@ -459,7 +453,7 @@ class Map {
   updateMapFill(previousResults) {
     previousResults.forEach(row =>
       this.map.setFeatureState(
-        { id: row.id, source: "protomap", sourceLayer: "tracts" },
+        { id: row.id, source: "protomap", sourceLayer: "geometry" },
         { geoColor: this.colorScale.getColorScale(row.duration, this.map.getZoom()) }
       )
     );
@@ -468,7 +462,7 @@ class Map {
   wipeMapPreviousState(previousResults) {
     previousResults.forEach(row =>
       this.map.setFeatureState(
-        { id: row.id, source: "protomap", sourceLayer: "tracts" },
+        { id: row.id, source: "protomap", sourceLayer: "geometry" },
         { geoColor: "none" }
       )
     );
@@ -509,7 +503,7 @@ class ParquetProcessor {
     data.forEach(row => {
       if (row[0] === id) {
         map.map.setFeatureState(
-          { id: row[1], source: "protomap", sourceLayer: "tracts" },
+          { id: row[1], source: "protomap", sourceLayer: "geometry" },
           { geoColor: map.colorScale.getColorScale(row[2], map.map.getZoom()) }
         );
         results.push({ duration: row[2], id: row[1] });
@@ -519,7 +513,13 @@ class ParquetProcessor {
 
   async runQuery(map, queryBaseUrl, mode, state, id) {
     const queryUrl = `${queryBaseUrl}/state=${state}/times-${TIMES_VERSION}-${mode}-${TIMES_YEAR}-${TIMES_GEOGRAPHY}-${state}`,
-      urlsArray = [`${queryUrl}-0.parquet`];
+      mapIndex = await map.index,
+      urlsArray = [],
+      tileCount = mapIndex?.[mode]?.[state] ?? 1;
+
+    for (let ti = 0; ti < tileCount; ti += 1) {
+      urlsArray.push(`${queryUrl}-${ti}.parquet`);
+    }
     let filteredPreviousResults = null,
       resultIds = null,
       results = null;
@@ -620,11 +620,11 @@ class ParquetProcessor {
 }
 
 (() => {
-  const colorScale = new ColorScale(),
+  const loadTileIndex = async () => await fetch(`${URL_TILES}.json`).then(response => response.json()),
+    colorScale = new ColorScale(),
     processor = new ParquetProcessor(),
     spinner = new Spinner(),
-    // eslint-disable-next-line sort-vars
-    map = new Map(colorScale, spinner, processor);
+    map = new Map(colorScale, spinner, processor, loadTileIndex());
 
   colorScale.draw(map.map);
   colorScale.modeDropdown.addEventListener("change", async (event) => {

@@ -65134,3 +65134,31 @@ stages:
       hash: md5
       md5: c61f12deef49d2a1114a0e60bf73f589
       size: 228350160
+  fetch_cb_national@2022-tract:
+    cmd: python ./src/fetch_cb.py --year 2022 --geography tract
+    outs:
+    - path: ./input/cb/year=2022/geography=tract/tract.geojson
+      hash: md5
+      md5: ddc4b173d36a287343d22667b400efe5
+      size: 140825166
+  fetch_cb_national@2023-block_group:
+    cmd: python ./src/fetch_cb.py --year 2023 --geography block_group
+    outs:
+    - path: ./input/cb/year=2023/geography=block_group/block_group.geojson
+      hash: md5
+      md5: e292b5dc67d4d12d6374b4c59100577f
+      size: 240267666
+  fetch_cb_national@2023-tract:
+    cmd: python ./src/fetch_cb.py --year 2023 --geography tract
+    outs:
+    - path: ./input/cb/year=2023/geography=tract/tract.geojson
+      hash: md5
+      md5: 965dc44c8f7c46bb593ea7b530753423
+      size: 140896344
+  fetch_cb_national@2022-block_group:
+    cmd: python ./src/fetch_cb.py --year 2022 --geography block_group
+    outs:
+    - path: ./input/cb/year=2022/geography=block_group/block_group.geojson
+      hash: md5
+      md5: 7837e9d4c394a776a258f62e009e22e1
+      size: 240172593
