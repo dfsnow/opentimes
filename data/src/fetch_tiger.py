@@ -52,7 +52,7 @@ def fetch_shapefile(
     tiger_geo_name = TIGER_GEO_NAMES[geography]
     file_prefix = f"tl_{year}_{'us' if not state else state}"
     remote_file_name = f"{file_prefix}_{tiger_geo_name}.zip"
-    url = f"{TIGER_BASE_URL}{year}/{tiger_geo_name.upper()}/{remote_file_name}"
+    url = f"{TIGER_BASE_URL}TIGER{year}/{tiger_geo_name.upper()}/{remote_file_name}"
 
     try:
         response = r.get(url, stream=True)

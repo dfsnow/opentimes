@@ -3,7 +3,7 @@
 DOCKER_ENDPOINT = "http://127.0.0.1:5333"
 
 # Base URL for TIGER/Line shapefiles
-TIGER_BASE_URL = "https://www2.census.gov/geo/tiger/TIGER"
+TIGER_BASE_URL = "https://www2.census.gov/geo/tiger/"
 
 # This is a dictionary that determines the construction of the public
 # OpenTimes files. partition_levels is the number of directories present in
