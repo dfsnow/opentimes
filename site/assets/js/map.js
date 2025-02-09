@@ -14,10 +14,12 @@ import maplibregl from "maplibre-gl";
 import { Protocol } from "pmtiles";
 
 const TIMES_DEFAULT_MODE = "car",
+  TIMES_DEFAULT_YEAR = "2024",
   TIMES_GEOGRAPHY = "tract",
   TIMES_MODES = ["car", "bicycle", "foot"],
   TIMES_VERSION = "0.0.1",
   TIMES_YEAR = "2024",
+  TIMES_YEARS = ["2020", "2021", "2022", "2023", "2024"],
   URL_TILES = `https://data.opentimes.org/tiles/version=${TIMES_VERSION}/year=${TIMES_YEAR}/geography=${TIMES_GEOGRAPHY}/tiles-${TIMES_VERSION}-${TIMES_YEAR}-${TIMES_GEOGRAPHY}.pmtiles`,
   ZOOM_THRESHOLDS = {
     "bicycle": [8, 9.5],
@@ -27,7 +29,8 @@ const TIMES_DEFAULT_MODE = "car",
 
 let baseUrl = `https://data.opentimes.org/times/version=${TIMES_VERSION}/mode=${TIMES_DEFAULT_MODE}/year=${TIMES_YEAR}/geography=${TIMES_GEOGRAPHY}`,
   idParam = null,
-  modeParam = "car";
+  modeParam = "car",
+  yearParam = "2024";
 
 // eslint-disable-next-line one-var
 const debounce = function debounce(func, wait) {
@@ -54,37 +57,43 @@ const debounce = function debounce(func, wait) {
     }
     console.warn(`Invalid travel mode. Must be one of: ${TIMES_MODES.join(", ")}.`);
     return false;
+  },
+
+  validYearInput = function validYearInput(year) {
+    if (TIMES_YEARS.includes(year)) {
+      return true;
+    }
+    console.warn(`Invalid Census year. Must be one of: ${TIMES_YEARS.join(", ")}.`);
+    return false;
   };
 
 class ColorScale {
   constructor() {
     this.scaleContainer = this.createScaleContainer();
     this.toggleButton = this.createToggleButton();
-    this.modeDropdown = this.createModeDropdown();
+    this.modeDropdown = this.createDropdown("mode", TIMES_DEFAULT_MODE, TIMES_MODES, "Travel mode");
+    this.yearDropdown = this.createDropdown("year", TIMES_DEFAULT_YEAR, TIMES_YEARS, "Census year");
     this.colors = this.getColors();
     this.zoomLower = null;
     this.zoomUpper = null;
   }
 
-  createModeDropdown() {
+  createDropdown(param, defaultParam, possibleParams, labelText) {
     const container = document.createElement("div"),
       dropdown = document.createElement("select"),
       label = document.createElement("label"),
       urlParams = new URLSearchParams(window.location.search);
 
-    container.id = "mode-dropdown";
-    dropdown.id = "mode-dropdown-select";
-    label.setAttribute("for", "mode-dropdown-select");
-    label.textContent = "Travel mode";
-    TIMES_MODES.forEach(mode => {
+    container.className = "dropdown-container";
+    dropdown.id = `${param}`;
+    label.setAttribute("for", `${param}`);
+    label.textContent = labelText;
+    possibleParams.forEach(opt => {
       const option = document.createElement("option");
-      option.value = mode;
-      option.textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
+      option.value = opt;
+      option.textContent = opt.charAt(0).toUpperCase() + opt.slice(1);
       dropdown.appendChild(option);
     });
-
-    modeParam = urlParams.get("mode") || TIMES_DEFAULT_MODE;
-    dropdown.value = modeParam;
 
     container.appendChild(label);
     container.appendChild(dropdown);
@@ -130,6 +139,7 @@ class ColorScale {
     });
 
     this.scaleContainer.append(this.modeDropdown);
+    this.scaleContainer.append(this.yearDropdown);
     this.scaleContainer.append(this.toggleButton);
     map.getContainer().append(this.scaleContainer);
   }
@@ -348,6 +358,7 @@ class Map {
           this,
           baseUrl,
           modeParam,
+          yearParam,
           feature.properties.state,
           feature.properties.id,
         );
@@ -517,8 +528,8 @@ class ParquetProcessor {
     });
   }
 
-  async runQuery(map, queryBaseUrl, mode, state, id) {
-    const queryUrl = `${queryBaseUrl}/state=${state}/times-${TIMES_VERSION}-${mode}-${TIMES_YEAR}-${TIMES_GEOGRAPHY}-${state}`,
+  async runQuery(map, queryBaseUrl, mode, year, state, id) {
+    const queryUrl = `${queryBaseUrl}/state=${state}/times-${TIMES_VERSION}-${mode}-${year}-${TIMES_GEOGRAPHY}-${state}`,
       urlsArray = [`${queryUrl}-0.parquet`];
     let filteredPreviousResults = null,
       resultIds = null,
@@ -627,42 +638,48 @@ class ParquetProcessor {
     map = new Map(colorScale, spinner, processor);
 
   colorScale.draw(map.map);
-  colorScale.modeDropdown.addEventListener("change", async (event) => {
-    const selectedMode = event.target.value,
-      urlParams = new URLSearchParams(window.location.search);
 
-    idParam = urlParams.get("id");
-    baseUrl = `https://data.opentimes.org/times/version=${TIMES_VERSION}/mode=${selectedMode}/year=${TIMES_YEAR}/geography=${TIMES_GEOGRAPHY}`;
-    modeParam = selectedMode;
-    colorScale.updateZoomThresholds(
-      ZOOM_THRESHOLDS[modeParam][0],
-      ZOOM_THRESHOLDS[modeParam][1]
-    );
-    colorScale.updateLabels(map.map.getZoom());
+  // eslint-disable-next-line one-var
+  const dropdowns = document.querySelectorAll("select");
+  dropdowns.forEach(dropdown => {
+    dropdown.addEventListener("change", async (event) => {
+      const urlParams = new URLSearchParams(window.location.search);
+      urlParams.set(event.target.id, event.target.value);
+      window.history.replaceState({}, "", `${window.location.pathname}?${urlParams}${window.location.hash}`);
 
-    urlParams.set("mode", selectedMode);
-    window.history.replaceState({}, "", `${window.location.pathname}?${urlParams}${window.location.hash}`);
+      idParam = urlParams.get("id");
+      modeParam = urlParams.get("mode") || TIMES_DEFAULT_MODE;
+      yearParam = urlParams.get("year") || TIMES_DEFAULT_YEAR;
+      baseUrl = `https://data.opentimes.org/times/version=${TIMES_VERSION}/mode=${modeParam}/year=${yearParam}/geography=${TIMES_GEOGRAPHY}`;
 
-    if (idParam) {
-      spinner.show();
-      await processor.runQuery(map, baseUrl, selectedMode, idParam.substring(0, 2), idParam);
-    }
+      if (validModeInput(modeParam) && validIdInput(idParam) && validYearInput(yearParam)) {
+        colorScale.updateZoomThresholds(
+          ZOOM_THRESHOLDS[modeParam][0],
+          ZOOM_THRESHOLDS[modeParam][1]
+        );
+        colorScale.updateLabels(map.map.getZoom());
 
-    spinner.hide();
+        if (idParam) {
+          spinner.show();
+          await processor.runQuery(map, baseUrl, modeParam, yearParam, idParam.substring(0, 2), idParam);
+        }
+      }
+
+      spinner.hide();
+    });
   });
 
   // Wait for the map to fully load before running a query
   map.map.on("load", async () => {
     // Load the previous map click if there was one
     const urlParams = new URLSearchParams(window.location.search);
-    let validMode = true;
 
     idParam = urlParams.get("id");
     modeParam = urlParams.get("mode") || TIMES_DEFAULT_MODE;
-    validMode = validModeInput(modeParam);
-    baseUrl = `https://data.opentimes.org/times/version=${TIMES_VERSION}/mode=${modeParam}/year=${TIMES_YEAR}/geography=${TIMES_GEOGRAPHY}`;
+    yearParam = urlParams.get("year") || TIMES_DEFAULT_YEAR;
+    baseUrl = `https://data.opentimes.org/times/version=${TIMES_VERSION}/mode=${modeParam}/year=${yearParam}/geography=${TIMES_GEOGRAPHY}`;
 
-    if (validMode) {
+    if (validModeInput(modeParam) && validIdInput(idParam) && validYearInput(yearParam)) {
       colorScale.updateZoomThresholds(
         ZOOM_THRESHOLDS[modeParam][0],
         ZOOM_THRESHOLDS[modeParam][1]
@@ -671,7 +688,7 @@ class ParquetProcessor {
 
       if (idParam) {
         spinner.show();
-        await processor.runQuery(map, baseUrl, modeParam, idParam.substring(0, 2), idParam);
+        await processor.runQuery(map, baseUrl, modeParam, yearParam, idParam.substring(0, 2), idParam);
       }
     }
 
