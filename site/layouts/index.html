@@ -4,7 +4,7 @@
 {{- end -}}
 
 {{- define "scripts" -}}
-{{- $map := resources.Get "js/map.js" | js.Build (dict "format" "esm") | minify | fingerprint -}}
+{{- $map := resources.Get "js/map.js" | js.Build (dict "format" "esm" "sourceMap" "inline") | minify | fingerprint -}}
 <script type="module" src="{{- $map.RelPermalink -}}"></script>
 {{- end -}}
 

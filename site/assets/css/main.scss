@@ -369,21 +369,35 @@ blockquote,
   padding: 10px;
   border-radius: 5px;
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
-  min-width: 90px;
+  min-width: 94px;
+
+  span {
+    font-size: 1.1em;
+  }
+
+  #legend-title > h2 {
+    font-size: 1.2em;
+    margin-top: 0;
+    margin-bottom: 0.4em;
+  }
 
   #mode-dropdown {
-    width: 100%;
-    font-size: 1.2em;
-  }
-
-  #legend-title > h3 {
-    margin-top: 0;
-    margin-bottom: 0.6em;
-  }
-
-  #mode-title > h3 {
+    display: block;
     margin-top: 0.6em;
-    margin-bottom: 0.2em;
+    margin-bottom: 0;
+    width: 100%;
+
+    label {
+      display: block;
+      font-weight: bold;
+      font-size: 1.2em;
+      margin-bottom: 0.2em;
+    }
+
+    select {
+      width: 100%;
+      font-size: 1.2em;
+    }
   }
 
   div {
@@ -412,7 +426,7 @@ blockquote,
     display: none;
   }
 
-  >select {
+  >div#mode-dropdown {
     display: none;
   }
 }

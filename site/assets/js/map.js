@@ -67,10 +67,15 @@ class ColorScale {
   }
 
   createModeDropdown() {
-    const dropdown = document.createElement("select"),
+    const container = document.createElement("div"),
+      dropdown = document.createElement("select"),
+      label = document.createElement("label"),
       urlParams = new URLSearchParams(window.location.search);
 
-    dropdown.id = "mode-dropdown";
+    container.id = "mode-dropdown";
+    dropdown.id = "mode-dropdown-select";
+    label.setAttribute("for", "mode-dropdown-select");
+    label.textContent = "Travel mode";
     TIMES_MODES.forEach(mode => {
       const option = document.createElement("option");
       option.value = mode;
@@ -80,7 +85,11 @@ class ColorScale {
 
     modeParam = urlParams.get("mode") || TIMES_DEFAULT_MODE;
     dropdown.value = modeParam;
-    return dropdown;
+
+    container.appendChild(label);
+    container.appendChild(dropdown);
+
+    return container;
   }
 
   createScaleContainer() {
@@ -105,14 +114,9 @@ class ColorScale {
   }
 
   draw(map) {
-    const legendTitle = document.createElement("div"),
-      modeTitle = document.createElement("div");
-
+    const legendTitle = document.createElement("div");
     legendTitle.id = "legend-title";
-    legendTitle.innerHTML = "<h3>Travel time</h3>";
-
-    modeTitle.id = "mode-title";
-    modeTitle.innerHTML = "<h3>Travel mode</h3>";
+    legendTitle.innerHTML = "<h2>Travel time</h2>";
 
     this.scaleContainer.append(legendTitle);
     this.colors.forEach(({ color, label }) => {
@@ -125,7 +129,6 @@ class ColorScale {
       this.scaleContainer.append(item);
     });
 
-    this.scaleContainer.append(modeTitle);
     this.scaleContainer.append(this.modeDropdown);
     this.scaleContainer.append(this.toggleButton);
     map.getContainer().append(this.scaleContainer);
@@ -254,7 +257,6 @@ class Map {
       center: [-74.0, 40.75],
       container: "map",
       doubleClickZoom: false,
-      hash: true,
       maxBounds: [
         [-175.0, -9.0],
         [-20.0, 72.1],
@@ -265,6 +267,9 @@ class Map {
       style: "https://tiles.openfreemap.org/styles/positron",
       zoom: 10,
     });
+    this.hash = new maplibregl.Hash();
+    this.hash.addTo(this.map);
+    this.hash._onHashChange();
 
     return new Promise((resolve) => {
       this.map.on("load", () => {
@@ -356,6 +361,10 @@ class Map {
     });
 
     this.map.on("moveend", () => {
+
+      // Only update/add the location hash after the first movement
+      this.hash._updateHash();
+
       const urlParams = new URLSearchParams(window.location.search);
       idParam = urlParams.get("id");
       if (idParam) {
@@ -657,11 +666,6 @@ class ParquetProcessor {
         spinner.show();
         await processor.runQuery(map, baseUrl, modeParam, idParam.substring(0, 2), idParam);
       }
-    }
-
-    // Remove the hash if map is at starting location
-    if (window.location.hash === "#10/40.75/-74" && idParam === null && modeParam === TIMES_DEFAULT_MODE) {
-      window.history.replaceState({}, "", window.location.pathname + window.location.search);
     }
 
     spinner.hide();
