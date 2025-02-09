@@ -1,7 +1,9 @@
 {
   "dependencies": {
     "hyparquet": "^1.6.4",
-    "hyparquet-compressors": "^1.0.0"
+    "hyparquet-compressors": "^1.0.0",
+    "maplibre-gl": "^4.7.0",
+    "pmtiles": "^3.2.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

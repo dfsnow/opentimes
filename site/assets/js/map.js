@@ -10,6 +10,8 @@
 /* eslint-disable class-methods-use-this */
 import { asyncBufferFromUrl, byteLengthFromUrl, parquetMetadataAsync, parquetRead } from "hyparquet";
 import { compressors } from "hyparquet-compressors";
+import maplibregl from "maplibre-gl";
+import { Protocol } from "pmtiles";
 
 const TIMES_DEFAULT_MODE = "car",
   TIMES_GEOGRAPHY = "tract",
@@ -245,7 +247,7 @@ class Map {
   }
 
   init() {
-    const protocol = new pmtiles.Protocol();
+    const protocol = new Protocol();
     maplibregl.addProtocol("pmtiles", protocol.tile);
 
     this.map = new maplibregl.Map({
