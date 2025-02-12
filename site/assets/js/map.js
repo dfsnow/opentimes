@@ -1,4 +1,4 @@
-/* eslint-disable no-useless-assignment, no-console, max-params, max-lines, max-statements, max-lines-per-function */
+/* eslint-disable no-useless-assignment, no-console, max-params, max-lines, max-statements, max-lines-per-function, one-var */
 /* eslint-disable max-classes-per-file, no-magic-numbers, no-undef, class-methods-use-this, sort-vars, no-underscore-dangle */
 import { asyncBufferFromUrl, byteLengthFromUrl, parquetMetadataAsync, parquetRead } from "hyparquet";
 import { Protocol } from "pmtiles";
@@ -21,32 +21,31 @@ let baseUrl = `https://data.opentimes.org/times/version=${TIMES_VERSION}/mode=${
   idParam = null,
   modeParam = "car";
 
-// eslint-disable-next-line one-var
 const debounce = function debounce(func, wait) {
-    let timeout = null;
-    return function debouncedFunction(...args) {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        func(...args);
-      }, wait);
-    };
-  },
-
-  validIdInput = function validIdInput(id) {
-    if (id && /^\d{5,12}$/u.test(id)) {
-      return true;
-    }
-    console.warn("Invalid ID input. Please enter a valid Census GEOID.");
-    return false;
-  },
-
-  validModeInput = function validModeInput(mode) {
-    if (TIMES_MODES.includes(mode)) {
-      return true;
-    }
-    console.warn(`Invalid travel mode. Must be one of: ${TIMES_MODES.join(", ")}.`);
-    return false;
+  let timeout = null;
+  return function debouncedFunction(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      func(...args);
+    }, wait);
   };
+};
+
+const validIdInput = function validIdInput(id) {
+  if (id && /^\d{5,12}$/u.test(id)) {
+    return true;
+  }
+  console.warn("Invalid ID input. Please enter a valid Census GEOID.");
+  return false;
+};
+
+const validModeInput = function validModeInput(mode) {
+  if (TIMES_MODES.includes(mode)) {
+    return true;
+  }
+  console.warn(`Invalid travel mode. Must be one of: ${TIMES_MODES.join(", ")}.`);
+  return false;
+};
 
 class ColorScale {
   constructor() {
@@ -288,7 +287,6 @@ class Map {
         feat.point,
         { layers: ["geo_fill"] }
       );
-      // eslint-disable-next-line one-var
       const [feature] = features,
         geoName = TIMES_GEOGRAPHY.split("_").
           map(word => word.charAt(0).toUpperCase() +
@@ -557,11 +555,9 @@ class ParquetProcessor {
       totalGroups = 0;
 
     // Process the metadata for each URL
-    // eslint-disable-next-line one-var
     const rowGroupResults = urls.map(async (url) => {
       const contentLength = this.byteLengthCache[url],
         rowGroupMetadata = [];
-      // eslint-disable-next-line one-var
       const buffer = await asyncBufferFromUrl({ byteLength: contentLength, url }),
         metadata = await this.fetchAndCacheMetadata(url);
 
@@ -597,7 +593,6 @@ class ParquetProcessor {
     });
 
     // Async query the rowgroups relevant to the input ID
-    // eslint-disable-next-line one-var
     let rowGroupItems = await Promise.all(rowGroupResults);
     rowGroupItems = rowGroupItems.flat().filter(item => item.length !== 0);
     completedGroups = 0;
