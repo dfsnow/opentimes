@@ -16,6 +16,7 @@ export default [
       "max-statements": "off",
       "no-console": "off",
       "no-magic-numbers": "off",
+      "no-ternary": "off",
       "no-undef": "off",
       "no-underscore-dangle": "off",
       "no-useless-assignment": "off",

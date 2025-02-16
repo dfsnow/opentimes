@@ -39,7 +39,10 @@ let modeParam = TIMES_MODE,
   yearParam = TIMES_YEAR,
   geographyParam = TIMES_GEOGRAPHY,
   stateParam = null,
-  idParam = null;
+  idParam = null,
+  idParamBlockGroup = null,
+  idParamCounty = null,
+  idParamTract = null;
 
 const debounce = function debounce(func, wait) {
   let timeout = null;
@@ -71,13 +74,28 @@ const getTimesUrl = function getTimesUrl({
     `state=${state}/times-${version}-${mode}-${year}-${geography}-${state}`;
 };
 
-const getZoomGeo = function getZoomGeo(value) {
+const getZoomGeometry = function getZoomGeometry(value) {
   for (const [key, range] of Object.entries(ZOOM_THRESHOLDS_GEOGRAPHY)) {
     if (value >= range[0] && value < range[1]) {
       return key;
     }
   }
   return null;
+};
+
+const setFeatureIds = function setFeatureIds(id, geography) {
+  idParamBlockGroup = id;
+  idParamTract = idParamBlockGroup.substring(0, 11);
+  idParamCounty = idParamBlockGroup.substring(0, 5);
+  stateParam = idParamBlockGroup.substring(0, 2);
+
+  if (geography === "block_group") {
+    idParam = idParamBlockGroup;
+  } else if (geography === "tract") {
+    idParam = idParamTract;
+  } else if (geography === "county") {
+    idParam = idParamCounty;
+  }
 };
 
 const validIdInput = function validIdInput(id) {
@@ -317,9 +335,9 @@ class Map {
 
     return new Promise((resolve) => {
       this.map.on("load", () => {
-        for (const geo in ZOOM_THRESHOLDS_GEOGRAPHY) {
-          const url = getTilesUrl({ geography: geo });
-          this.map.addSource(`protomap-${geo}`, {
+        for (const geometry in ZOOM_THRESHOLDS_GEOGRAPHY) {
+          const url = getTilesUrl({ geography: geometry });
+          this.map.addSource(`protomap-${geometry}`, {
             promoteId: "id",
             type: "vector",
             url: `pmtiles://${url}.pmtiles`
@@ -394,33 +412,25 @@ class Map {
 
     this.map.on("click", async (feat) => {
       // Do nothing if already querying
-      if (this.isProcessing) {
-        return;
-      }
+      if (this.isProcessing) { return; }
 
       const urlParams = new URLSearchParams(window.location.search);
       const [feature] = this.map.queryRenderedFeatures(
         feat.point,
-        { layers: [`geo_fill_${geographyParam}`] }
+        { layers: ["geo_fill_query"] }
       );
+      console.log(feature);
 
       if (feature) {
         this.spinner.show();
         this.isProcessing = true;
+        setFeatureIds(feature?.properties.id, geographyParam);
 
-        stateParam = feature.properties.id.substring(0, 2);
-        await this.processor.runQuery(
-          this,
-          modeParam,
-          yearParam,
-          geographyParam,
-          stateParam,
-          feature.properties.id,
-        );
+        await this.processor.runQuery(this, modeParam, yearParam, geographyParam, stateParam, idParam);
 
         // Update the URL with parameters
         urlParams.set("id", feature.properties.id);
-        window.history.replaceState({}, "", `${window.location.pathname}?${urlParams}${window.location.hash}`);
+        window.history.replaceState({}, "", `?${urlParams}${window.location.hash}`);
         this.isProcessing = false;
         this.spinner.hide();
       }
@@ -437,7 +447,7 @@ class Map {
 
     this.map.on("zoom", debounce(() => {
       const currentZoomLevel = this.map.getZoom();
-      geographyParam = getZoomGeo(currentZoomLevel);
+      geographyParam = getZoomGeometry(currentZoomLevel);
       if (this.previousZoomLevel !== null) {
 
         const crossedGeoThreshold = ZOOM_THRESHOLDS_GEOGRAPHY[geographyParam].some(
@@ -453,8 +463,8 @@ class Map {
         );
 
         if (crossedGeoThreshold) {
-          for (const geo in ZOOM_THRESHOLDS_GEOGRAPHY) {
-            if (geo !== geographyParam) {
+          for (const geometry in ZOOM_THRESHOLDS_GEOGRAPHY) {
+            if (geometry !== geographyParam) {
               this.map.setFeatureState(
                 {
                   id: this.hoveredPolygonId,
@@ -486,12 +496,12 @@ class Map {
         break;
       }
     }
-    for (const geo in ZOOM_THRESHOLDS_GEOGRAPHY) {
+    for (const geometry in ZOOM_THRESHOLDS_GEOGRAPHY) {
       this.map.addLayer({
         filter: ["==", ["geometry-type"], "Polygon"],
-        id: `geo_fill_${geo}`,
-        maxzoom: ZOOM_THRESHOLDS_GEOGRAPHY[geo][1],
-        minzoom: ZOOM_THRESHOLDS_GEOGRAPHY[geo][0],
+        id: `geo_fill_${geometry}`,
+        maxzoom: ZOOM_THRESHOLDS_GEOGRAPHY[geometry][1],
+        minzoom: ZOOM_THRESHOLDS_GEOGRAPHY[geometry][0],
         paint: {
           "fill-color": [
             "case",
@@ -504,16 +514,16 @@ class Map {
             "rgba(255, 255, 255, 0.0)"
           ],
         },
-        source: `protomap-${geo}`,
+        source: `protomap-${geometry}`,
         "source-layer": "geometry",
         type: "fill",
       }, firstSymbolId);
 
       this.map.addLayer({
         filter: ["==", ["geometry-type"], "Polygon"],
-        id: `geo_line_${geo}`,
-        maxzoom: ZOOM_THRESHOLDS_GEOGRAPHY[geo][1],
-        minzoom: ZOOM_THRESHOLDS_GEOGRAPHY[geo][0],
+        id: `geo_line_${geometry}`,
+        maxzoom: ZOOM_THRESHOLDS_GEOGRAPHY[geometry][1],
+        minzoom: ZOOM_THRESHOLDS_GEOGRAPHY[geometry][0],
         paint: {
           "line-color": "#333",
           "line-opacity": [
@@ -529,11 +539,11 @@ class Map {
             1
           ]
         },
-        source: `protomap-${geo}`,
+        source: `protomap-${geometry}`,
         "source-layer": "geometry",
         type: "line",
       }, firstSymbolId);
-    }
+    };
   }
 
   createGeoIdDisplay() {
@@ -622,6 +632,10 @@ class ParquetProcessor {
     const tilesUrl = getTilesUrl({ geography }),
       queryUrl = getTimesUrl({ geography, mode, state, year });
 
+    let filteredPreviousResults = null,
+      resultIds = null,
+      results = null;
+
     // Get the count of files given the geography, mode, and state
     const loadTileIndex = async () => await fetch(`${tilesUrl}.json`).then(response => response.json());
     const mapIndex = await loadTileIndex(),
@@ -630,10 +644,6 @@ class ParquetProcessor {
     for (let i = 0; i < fileCount; i += 1) {
       urlsArray.push(`${queryUrl}-${i}.parquet`);
     }
-
-    let filteredPreviousResults = null,
-      resultIds = null,
-      results = null;
 
     results = await this.updateMapOnQuery(map, urlsArray, mode, id);
     resultIds = new Set(results.map(item => item.id));
@@ -740,7 +750,6 @@ class ParquetProcessor {
     let validMode = true;
 
     idParam = urlParams.get("id");
-    stateParam = idParam.substring(0, 2);
     modeParam = event.target.value;
     validMode = validModeInput(modeParam);
 
@@ -755,6 +764,7 @@ class ParquetProcessor {
       window.history.replaceState({}, "", `?${urlParams}${window.location.hash}`);
 
       if (idParam) {
+        setFeatureIds(idParam, geographyParam);
         spinner.show();
         await processor.runQuery(map, modeParam, yearParam, geographyParam, stateParam, idParam);
       }
@@ -771,12 +781,11 @@ class ParquetProcessor {
       validYear = true;
 
     idParam = urlParams.get("id");
-    stateParam = idParam.substring(0, 2);
     modeParam = urlParams.get("mode") || TIMES_MODE;
     validMode = validModeInput(modeParam);
     yearParam = urlParams.get("year") || TIMES_YEAR;
     validYear = validYearInput(yearParam);
-    geographyParam = getZoomGeo(map.map.getZoom());
+    geographyParam = getZoomGeometry(map.map.getZoom());
 
     if (validMode && validYear) {
       colorScale.updateZoomThresholds(
@@ -786,6 +795,7 @@ class ParquetProcessor {
       colorScale.updateLabels(map.map.getZoom());
 
       if (idParam) {
+        setFeatureIds(idParam, geographyParam);
         spinner.show();
         await processor.runQuery(map, modeParam, yearParam, geographyParam, stateParam, idParam);
       }
