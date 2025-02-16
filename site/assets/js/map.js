@@ -44,16 +44,6 @@ let modeParam = TIMES_MODE,
   idParamCounty = null,
   idParamTract = null;
 
-const debounce = function debounce(func, wait) {
-  let timeout = null;
-  return function debouncedFunction(...args) {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => {
-      func(...args);
-    }, wait);
-  };
-};
-
 const getTilesUrl = function getTilesUrl({
   version = TIMES_VERSION,
   year = TIMES_YEAR,
@@ -96,6 +86,11 @@ const setFeatureIds = function setFeatureIds(id, geography) {
   } else if (geography === "county") {
     idParam = idParamCounty;
   }
+
+  // Update the URL with parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  urlParams.set("id", idParam);
+  window.history.replaceState({}, "", `?${urlParams}${window.location.hash}`);
 };
 
 const validIdInput = function validIdInput(id) {
@@ -308,6 +303,7 @@ class Map {
     this.processor = processor;
     this.hoveredPolygonId = null;
     this.previousZoomLevel = null;
+    this.geographiesLoaded = new Set();
     this.isProcessing = false;
   }
 
@@ -414,30 +410,24 @@ class Map {
       // Do nothing if already querying
       if (this.isProcessing) { return; }
 
-      const urlParams = new URLSearchParams(window.location.search);
       const [feature] = this.map.queryRenderedFeatures(
         feat.point,
         { layers: ["geo_fill_query"] }
       );
-      console.log(feature);
 
       if (feature) {
         this.spinner.show();
         this.isProcessing = true;
         setFeatureIds(feature?.properties.id, geographyParam);
-
         await this.processor.runQuery(this, modeParam, yearParam, geographyParam, stateParam, idParam);
-
-        // Update the URL with parameters
-        urlParams.set("id", feature.properties.id);
-        window.history.replaceState({}, "", `?${urlParams}${window.location.hash}`);
+        this.geographiesLoaded.clear();
+        this.geographiesLoaded.add(geographyParam);
         this.isProcessing = false;
         this.spinner.hide();
       }
     });
 
     this.map.on("moveend", () => {
-
       // Only update/add the location hash after the first movement
       this.hash._updateHash();
 
@@ -445,45 +435,47 @@ class Map {
       window.history.replaceState({}, "", `${urlParams ? `?${urlParams}` : ""}${window.location.hash}`);
     });
 
-    this.map.on("zoom", debounce(() => {
+    this.map.on("zoomend", async () => {
       const currentZoomLevel = this.map.getZoom();
       geographyParam = getZoomGeometry(currentZoomLevel);
+
+      // Set fill state of relevant layer
+      // Remove hover from irrelevant layers
+      // Update legend
+
       if (this.previousZoomLevel !== null) {
-
-        const crossedGeoThreshold = ZOOM_THRESHOLDS_GEOGRAPHY[geographyParam].some(
-          (threshold) =>
-            (this.previousZoomLevel < threshold && currentZoomLevel >= threshold) ||
-            (this.previousZoomLevel >= threshold && currentZoomLevel < threshold)
-        );
-
+        // Update legend and fill based on mode
         const crossedModeThreshold = ZOOM_THRESHOLDS_MODE[modeParam].some(
           (threshold) =>
             (this.previousZoomLevel < threshold && currentZoomLevel >= threshold) ||
             (this.previousZoomLevel >= threshold && currentZoomLevel < threshold)
         );
 
-        if (crossedGeoThreshold) {
-          for (const geometry in ZOOM_THRESHOLDS_GEOGRAPHY) {
-            if (geometry !== geographyParam) {
-              this.map.setFeatureState(
-                {
-                  id: this.hoveredPolygonId,
-                  source: `protomap-${geographyParam}`,
-                  sourceLayer: "geometry"
-                },
-                { hover: false }
-              );
-            }
-          }
-        };
-
         if (crossedModeThreshold && !this.isProcessing) {
           this.updateMapFill(this.processor.previousResults);
           this.colorScale.updateLabels(currentZoomLevel);
-        }
+        };
+
+        const crossedGeographyThreshold = ZOOM_THRESHOLDS_GEOGRAPHY[geographyParam].some(
+          (threshold) =>
+            (this.previousZoomLevel < threshold && currentZoomLevel >= threshold) ||
+            (this.previousZoomLevel >= threshold && currentZoomLevel < threshold)
+        );
+
+        if (crossedGeographyThreshold && !this.isProcessing) {
+          setFeatureIds(idParam, geographyParam);
+          console.log(this.geographiesLoaded);
+          if (!this.geographiesLoaded.has(geographyParam)) {
+            this.spinner.show();
+            await this.processor.runQuery(this, modeParam, yearParam, geographyParam, stateParam, idParam);
+            this.spinner.hide();
+          }
+
+        };
       }
       this.previousZoomLevel = currentZoomLevel;
-    }, 100));
+      this.geographiesLoaded.add(geographyParam);
+    });
   }
 
   addMapLayers() {
@@ -544,6 +536,16 @@ class Map {
         type: "line",
       }, firstSymbolId);
     };
+
+    // Invisible block group layer to query on click
+    this.map.addLayer({
+      filter: ["==", ["geometry-type"], "Polygon"],
+      id: "geo_fill_query",
+      paint: { "fill-opacity": 0 },
+      source: "protomap-block_group",
+      "source-layer": "geometry",
+      type: "fill",
+    }, firstSymbolId);
   }
 
   createGeoIdDisplay() {
@@ -798,6 +800,7 @@ class ParquetProcessor {
         setFeatureIds(idParam, geographyParam);
         spinner.show();
         await processor.runQuery(map, modeParam, yearParam, geographyParam, stateParam, idParam);
+        map.geographiesLoaded.add(geographyParam);
       }
     }
 
