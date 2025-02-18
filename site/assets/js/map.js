@@ -38,11 +38,16 @@ const
 let modeParam = TIMES_MODE,
   yearParam = TIMES_YEAR,
   geographyParam = TIMES_GEOGRAPHY,
-  stateParam = null,
-  idParam = null,
-  idParamBlockGroup = null,
-  idParamCounty = null,
-  idParamTract = null;
+  idParam = null;
+
+const getIdDict = function getIdDict(id) {
+  return {
+    "block_group": id,
+    "county": id.substring(0, 5),
+    "state": id.substring(0, 2),
+    "tract": id.substring(0, 11)
+  };
+};
 
 const getTilesUrl = function getTilesUrl({
   version = TIMES_VERSION,
@@ -73,23 +78,9 @@ const getZoomGeometry = function getZoomGeometry(value) {
   return null;
 };
 
-const setFeatureIds = function setFeatureIds(id, geography) {
-  idParamBlockGroup = id;
-  idParamTract = idParamBlockGroup.substring(0, 11);
-  idParamCounty = idParamBlockGroup.substring(0, 5);
-  stateParam = idParamBlockGroup.substring(0, 2);
-
-  if (geography === "block_group") {
-    idParam = idParamBlockGroup;
-  } else if (geography === "tract") {
-    idParam = idParamTract;
-  } else if (geography === "county") {
-    idParam = idParamCounty;
-  }
-
-  // Update the URL with parameters
+const setUrlParam = function setUrlParam(name, value) {
   const urlParams = new URLSearchParams(window.location.search);
-  urlParams.set("id", idParam);
+  urlParams.set(name, value);
   window.history.replaceState({}, "", `?${urlParams}${window.location.hash}`);
 };
 
@@ -303,7 +294,6 @@ class Map {
     this.processor = processor;
     this.hoveredPolygonId = null;
     this.previousZoomLevel = null;
-    this.geographiesLoaded = new Set();
     this.isProcessing = false;
   }
 
@@ -416,14 +406,11 @@ class Map {
       );
 
       if (feature) {
-        this.spinner.show();
-        this.isProcessing = true;
-        setFeatureIds(feature?.properties.id, geographyParam);
-        await this.processor.runQuery(this, modeParam, yearParam, geographyParam, stateParam, idParam);
-        this.geographiesLoaded.clear();
-        this.geographiesLoaded.add(geographyParam);
-        this.isProcessing = false;
-        this.spinner.hide();
+        idParam = feature?.properties.id;
+        setUrlParam("id", idParam);
+        await this.processor.runAllQueries(
+          this, modeParam, yearParam, geographyParam, getIdDict(idParam)
+        );
       }
     });
 
@@ -435,13 +422,9 @@ class Map {
       window.history.replaceState({}, "", `${urlParams ? `?${urlParams}` : ""}${window.location.hash}`);
     });
 
-    this.map.on("zoomend", async () => {
+    this.map.on("zoomend", () => {
       const currentZoomLevel = this.map.getZoom();
       geographyParam = getZoomGeometry(currentZoomLevel);
-
-      // Set fill state of relevant layer
-      // Remove hover from irrelevant layers
-      // Update legend
 
       if (this.previousZoomLevel !== null) {
         // Update legend and fill based on mode
@@ -452,29 +435,11 @@ class Map {
         );
 
         if (crossedModeThreshold && !this.isProcessing) {
-          this.updateMapFill(this.processor.previousResults);
+          this.updateMapFill(this.processor.previousResults[geographyParam], geographyParam);
           this.colorScale.updateLabels(currentZoomLevel);
-        };
-
-        const crossedGeographyThreshold = ZOOM_THRESHOLDS_GEOGRAPHY[geographyParam].some(
-          (threshold) =>
-            (this.previousZoomLevel < threshold && currentZoomLevel >= threshold) ||
-            (this.previousZoomLevel >= threshold && currentZoomLevel < threshold)
-        );
-
-        if (crossedGeographyThreshold && !this.isProcessing) {
-          setFeatureIds(idParam, geographyParam);
-          console.log(this.geographiesLoaded);
-          if (!this.geographiesLoaded.has(geographyParam)) {
-            this.spinner.show();
-            await this.processor.runQuery(this, modeParam, yearParam, geographyParam, stateParam, idParam);
-            this.spinner.hide();
-          }
-
         };
       }
       this.previousZoomLevel = currentZoomLevel;
-      this.geographiesLoaded.add(geographyParam);
     });
   }
 
@@ -557,12 +522,12 @@ class Map {
     return display;
   }
 
-  updateMapFill(previousResults) {
-    previousResults.forEach(row =>
+  updateMapFill(results, geography) {
+    results.forEach(row =>
       this.map.setFeatureState(
         {
           id: row.id,
-          source: `protomap-${geographyParam}`,
+          source: `protomap-${geography}`,
           sourceLayer: "geometry"
         },
         { geoColor: this.colorScale.getColorScale(row.duration, this.map.getZoom()) }
@@ -570,12 +535,12 @@ class Map {
     );
   }
 
-  wipeMapPreviousState(previousResults) {
-    previousResults.forEach(row =>
+  wipeMapPreviousState(results, geography) {
+    results.forEach(row =>
       this.map.setFeatureState(
         {
           id: row.id,
-          source: `protomap-${geographyParam}`,
+          source: `protomap-${geography}`,
           sourceLayer: "geometry"
         },
         { geoColor: "none" }
@@ -586,7 +551,7 @@ class Map {
 
 class ParquetProcessor {
   constructor() {
-    this.previousResults = [];
+    this.previousResults = { "block_group": [], "county": [], "tract": [] };
     this.byteLengthCache = {};
     this.metadataCache = {};
   }
@@ -614,13 +579,13 @@ class ParquetProcessor {
     return metadata;
   }
 
-  processParquetRowGroup(map, id, data, results) {
+  processParquetRowGroup(map, id, geography, data, results) {
     data.forEach(row => {
       if (row[0] === id) {
         map.map.setFeatureState(
           {
             id: row[1],
-            source: `protomap-${geographyParam}`,
+            source: `protomap-${geography}`,
             sourceLayer: "geometry"
           },
           { geoColor: map.colorScale.getColorScale(row[2], map.map.getZoom()) }
@@ -630,16 +595,21 @@ class ParquetProcessor {
     });
   }
 
+  saveResultState(map, results, geography) {
+    const resultIds = new Set(results.map(item => item.id));
+    const filteredPreviousResults = this.previousResults[geography]
+      .filter(item => !resultIds.has(item.id));
+    map.wipeMapPreviousState(filteredPreviousResults, geography);
+    this.previousResults[geography] = results;
+  }
+
   async runQuery(map, mode, year, geography, state, id) {
     const tilesUrl = getTilesUrl({ geography }),
       queryUrl = getTimesUrl({ geography, mode, state, year });
 
-    let filteredPreviousResults = null,
-      resultIds = null,
-      results = null;
-
     // Get the count of files given the geography, mode, and state
-    const loadTileIndex = async () => await fetch(`${tilesUrl}.json`).then(response => response.json());
+    const loadTileIndex = async () => await fetch(`${tilesUrl}.json`)
+      .then(response => response.json());
     const mapIndex = await loadTileIndex(),
       urlsArray = [],
       fileCount = mapIndex?.[mode]?.[state] ?? 1;
@@ -647,37 +617,57 @@ class ParquetProcessor {
       urlsArray.push(`${queryUrl}-${i}.parquet`);
     }
 
-    results = await this.updateMapOnQuery(map, urlsArray, mode, id);
-    resultIds = new Set(results.map(item => item.id));
-
-    filteredPreviousResults = this.previousResults.filter(item => !resultIds.has(item.id));
-    map.wipeMapPreviousState(filteredPreviousResults);
-    this.previousResults = results;
+    return await this.updateMapOnQuery(map, urlsArray, mode, id, geography);
   }
 
-  async readAndUpdateMap(map, id, file, metadata, rowGroup, results) {
+  async runAllQueries(map, mode, year, geography, idDict) {
+    map.spinner.show();
+    map.isProcessing = true;
+    let progress = 5;
+    const progressRemainder = (100 - progress) / 2;
+
+    // Run query for the current/clicked geography first
+    const curResults = await this.runQuery(
+      map, mode, year, geography, idDict.state, idDict[geography]
+    );
+    this.saveResultState(map, curResults, geography);
+    progress += progressRemainder;
+    map.spinner.updateProgress(progress);
+
+    // Fill other geographies (not shown on current zoom level) asynchronously
+    for (const geo of Object.keys(ZOOM_THRESHOLDS_GEOGRAPHY)
+      .filter(x => x !== geography)) {
+      const results = await this.runQuery(map, mode, year, geo, idDict.state, idDict[geo]);
+      this.saveResultState(map, results, geo);
+      progress += 30;
+      map.spinner.updateProgress(progress);
+    }
+
+    map.spinner.hide();
+    map.isProcessing = false;
+  }
+
+  async readAndUpdateMap(map, id, geography, file, metadata, rowGroup, results) {
     await parquetRead(
       {
         columns: ["origin_id", "destination_id", "duration_sec"],
         compressors,
         file,
         metadata,
-        onComplete: data => this.processParquetRowGroup(map, id, data, results),
+        onComplete: data => this.processParquetRowGroup(map, id, geography, data, results),
         rowEnd: rowGroup.endRow,
         rowStart: rowGroup.startRow
       }
     );
   }
 
-  async updateMapOnQuery(map, urls, mode, id) {
+  async updateMapOnQuery(map, urls, mode, id, geography) {
     const results = [];
     if (!(validIdInput(id) && validModeInput(mode))) {
       return results;
     }
 
-    // Initialize progress bar
-    let completedGroups = 0,
-      totalGroups = 0;
+    let totalGroups = 0;
 
     // Process the metadata for each URL
     const rowGroupResults = urls.map(async (url) => {
@@ -708,9 +698,6 @@ class ParquetProcessor {
             }
           }
         }
-        completedGroups += 1;
-        const progress = Math.ceil((completedGroups / totalGroups) * 10);
-        map.spinner.updateProgress(progress);
         rowStart += Number(rowGroup.num_rows);
       }
 
@@ -720,7 +707,6 @@ class ParquetProcessor {
     // Async query the rowgroups relevant to the input ID
     let rowGroupItems = await Promise.all(rowGroupResults);
     rowGroupItems = rowGroupItems.flat().filter(item => item.length !== 0);
-    completedGroups = 0;
 
     totalGroups = rowGroupItems.length;
     if (totalGroups === 0) {
@@ -730,10 +716,7 @@ class ParquetProcessor {
     }
 
     await Promise.all(rowGroupItems.map(async (rg) => {
-      await this.readAndUpdateMap(map, rg.id, rg.file, rg.metadata, rg.rowGroup, results);
-      completedGroups += 1;
-      const progress = Math.ceil((completedGroups / totalGroups) * 90) + 10;
-      map.spinner.updateProgress(progress);
+      await this.readAndUpdateMap(map, rg.id, geography, rg.file, rg.metadata, rg.rowGroup, results);
     }));
     return results;
   }
@@ -761,18 +744,15 @@ class ParquetProcessor {
         ZOOM_THRESHOLDS_MODE[modeParam][1]
       );
       colorScale.updateLabels(map.map.getZoom());
-
-      urlParams.set("mode", modeParam);
-      window.history.replaceState({}, "", `?${urlParams}${window.location.hash}`);
+      setUrlParam("mode", modeParam);
 
       if (idParam) {
-        setFeatureIds(idParam, geographyParam);
-        spinner.show();
-        await processor.runQuery(map, modeParam, yearParam, geographyParam, stateParam, idParam);
+        setUrlParam("id", idParam);
+        await processor.runAllQueries(
+          map, modeParam, yearParam, geographyParam, getIdDict(idParam)
+        );
       }
     }
-
-    spinner.hide();
   });
 
   // Wait for the map to fully load before running a query
@@ -797,13 +777,11 @@ class ParquetProcessor {
       colorScale.updateLabels(map.map.getZoom());
 
       if (idParam) {
-        setFeatureIds(idParam, geographyParam);
-        spinner.show();
-        await processor.runQuery(map, modeParam, yearParam, geographyParam, stateParam, idParam);
-        map.geographiesLoaded.add(geographyParam);
+        setUrlParam("id", idParam);
+        await processor.runAllQueries(
+          map, modeParam, yearParam, geographyParam, getIdDict(idParam)
+        );
       }
     }
-
-    spinner.hide();
   });
 })();
