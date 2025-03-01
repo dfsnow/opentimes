@@ -17,18 +17,25 @@ with open("params.yaml") as file:
 
 # Translate geography names to their TIGER equivalents
 TIGER_GEO_NAMES = {
-    "county": "county",
-    "county_subdivision": "cousub",
-    "tract": "tract",
-    "block_group": "bg",
+    "state": {"type": "national", "name": "state"},
+    "county": {"type": "national", "name": "county"},
+    "zcta": {"type": "national", "name": "zcta520"},
+    "county_subdivision": {"type": "state", "name": "cousub"},
+    "tract": {"type": "state", "name": "tract"},
+    "block_group": {"type": "state", "name": "bg"},
 }
 
 
 def download_and_load_shapefile(
-    year: str, geography: str, state: str, temp_dir: Path
+    year: str, geography: str, state: str | None, temp_dir: Path
 ):
+    if not state:
+        geo_prefix = "_us_"
+    else:
+        geo_prefix = f"_{state}_"
+
     remote_file_name = (
-        f"cb_{year}_{state}_{TIGER_GEO_NAMES[geography]}_500k.zip"
+        f"cb_{year}{geo_prefix}{TIGER_GEO_NAMES[geography]['name']}_500k.zip"
     )
     url = f"{TIGER_BASE_URL}GENZ{year}/shp/{remote_file_name}"
     temp_file = Path(temp_dir) / remote_file_name
@@ -63,7 +70,10 @@ def fetch_cb_shapefile(
         year: The year of the TIGER/Line data.
         geography: The Census geography type of the shapefile.
     """
-    states = params["input"]["state"]
+    if TIGER_GEO_NAMES[geography]["type"] == "national":
+        states = [None]
+    else:
+        states = params["input"]["state"]
 
     output_dir = (
         Path.cwd() / "input" / "cb" / f"year={year}" / f"geography={geography}"

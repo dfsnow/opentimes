@@ -65134,31 +65134,45 @@ stages:
       hash: md5
       md5: c61f12deef49d2a1114a0e60bf73f589
       size: 228350160
-  fetch_cb_national@2022-tract:
-    cmd: python ./src/fetch_cb.py --year 2022 --geography tract
+  fetch_cb@2023-state:
+    cmd: python ./src/fetch_cb.py --year 2023 --geography state
     outs:
-    - path: ./input/cb/year=2022/geography=tract/tract.geojson
+    - path: ./input/cb/year=2023/geography=state/state.geojson
       hash: md5
-      md5: ddc4b173d36a287343d22667b400efe5
-      size: 140825166
-  fetch_cb_national@2023-block_group:
+      md5: 1a788d7f155bc21ac40c7ee0265e5bc4
+      size: 8573147
+  fetch_cb@2023-block_group:
     cmd: python ./src/fetch_cb.py --year 2023 --geography block_group
     outs:
     - path: ./input/cb/year=2023/geography=block_group/block_group.geojson
       hash: md5
-      md5: e292b5dc67d4d12d6374b4c59100577f
-      size: 240267666
-  fetch_cb_national@2023-tract:
+      md5: aa8e96cfc30fd4e2187525309b1c5a68
+      size: 240267568
+  fetch_cb@2023-tract:
     cmd: python ./src/fetch_cb.py --year 2023 --geography tract
     outs:
     - path: ./input/cb/year=2023/geography=tract/tract.geojson
       hash: md5
-      md5: 965dc44c8f7c46bb593ea7b530753423
-      size: 140896344
-  fetch_cb_national@2022-block_group:
-    cmd: python ./src/fetch_cb.py --year 2022 --geography block_group
+      md5: 20d8f4a8e3b9e9b9fffdd510c2d17493
+      size: 140896368
+  fetch_cb@2023-county:
+    cmd: python ./src/fetch_cb.py --year 2023 --geography county
     outs:
-    - path: ./input/cb/year=2022/geography=block_group/block_group.geojson
+    - path: ./input/cb/year=2023/geography=county/county.geojson
       hash: md5
-      md5: 7837e9d4c394a776a258f62e009e22e1
-      size: 240172593
+      md5: 037bdf89ebc2289087eb6e1c0bf8c710
+      size: 29194910
+  fetch_cb@2023-county_subdivision:
+    cmd: python ./src/fetch_cb.py --year 2023 --geography county_subdivision
+    outs:
+    - path: ./input/cb/year=2023/geography=county_subdivision/county_subdivision.geojson
+      hash: md5
+      md5: 38b90aee463bcd8d787fe4708c898c16
+      size: 97039772
+  fetch_cb_zcta@2020-zcta:
+    cmd: python ./src/fetch_cb.py --year 2020 --geography zcta
+    outs:
+    - path: ./input/cb/year=2020/geography=zcta/zcta.geojson
+      hash: md5
+      md5: 066d94a07a83dc9ed919444fa68e401a
+      size: 166178249
