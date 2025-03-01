@@ -95,31 +95,29 @@ class ColorScale {
   constructor() {
     this.scaleContainer = this.createScaleContainer();
     this.toggleButton = this.createToggleButton();
-    this.modeDropdown = this.createModeDropdown();
+    this.modeDropdown = this.createDropdown("mode", TIMES_DEFAULT_MODE, TIMES_MODES, "Travel mode");
+    this.yearDropdown = this.createDropdown("year", TIMES_DEFAULT_YEAR, TIMES_YEARS, "Census year");
     this.colors = this.getColors();
     this.zoomLower = null;
     this.zoomUpper = null;
   }
 
-  createModeDropdown() {
+  createDropdown(param, defaultParam, possibleParams, labelText) {
     const container = document.createElement("div"),
       dropdown = document.createElement("select"),
       label = document.createElement("label"),
       urlParams = new URLSearchParams(window.location.search);
 
-    container.id = "mode-dropdown";
-    dropdown.id = "mode-dropdown-select";
-    label.setAttribute("for", "mode-dropdown-select");
-    label.textContent = "Travel mode";
-    TIMES_MODES.forEach(mode => {
+    container.className = "dropdown-container";
+    dropdown.id = `${param}`;
+    label.setAttribute("for", `${param}`);
+    label.textContent = labelText;
+    possibleParams.forEach(opt => {
       const option = document.createElement("option");
-      option.value = mode;
-      option.textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
+      option.value = opt;
+      option.textContent = opt.charAt(0).toUpperCase() + opt.slice(1);
       dropdown.appendChild(option);
     });
-
-    modeParam = urlParams.get("mode") || TIMES_MODE;
-    dropdown.value = modeParam;
 
     container.appendChild(label);
     container.appendChild(dropdown);
@@ -165,6 +163,7 @@ class ColorScale {
     });
 
     this.scaleContainer.append(this.modeDropdown);
+    this.scaleContainer.append(this.yearDropdown);
     this.scaleContainer.append(this.toggleButton);
     map.getContainer().append(this.scaleContainer);
   }
