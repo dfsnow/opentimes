@@ -11,7 +11,11 @@ const
 
 const
   TIMES_MODES = ["car", "bicycle", "foot"],
-  TIMES_YEARS = ["2020", "2021", "2022", "2023", "2024"];
+  TIMES_YEARS = ["2020", "2021", "2022", "2023", "2024"],
+  TIMES_GEOGRAPHIES = [
+    "state", "county", "county_subdivision",
+    "tract", "block_group", "zcta"
+  ];
 
 const
   URL_TILES = `https://data.opentimes.org/tiles/version=${TIMES_VERSION}`,
@@ -23,11 +27,6 @@ const
   MAP_ZOOM_LIMITS = [2, 12];
 
 const
-  ZOOM_THRESHOLDS_GEOGRAPHY = {
-    "block_group": [10.5, 23],
-    //"county": [0, 4],
-    "tract": [4, 10.5]
-  },
   ZOOM_THRESHOLDS_MODE = {
     "bicycle": [8, 9.5],
     "car": [6, 8],
@@ -39,15 +38,6 @@ let modeParam = TIMES_MODE,
   yearParam = TIMES_YEAR,
   geographyParam = TIMES_GEOGRAPHY,
   idParam = null;
-
-const getIdDict = function getIdDict(id) {
-  return {
-    "block_group": id,
-    "county": id.substring(0, 5),
-    "state": id.substring(0, 2),
-    "tract": id.substring(0, 11)
-  };
-};
 
 const getTilesUrl = function getTilesUrl({
   version = TIMES_VERSION,
@@ -69,27 +59,10 @@ const getTimesUrl = function getTimesUrl({
     `state=${state}/times-${version}-${mode}-${year}-${geography}-${state}`;
 };
 
-const getZoomGeometry = function getZoomGeometry(value) {
-  for (const [key, range] of Object.entries(ZOOM_THRESHOLDS_GEOGRAPHY)) {
-    if (value >= range[0] && value < range[1]) {
-      return key;
-    }
-  }
-  return null;
-};
-
 const setUrlParam = function setUrlParam(name, value) {
   const urlParams = new URLSearchParams(window.location.search);
   urlParams.set(name, value);
   window.history.replaceState({}, "", `?${urlParams}${window.location.hash}`);
-};
-
-const validIdInput = function validIdInput(id) {
-  if (id && /^\d{5,12}$/u.test(id)) {
-    return true;
-  }
-  console.warn("Invalid ID input. Please enter a valid Census GEOID.");
-  return false;
 };
 
 const validModeInput = function validModeInput(mode) {
@@ -101,6 +74,20 @@ const validModeInput = function validModeInput(mode) {
 const validYearInput = function validYearInput(year) {
   if (TIMES_YEARS.includes(year)) { return true; }
   console.warn(`Invalid data year. Must be one of: ${TIMES_YEARS.join(", ")}.`);
+  return false;
+};
+
+const validGeographyInput = function validGeographyInput(geography) {
+  if (TIMES_GEOGRAPHIES.includes(geography)) { return true; }
+  console.warn("Invalid geography. Please enter a valid Census geography.");
+  return false;
+};
+
+const validIdInput = function validIdInput(id) {
+  if (id && /^\d{5,12}$/u.test(id)) {
+    return true;
+  }
+  console.warn("Invalid ID input. Please enter a valid Census GEOID.");
   return false;
 };
 
@@ -321,9 +308,10 @@ class Map {
 
     return new Promise((resolve) => {
       this.map.on("load", () => {
-        for (const geometry in ZOOM_THRESHOLDS_GEOGRAPHY) {
-          const url = getTilesUrl({ geography: geometry });
-          this.map.addSource(`protomap-${geometry}`, {
+        for (const geography of TIMES_GEOGRAPHIES) {
+          const url = getTilesUrl({ geography });
+          console.log(url);
+          this.map.addSource(`protomap-${geography}`, {
             promoteId: "id",
             type: "vector",
             url: `pmtiles://${url}.pmtiles`
@@ -397,9 +385,9 @@ class Map {
     });
 
     this.map.on("click", async (feat) => {
-      // Do nothing if already querying
       if (this.isProcessing) { return; }
 
+      // Query the invisible block group layer to get feature id
       const [feature] = this.map.queryRenderedFeatures(
         feat.point,
         { layers: ["geo_fill_query"] }
@@ -407,10 +395,15 @@ class Map {
 
       if (feature) {
         idParam = feature?.properties.id;
-        setUrlParam("id", idParam);
-        await this.processor.runAllQueries(
-          this, modeParam, yearParam, geographyParam, getIdDict(idParam)
-        );
+        const validId = validIdInput(idParam);
+
+        if (idParam && validId) {
+          setUrlParam("id", idParam);
+          await this.processor.runQuery(
+            this, modeParam, yearParam, geographyParam,
+            idParam.substring(0, 2), idParam
+          );
+        }
       }
     });
 
@@ -424,8 +417,6 @@ class Map {
 
     this.map.on("zoomend", () => {
       const currentZoomLevel = this.map.getZoom();
-      geographyParam = getZoomGeometry(currentZoomLevel);
-
       if (this.previousZoomLevel !== null) {
         // Update legend and fill based on mode
         const crossedModeThreshold = ZOOM_THRESHOLDS_MODE[modeParam].some(
@@ -453,12 +444,11 @@ class Map {
         break;
       }
     }
-    for (const geometry in ZOOM_THRESHOLDS_GEOGRAPHY) {
+    for (const geography of TIMES_GEOGRAPHIES) {
       this.map.addLayer({
         filter: ["==", ["geometry-type"], "Polygon"],
-        id: `geo_fill_${geometry}`,
-        maxzoom: ZOOM_THRESHOLDS_GEOGRAPHY[geometry][1],
-        minzoom: ZOOM_THRESHOLDS_GEOGRAPHY[geometry][0],
+        id: `geo_fill_${geography}`,
+        layout: { visibility: "none" },
         paint: {
           "fill-color": [
             "case",
@@ -471,16 +461,15 @@ class Map {
             "rgba(255, 255, 255, 0.0)"
           ],
         },
-        source: `protomap-${geometry}`,
+        source: `protomap-${geography}`,
         "source-layer": "geometry",
         type: "fill",
       }, firstSymbolId);
 
       this.map.addLayer({
         filter: ["==", ["geometry-type"], "Polygon"],
-        id: `geo_line_${geometry}`,
-        maxzoom: ZOOM_THRESHOLDS_GEOGRAPHY[geometry][1],
-        minzoom: ZOOM_THRESHOLDS_GEOGRAPHY[geometry][0],
+        id: `geo_line_${geography}`,
+        layout: { visibility: "none" },
         paint: {
           "line-color": "#333",
           "line-opacity": [
@@ -496,7 +485,7 @@ class Map {
             1
           ]
         },
-        source: `protomap-${geometry}`,
+        source: `protomap-${geography}`,
         "source-layer": "geometry",
         type: "line",
       }, firstSymbolId);
@@ -617,34 +606,7 @@ class ParquetProcessor {
       urlsArray.push(`${queryUrl}-${i}.parquet`);
     }
 
-    return await this.updateMapOnQuery(map, urlsArray, mode, id, geography);
-  }
-
-  async runAllQueries(map, mode, year, geography, idDict) {
-    map.spinner.show();
-    map.isProcessing = true;
-    let progress = 5;
-    const progressRemainder = (100 - progress) / 2;
-
-    // Run query for the current/clicked geography first
-    const curResults = await this.runQuery(
-      map, mode, year, geography, idDict.state, idDict[geography]
-    );
-    this.saveResultState(map, curResults, geography);
-    progress += progressRemainder;
-    map.spinner.updateProgress(progress);
-
-    // Fill other geographies (not shown on current zoom level) asynchronously
-    for (const geo of Object.keys(ZOOM_THRESHOLDS_GEOGRAPHY)
-      .filter(x => x !== geography)) {
-      const results = await this.runQuery(map, mode, year, geo, idDict.state, idDict[geo]);
-      this.saveResultState(map, results, geo);
-      progress += 30;
-      map.spinner.updateProgress(progress);
-    }
-
-    map.spinner.hide();
-    map.isProcessing = false;
+    return await this.updateMapOnQuery(map, urlsArray, id, geography);
   }
 
   async readAndUpdateMap(map, id, geography, file, metadata, rowGroup, results) {
@@ -661,12 +623,8 @@ class ParquetProcessor {
     );
   }
 
-  async updateMapOnQuery(map, urls, mode, id, geography) {
+  async updateMapOnQuery(map, urls, id, geography) {
     const results = [];
-    if (!(validIdInput(id) && validModeInput(mode))) {
-      return results;
-    }
-
     let totalGroups = 0;
 
     // Process the metadata for each URL
@@ -732,11 +690,12 @@ class ParquetProcessor {
 
   colorScale.modeDropdown.addEventListener("change", async (event) => {
     const urlParams = new URLSearchParams(window.location.search);
-    let validMode = true;
 
     idParam = urlParams.get("id");
     modeParam = event.target.value;
-    validMode = validModeInput(modeParam);
+
+    const validId = validIdInput(idParam),
+      validMode = validModeInput(modeParam);
 
     if (validMode) {
       colorScale.updateZoomThresholds(
@@ -746,10 +705,10 @@ class ParquetProcessor {
       colorScale.updateLabels(map.map.getZoom());
       setUrlParam("mode", modeParam);
 
-      if (idParam) {
-        setUrlParam("id", idParam);
-        await processor.runAllQueries(
-          map, modeParam, yearParam, geographyParam, getIdDict(idParam)
+      if (idParam && validId) {
+        await processor.runQuery(
+          map, modeParam, yearParam, geographyParam,
+          idParam.substring(0, 2), idParam
         );
       }
     }
@@ -759,27 +718,28 @@ class ParquetProcessor {
   map.map.on("load", async () => {
     // Load the previous map click if there was one
     const urlParams = new URLSearchParams(window.location.search);
-    let validMode = true,
-      validYear = true;
 
     idParam = urlParams.get("id");
     modeParam = urlParams.get("mode") || TIMES_MODE;
-    validMode = validModeInput(modeParam);
+    geographyParam = urlParams.get("geography") || TIMES_GEOGRAPHY;
     yearParam = urlParams.get("year") || TIMES_YEAR;
-    validYear = validYearInput(yearParam);
-    geographyParam = getZoomGeometry(map.map.getZoom());
 
-    if (validMode && validYear) {
+    const validId = validIdInput(idParam),
+      validMode = validModeInput(modeParam),
+      validGeography = validGeographyInput(geographyParam),
+      validYear = validYearInput(yearParam);
+
+    if (validMode && validYear && validGeography) {
       colorScale.updateZoomThresholds(
         ZOOM_THRESHOLDS_MODE[modeParam][0],
         ZOOM_THRESHOLDS_MODE[modeParam][1]
       );
       colorScale.updateLabels(map.map.getZoom());
 
-      if (idParam) {
-        setUrlParam("id", idParam);
-        await processor.runAllQueries(
-          map, modeParam, yearParam, geographyParam, getIdDict(idParam)
+      if (idParam && validId) {
+        await processor.runQuery(
+          map, modeParam, yearParam, geographyParam,
+          idParam.substring(0, 2), idParam
         );
       }
     }
