@@ -634,6 +634,8 @@ class ParquetProcessor {
   }
 
   async runQuery(map, mode, year, geography, state, id) {
+    map.isProcessing = true;
+    map.spinner.show();
     const tilesUrl = getTilesUrl({ geography }),
       queryUrl = getTimesUrl({ geography, mode, state, year }),
       truncId = this.truncateId(geography, id);
@@ -650,6 +652,8 @@ class ParquetProcessor {
 
     const results = await this.updateMapOnQuery(map, urlsArray, truncId, geography);
     this.saveResultState(map, results, geography);
+    map.isProcessing = false;
+    map.spinner.hide();
   }
 
   async readAndUpdateMap(map, id, geography, file, metadata, rowGroup, results) {
@@ -716,8 +720,13 @@ class ParquetProcessor {
       return results;
     }
 
+    let processedGroups = 0,
+      progress = 5;
     await Promise.all(rowGroupItems.map(async (rg) => {
       await this.readAndUpdateMap(map, rg.id, geography, rg.file, rg.metadata, rg.rowGroup, results);
+      processedGroups += 1;
+      progress = Math.ceil((processedGroups / totalGroups) * 100);
+      map.spinner.updateProgress(progress);
     }));
     return results;
   }

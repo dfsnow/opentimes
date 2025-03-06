@@ -348,7 +348,7 @@ blockquote,
   top: 0;
   left: 0;
   width: 100%;
-  height: 4px;
+  height: 4.5px;
   opacity: 1;
   background: #3498db;
   transform: scaleX(0);
@@ -441,21 +441,6 @@ blockquote,
   padding: 0;
   vertical-align: middle;
   line-height: 1;
-}
-
-
-@keyframes loading-bar-animation {
-  0% {
-    transform: translateX(-100%);
-  }
-
-  50% {
-    transform: translateX(100%);
-  }
-
-  100% {
-    transform: translateX(-100%);
-  }
 }
 
 /* support for Edge */
