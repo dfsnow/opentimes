@@ -33,10 +33,19 @@ stages:
       - ./input/blockpop/year=${item.year}/state=${item.state}/${item.state}.parquet:
           persist: true
 
-  fetch_cb_national:
+  fetch_cb:
     matrix:
-      year: ['2022', '2023']
-      geography: ['tract', 'block_group']
+      year: ['2023']
+      geography: ['state', 'county', 'county_subdivision', 'tract', 'block_group']
+    cmd: "python ./src/fetch_cb.py --year ${item.year} --geography ${item.geography}"
+    outs:
+      - ./input/cb/year=${item.year}/geography=${item.geography}/${item.geography}.geojson:
+          persist: true
+
+  fetch_cb_zcta:
+    matrix:
+      year: ['2020']
+      geography: ['zcta']
     cmd: "python ./src/fetch_cb.py --year ${item.year} --geography ${item.geography}"
     outs:
       - ./input/cb/year=${item.year}/geography=${item.geography}/${item.geography}.geojson:
