@@ -425,10 +425,6 @@ blockquote,
   >div:not(:last-child) {
     display: none;
   }
-
-  >div#mode-dropdown {
-    display: none;
-  }
 }
 
 #map-color-scale-toggle {

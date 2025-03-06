@@ -12,10 +12,7 @@ const
 const
   TIMES_MODES = ["car", "bicycle", "foot"],
   TIMES_YEARS = ["2020", "2021", "2022", "2023", "2024"],
-  TIMES_GEOGRAPHIES = [
-    "state", "county", "county_subdivision",
-    "tract", "block_group", "zcta"
-  ];
+  TIMES_GEOGRAPHIES = ["county", "tract", "block_group"];
 
 const
   URL_TILES = `https://data.opentimes.org/tiles/version=${TIMES_VERSION}`,
@@ -38,6 +35,11 @@ let modeParam = TIMES_MODE,
   yearParam = TIMES_YEAR,
   geographyParam = TIMES_GEOGRAPHY,
   idParam = null;
+
+let validMode = true,
+  validYear = true,
+  validGeography = true,
+  validId = true;
 
 const getTilesUrl = function getTilesUrl({
   version = TIMES_VERSION,
@@ -66,25 +68,25 @@ const setUrlParam = function setUrlParam(name, value) {
 };
 
 const validModeInput = function validModeInput(mode) {
-  if (TIMES_MODES.includes(mode)) { return true; }
+  if (TIMES_MODES.includes(mode) && mode) { return true; }
   console.warn(`Invalid travel mode. Must be one of: ${TIMES_MODES.join(", ")}.`);
   return false;
 };
 
 const validYearInput = function validYearInput(year) {
-  if (TIMES_YEARS.includes(year)) { return true; }
+  if (TIMES_YEARS.includes(year) && year) { return true; }
   console.warn(`Invalid data year. Must be one of: ${TIMES_YEARS.join(", ")}.`);
   return false;
 };
 
 const validGeographyInput = function validGeographyInput(geography) {
-  if (TIMES_GEOGRAPHIES.includes(geography)) { return true; }
-  console.warn("Invalid geography. Please enter a valid Census geography.");
+  if (TIMES_GEOGRAPHIES.includes(geography) && geography) { return true; }
+  console.warn(`Invalid geography. Must be one of: ${TIMES_GEOGRAPHIES.join(", ")}.`);
   return false;
 };
 
 const validIdInput = function validIdInput(id) {
-  if (id && /^\d{5,12}$/u.test(id)) {
+  if (/^\d{5,12}$/u.test(id) || !id) {
     return true;
   }
   console.warn("Invalid ID input. Please enter a valid Census GEOID.");
@@ -95,8 +97,12 @@ class ColorScale {
   constructor() {
     this.scaleContainer = this.createScaleContainer();
     this.toggleButton = this.createToggleButton();
-    this.modeDropdown = this.createDropdown("mode", TIMES_DEFAULT_MODE, TIMES_MODES, "Travel mode");
-    this.yearDropdown = this.createDropdown("year", TIMES_DEFAULT_YEAR, TIMES_YEARS, "Census year");
+    this.modeDropdown = this.createDropdown(
+      "mode", TIMES_MODE, TIMES_MODES, "Travel mode"
+    );
+    this.geographyDropdown = this.createDropdown(
+      "geography", TIMES_GEOGRAPHY, TIMES_GEOGRAPHIES, "Geography"
+    );
     this.colors = this.getColors();
     this.zoomLower = null;
     this.zoomUpper = null;
@@ -105,8 +111,7 @@ class ColorScale {
   createDropdown(param, defaultParam, possibleParams, labelText) {
     const container = document.createElement("div"),
       dropdown = document.createElement("select"),
-      label = document.createElement("label"),
-      urlParams = new URLSearchParams(window.location.search);
+      label = document.createElement("label");
 
     container.className = "dropdown-container";
     dropdown.id = `${param}`;
@@ -115,7 +120,12 @@ class ColorScale {
     possibleParams.forEach(opt => {
       const option = document.createElement("option");
       option.value = opt;
-      option.textContent = opt.charAt(0).toUpperCase() + opt.slice(1);
+      option.textContent = opt.split("_").
+        map(word => word.charAt(0).toUpperCase() +
+          word.slice(1).toLowerCase()).join(" ");
+      if (opt === defaultParam) {
+        option.selected = true;
+      }
       dropdown.appendChild(option);
     });
 
@@ -163,7 +173,7 @@ class ColorScale {
     });
 
     this.scaleContainer.append(this.modeDropdown);
-    this.scaleContainer.append(this.yearDropdown);
+    this.scaleContainer.append(this.geographyDropdown);
     this.scaleContainer.append(this.toggleButton);
     map.getContainer().append(this.scaleContainer);
   }
@@ -278,7 +288,10 @@ class Map {
     this.colorScale = colorScale;
     this.spinner = spinner;
     this.processor = processor;
-    this.hoveredPolygonId = null;
+    this.hoveredPolygonId = TIMES_GEOGRAPHIES.reduce((acc, geography) => {
+      acc[geography] = null;
+      return acc;
+    }, {});
     this.previousZoomLevel = null;
     this.isProcessing = false;
   }
@@ -309,7 +322,6 @@ class Map {
       this.map.on("load", () => {
         for (const geography of TIMES_GEOGRAPHIES) {
           const url = getTilesUrl({ geography });
-          console.log(url);
           this.map.addSource(`protomap-${geography}`, {
             promoteId: "id",
             type: "vector",
@@ -329,6 +341,8 @@ class Map {
 
   addHandlers() {
     this.map.on("mousemove", (feat) => {
+      if (!validGeography) { return; }
+
       const [feature] = this.map.queryRenderedFeatures(
         feat.point,
         { layers: [`geo_fill_${geographyParam}`] }
@@ -342,20 +356,20 @@ class Map {
         this.map.getCanvas().style.cursor = "pointer";
         this.geoIdDisplay.style.display = "block";
         this.geoIdDisplay.textContent = `${geoName} ID: ${feature.properties.id}`;
-        if (this.hoveredPolygonId !== null) {
+        if (this.hoveredPolygonId[geographyParam] !== null) {
           this.map.setFeatureState(
             {
-              id: this.hoveredPolygonId,
+              id: this.hoveredPolygonId[geographyParam],
               source: `protomap-${geographyParam}`,
               sourceLayer: "geometry"
             },
             { hover: false }
           );
         }
-        this.hoveredPolygonId = feature.properties.id;
+        this.hoveredPolygonId[geographyParam] = feature.properties.id;
         this.map.setFeatureState(
           {
-            id: this.hoveredPolygonId,
+            id: this.hoveredPolygonId[geographyParam],
             source: `protomap-${geographyParam}`,
             sourceLayer: "geometry"
           },
@@ -370,21 +384,24 @@ class Map {
 
     // Clear hover
     this.map.on("mouseleave", () => {
-      if (this.hoveredPolygonId !== null) {
+      if (!validGeography) { return; }
+
+      if (this.hoveredPolygonId[geographyParam] !== null) {
         this.map.setFeatureState(
           {
-            id: this.hoveredPolygonId,
+            id: this.hoveredPolygonId[geographyParam],
             source: `protomap-${geographyParam}`,
             sourceLayer: "geometry"
           },
           { hover: false }
         );
       }
-      this.hoveredPolygonId = null;
+      this.hoveredPolygonId[geographyParam] = null;
     });
 
     this.map.on("click", async (feat) => {
       if (this.isProcessing) { return; }
+      if (!validMode || !validGeography || !validYear) { return; }
 
       // Query the invisible block group layer to get feature id
       const [feature] = this.map.queryRenderedFeatures(
@@ -394,7 +411,7 @@ class Map {
 
       if (feature) {
         idParam = feature?.properties.id;
-        const validId = validIdInput(idParam);
+        validId = validIdInput(idParam);
 
         if (idParam && validId) {
           setUrlParam("id", idParam);
@@ -510,6 +527,17 @@ class Map {
     return display;
   }
 
+  switchLayerVisibility(geography) {
+    this.map.setLayoutProperty(`geo_fill_${geography}`, "visibility", "visible");
+    this.map.setLayoutProperty(`geo_line_${geography}`, "visibility", "visible");
+
+    const otherGeographies = TIMES_GEOGRAPHIES.filter(geo => geo !== geography);
+    for (const geo of otherGeographies) {
+      this.map.setLayoutProperty(`geo_fill_${geo}`, "visibility", "none");
+      this.map.setLayoutProperty(`geo_line_${geo}`, "visibility", "none");
+    }
+  }
+
   updateMapFill(results, geography) {
     results.forEach(row =>
       this.map.setFeatureState(
@@ -539,7 +567,10 @@ class Map {
 
 class ParquetProcessor {
   constructor() {
-    this.previousResults = { "block_group": [], "county": [], "tract": [] };
+    this.previousResults = TIMES_GEOGRAPHIES.reduce((acc, geography) => {
+      acc[geography] = [];
+      return acc;
+    }, {});
     this.byteLengthCache = {};
     this.metadataCache = {};
   }
@@ -591,9 +622,21 @@ class ParquetProcessor {
     this.previousResults[geography] = results;
   }
 
+  truncateId(geography, id) {
+    if (geography === "county") {
+      return id.substring(0, 5);
+    } else if (geography === "tract") {
+      return id.substring(0, 11);
+    } else if (geography === "block_group") {
+      return id;
+    }
+    return id;
+  }
+
   async runQuery(map, mode, year, geography, state, id) {
     const tilesUrl = getTilesUrl({ geography }),
-      queryUrl = getTimesUrl({ geography, mode, state, year });
+      queryUrl = getTimesUrl({ geography, mode, state, year }),
+      truncId = this.truncateId(geography, id);
 
     // Get the count of files given the geography, mode, and state
     const loadTileIndex = async () => await fetch(`${tilesUrl}.json`)
@@ -605,7 +648,8 @@ class ParquetProcessor {
       urlsArray.push(`${queryUrl}-${i}.parquet`);
     }
 
-    return await this.updateMapOnQuery(map, urlsArray, id, geography);
+    const results = await this.updateMapOnQuery(map, urlsArray, truncId, geography);
+    this.saveResultState(map, results, geography);
   }
 
   async readAndUpdateMap(map, id, geography, file, metadata, rowGroup, results) {
@@ -690,11 +734,8 @@ class ParquetProcessor {
   colorScale.modeDropdown.addEventListener("change", async (event) => {
     const urlParams = new URLSearchParams(window.location.search);
 
-    idParam = urlParams.get("id");
     modeParam = event.target.value;
-
-    const validId = validIdInput(idParam),
-      validMode = validModeInput(modeParam);
+    validMode = validModeInput(modeParam);
 
     if (validMode) {
       colorScale.updateZoomThresholds(
@@ -703,6 +744,9 @@ class ParquetProcessor {
       );
       colorScale.updateLabels(map.map.getZoom());
       setUrlParam("mode", modeParam);
+
+      idParam = urlParams.get("id");
+      validId = validIdInput(idParam);
 
       if (idParam && validId) {
         await processor.runQuery(
@@ -713,27 +757,58 @@ class ParquetProcessor {
     }
   });
 
-  // Wait for the map to fully load before running a query
-  map.map.on("load", async () => {
-    // Load the previous map click if there was one
+  colorScale.geographyDropdown.addEventListener("change", async (event) => {
     const urlParams = new URLSearchParams(window.location.search);
 
-    idParam = urlParams.get("id");
+    geographyParam = event.target.value;
+    validGeography = validGeographyInput(geographyParam);
+
+    if (validGeography) {
+      map.switchLayerVisibility(geographyParam);
+      setUrlParam("geography", geographyParam);
+
+      idParam = urlParams.get("id");
+      validId = validIdInput(idParam);
+
+      if (idParam && validId) {
+        await processor.runQuery(
+          map, modeParam, yearParam, geographyParam,
+          idParam.substring(0, 2), idParam
+        );
+      }
+    }
+  });
+
+  map.map.on("load", async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+
     modeParam = urlParams.get("mode") || TIMES_MODE;
     geographyParam = urlParams.get("geography") || TIMES_GEOGRAPHY;
-    yearParam = urlParams.get("year") || TIMES_YEAR;
+    yearParam = TIMES_YEAR;
 
-    const validId = validIdInput(idParam),
-      validMode = validModeInput(modeParam),
-      validGeography = validGeographyInput(geographyParam),
-      validYear = validYearInput(yearParam);
+    validMode = validModeInput(modeParam);
+    validYear = validYearInput(yearParam);
+    validGeography = validGeographyInput(geographyParam);
 
-    if (validMode && validYear && validGeography) {
+    if (validMode) {
       colorScale.updateZoomThresholds(
         ZOOM_THRESHOLDS_MODE[modeParam][0],
         ZOOM_THRESHOLDS_MODE[modeParam][1]
       );
       colorScale.updateLabels(map.map.getZoom());
+      urlParams.set("mode", modeParam);
+      document.getElementById("mode").value = modeParam;
+    }
+
+    if (validGeography) {
+      map.switchLayerVisibility(geographyParam);
+      urlParams.set("geography", geographyParam);
+      document.getElementById("geography").value = geographyParam;
+    }
+
+    if (validMode && validYear && validGeography) {
+      idParam = urlParams.get("id");
+      validId = validIdInput(idParam);
 
       if (idParam && validId) {
         await processor.runQuery(
