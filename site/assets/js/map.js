@@ -238,6 +238,7 @@ class ColorScale {
 class Spinner {
   constructor() {
     this.spinner = this.createSpinner();
+    this.debounceTimeout = null;
   }
 
   createSpinner() {
@@ -247,20 +248,23 @@ class Spinner {
   }
 
   show() {
-    document.querySelector(".content").append(this.spinner);
-    this.spinner.style.transform = "scaleX(0.05)";
+    document.querySelector(".navbar").append(this.spinner);
     this.spinner.classList.remove("spinner-fade-out");
+    this.spinner.style.transform = "scaleX(0.0)";
+    setTimeout(() => {
+      this.spinner.style.transform = "scaleX(0.10)";
+    }, 100);
   }
 
   remove() {
-    const contentNode = document.querySelector(".content");
+    const contentNode = document.querySelector(".navbar");
     if (contentNode.contains(this.spinner)) {
       contentNode.removeChild(this.spinner);
     }
   }
 
   hide() {
-    const contentNode = document.querySelector(".content");
+    const contentNode = document.querySelector(".navbar");
     if (contentNode.contains(this.spinner)) {
       this.spinner.addEventListener("transitionend", (event) => {
         if (event.propertyName === "transform") {
@@ -276,9 +280,14 @@ class Spinner {
   }
 
   updateProgress(percentage) {
-    const minProgress = 5,
+    const minProgress = 10,
       progress = Math.max(percentage, minProgress);
-    this.spinner.style.transform = `scaleX(${progress / 100})`;
+
+    // Set a debounce to prevent rapid updates and bar jitter
+    clearTimeout(this.debounceTimeout);
+    this.debounceTimeout = setTimeout(() => {
+      this.spinner.style.transform = `scaleX(${progress / 100})`;
+    }, 50);
   }
 }
 
@@ -721,7 +730,7 @@ class ParquetProcessor {
     }
 
     let processedGroups = 0,
-      progress = 5;
+      progress = 10;
     await Promise.all(rowGroupItems.map(async (rg) => {
       await this.readAndUpdateMap(map, rg.id, geography, rg.file, rg.metadata, rg.rowGroup, results);
       processedGroups += 1;
