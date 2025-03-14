@@ -239,6 +239,7 @@ class Spinner {
   constructor() {
     this.spinner = this.createSpinner();
     this.debounceTimeout = null;
+    this.isHiding = false;
   }
 
   createSpinner() {
@@ -248,7 +249,10 @@ class Spinner {
   }
 
   show() {
-    document.querySelector(".navbar").append(this.spinner);
+    this.isHiding = false;
+    const contentNode = document.querySelector(".content");
+    contentNode.appendChild(this.spinner);
+    // Reset spinner appearance
     this.spinner.classList.remove("spinner-fade-out");
     this.spinner.style.transform = "scaleX(0.0)";
     setTimeout(() => {
@@ -256,34 +260,36 @@ class Spinner {
     }, 100);
   }
 
-  remove() {
-    const contentNode = document.querySelector(".navbar");
-    if (contentNode.contains(this.spinner)) {
-      contentNode.removeChild(this.spinner);
-    }
-  }
-
   hide() {
-    const contentNode = document.querySelector(".navbar");
-    if (contentNode.contains(this.spinner)) {
-      this.spinner.addEventListener("transitionend", (event) => {
-        if (event.propertyName === "transform") {
-          this.spinner.classList.add("spinner-fade-out");
-        }
-      }, { once: true });
-      this.spinner.addEventListener("transitionend", (event) => {
-        if (event.propertyName === "opacity") {
-          contentNode.removeChild(this.spinner);
-        }
-      }, { once: true });
-    }
+    if (this.isHiding) { return; };
+    this.isHiding = true;
+
+    const contentNode = document.querySelector(".content");
+    if (!contentNode.contains(this.spinner)) { return; };
+
+    // Expand spinner to full width
+    this.spinner.style.transform = "scaleX(1.0)";
+
+    let transformDone = false;
+    this.spinner.ontransitionend = (event) => {
+      if (!transformDone && event.propertyName === "transform") {
+        // When transform finishes, trigger the fade-out
+        transformDone = true;
+        this.spinner.classList.add("spinner-fade-out");
+      } else if (transformDone && event.propertyName === "opacity") {
+        // When opacity transition ends, remove the spinner
+        contentNode.removeChild(this.spinner);
+        this.spinner.ontransitionend = null;
+      }
+    };
   }
 
   updateProgress(percentage) {
-    const minProgress = 10,
-      progress = Math.max(percentage, minProgress);
+    if (this.isHiding) { return; };
 
-    // Set a debounce to prevent rapid updates and bar jitter
+    const minProgress = 10;
+    const progress = Math.max(percentage, minProgress);
+
     clearTimeout(this.debounceTimeout);
     this.debounceTimeout = setTimeout(() => {
       this.spinner.style.transform = `scaleX(${progress / 100})`;
@@ -725,7 +731,6 @@ class ParquetProcessor {
     totalGroups = rowGroupItems.length;
     if (totalGroups === 0) {
       console.warn("No data found for the given ID.");
-      map.spinner.remove();
       return results;
     }
 
