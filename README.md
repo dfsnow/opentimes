@@ -1,12 +1,12 @@
 # OpenTimes
 
-[Interactive Map](opentimes.org) | [Getting Bulk Data](opentimes.org/data) | [Data Directory](data.opentimes.org)
+[Interactive Map](opentimes.org) | [About OpenTimes](opentimes.org/about) | [Data Directory](data.opentimes.org)
 
 **OpenTimes** is a database of pre-computed, point-to-point travel times between
 United States Census geographies. It lets you download bulk travel time data
 for free and with no limits.
 
-## About the data
+## Overview
 
 OpenTimes is a collection of static files containing pre-calculated travel
 times between different U.S. Census geographies. These static files are stored
@@ -32,8 +32,6 @@ those counties (in seconds).
 OpenTimes is essentially just a few hundred billion records that look exactly
 like this, compressed and stored in a way that makes them easy to use and
 cheap to serve.
-
----
 
 ## Getting the data
 
@@ -227,8 +225,6 @@ but still has major limitations:
   it. This limit is self-imposed in order to make routing work on GitHub
   Actions (only a tiny portion of the national OSRM graph can fit in runner
   memory).
-
----
 
 ## Database structure
 

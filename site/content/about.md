@@ -11,7 +11,7 @@ for free and with no limits.
 All times are calculated using open-source software from publicly available
 data. The OpenTimes data pipelines, infrastructure, packages, and website
 are all open-source and available on [GitHub](https://github.com/dfsnow/opentimes).
-See the [Data]({{< ref "data" >}}) section to learn how to download the data.
+See the [GitHub README](https://github.com/dfsnow/opentimes) to learn how to download the data.
 
 ### Goals
 
@@ -34,8 +34,8 @@ performing live routing, etc.).
 ## FAQs
 
 This section focuses on the what, why, and how of the OpenTimes project. For
-more specific questions about the data (i.e. its coverage, structure, and
-limitations), see the [Data]({{< ref "data" >}}) section.
+more specific questions about the data (i.e. its coverage, structure, creation,
+and limitations), see the [GitHub README](https://github.com/dfsnow/opentimes).
 
 <details>
 <summary>General questions</summary>
@@ -52,12 +52,11 @@ points.
 #### What are the times between?
 
 Times are between the _population-weighted_ centroids of United States Census
-geographies. See [Data]({{< ref "data" >}}) for a full list of geographies.
-Centroids are weighted because sometimes Census geographies are huge and their
-unweighted centroid is in the middle of a desert or mountain range. However,
-most people don't want to go to the desert, they want to go to where other
-people are. Weighting the centroids moves them closer to where people actually
-want to go (i.e. towns and cities).
+geographies. Centroids are weighted because sometimes Census geographies are
+huge and their unweighted centroid is in the middle of a desert or mountain
+range. However, most people don't want to go to the desert, they want to go
+to where other people are. Weighting the centroids moves them closer to where
+people actually want to go (i.e. towns and cities).
 
 #### What travel modes are included?
 
@@ -145,8 +144,8 @@ can access a list of all the files [here](https://data.opentimes.org).
 Files can be downloaded directly, queried with DuckDB or Arrow, or accessed
 via the (forthcoming) R or Python wrapper packages.
 
-To learn more about how to access the data, see the dedicated
-[Data]({{< ref "data" >}}) section.
+To learn more about how to access the data, see the
+[GitHub README](https://github.com/dfsnow/opentimes).
 
 #### How much does this all cost to host?
 
