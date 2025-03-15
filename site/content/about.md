@@ -11,7 +11,7 @@ for free and with no limits.
 All times are calculated using open-source software from publicly available
 data. The OpenTimes data pipelines, infrastructure, packages, and website
 are all open-source and available on [GitHub](https://github.com/dfsnow/opentimes).
-See the [GitHub README](https://github.com/dfsnow/opentimes) to learn how to download the data.
+See the [GitHub README](https://github.com/dfsnow/opentimes#opentimes) to learn how to download the data.
 
 ### Goals
 
@@ -34,8 +34,8 @@ performing live routing, etc.).
 ## FAQs
 
 This section focuses on the what, why, and how of the OpenTimes project. For
-more specific questions about the data (i.e. its coverage, structure, creation,
-and limitations), see the [GitHub README](https://github.com/dfsnow/opentimes).
+more specific questions about the data (i.e. its coverage, structure,
+and limitations), see the [GitHub README](https://github.com/dfsnow/opentimes#opentimes).
 
 <details>
 <summary>General questions</summary>
@@ -45,7 +45,7 @@ and limitations), see the [GitHub README](https://github.com/dfsnow/opentimes).
 In this case, a travel time is just how long it takes to get from location A
 to location B while following a road or path network. Think Google Maps or
 your favorite smartphone mapping service. OpenTimes provides billions of these
-times, all pre-calculated from public data. However, unlike a smartphone map,
+times, all pre-calculated from public data. However, unlike a smartphone,
 OpenTimes does not provide the route itself, only the time between the two
 points.
 
@@ -145,7 +145,7 @@ Files can be downloaded directly, queried with DuckDB or Arrow, or accessed
 via the (forthcoming) R or Python wrapper packages.
 
 To learn more about how to access the data, see the
-[GitHub README](https://github.com/dfsnow/opentimes).
+[GitHub README](https://github.com/dfsnow/opentimes#opentimes).
 
 #### How much does this all cost to host?
 
@@ -202,7 +202,7 @@ Attribution is required when using OpenTimes data.
 Please see the
 [CITATION file on GitHub](https://github.com/dfsnow/opentimes/blob/master/CITATION.cff).
 You can also generate APA and BibTeX citations directly from the
-[GitHub project](https://github.com/dfsnow/opentimes) page.
+project's [GitHub page](https://github.com/dfsnow/opentimes#opentimes).
 
 #### What license do you use?
 

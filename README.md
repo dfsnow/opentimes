@@ -1,16 +1,10 @@
 # OpenTimes
 
-[Interactive Map](opentimes.org) | [About OpenTimes](opentimes.org/about) | [Data Directory](data.opentimes.org)
+[About OpenTimes](https://opentimes.org/about) | [Interactive Map](https://opentimes.org) | [Data Directory](https://data.opentimes.org)
 
 **OpenTimes** is a database of pre-computed, point-to-point travel times between
-United States Census geographies. It lets you download bulk travel time data
-for free and with no limits.
-
-## Overview
-
-OpenTimes is a collection of static files containing pre-calculated travel
-times between different U.S. Census geographies. These static files are stored
-as partitioned [Parquet files](https://en.wikipedia.org/wiki/Apache_Parquet),
+United States Census geographies. The travel times are stored as partitioned
+[Parquet files](https://en.wikipedia.org/wiki/Apache_Parquet),
 which allows them to be [downloaded directly](#direct-download), read using
 various libraries, or queried with SQL using [DuckDB](#using-duckdb).
 
@@ -131,6 +125,20 @@ times = conn.execute("""
 
 ```
 
+Some notes on using DuckDB:
+
+- Use as many [partition keys](#partitioning) as possible in the `WHERE`
+  clause of your query. Similarly, specify only the columns you _need_ in
+  `SELECT`. Doing both of these will greatly increase query speed.
+- The OpenTimes data is pretty big — roughly 140 billion rows and 500GB
+  _compressed_. If you try to `SELECT *` the whole `times` table you'll
+  probably crash DuckDB. Be warned.
+- Conversely, querying individual pairs using DuckDB is highly performant. If
+  you specify all partition keys, an origin ID, and a destination ID, you'll
+  usually get a response in a few seconds.
+
+## Example queries
+
 To get the start and end coordinates of every pair, you can run a query like:
 
 ```sql
@@ -163,20 +171,6 @@ WHERE t.version = '0.0.1'
     AND t.origin_id LIKE '17031%'"
 ```
 
-Some notes on using DuckDB:
-
-- Use as many [partition keys](#partitioning) as possible in the `WHERE`
-  clause of your query. Similarly, specify only the columns you _need_ in
-  `SELECT`. Doing both of these will greatly increase query speed.
-- The OpenTimes data is pretty big — roughly 140 billion rows and 500GB
-  _compressed_. If you try to `SELECT *` the whole `times` table you'll
-  probably crash DuckDB. Be warned.
-- Conversely, querying individual pairs using DuckDB is highly performant. If
-  you specify all partition keys, an origin ID, and a destination ID, you'll
-  usually get a response in a few seconds.
-
----
-
 ## Coverage
 
 OpenTimes data covers and includes times for:
@@ -201,8 +195,6 @@ counties, etc.
 Data is updated once new Census geographies are released (usually fall of
 a given year). Yearly updates are considered a [SemVer](https://semver.org)
 minor version. Small data corrections and tweaks are typically patch versions.
-
----
 
 ## Limitations
 
@@ -360,4 +352,16 @@ reading any unnecessary files. See the [Using DuckDB](#using-duckdb) section for
 
 ## License
 
-## Citation
+OpenTimes uses the [MIT](https://www.tldrlegal.com/license/mit-license) license.
+Input data is from [OpenStreetMap](https://www.openstreetmap.org) and the
+[U.S. Census](https://www.census.gov). The basemap on the homepage is
+from [OpenFreeMap](https://openfreemap.org). Times are calculated using
+[OSRM](https://project-osrm.org).
+
+## Attribution
+
+Attribution is required when using OpenTimes data.
+
+Please see the [CITATION file](./CITATION.cff).
+You can also generate APA and BibTeX citations directly from the
+project sidebar above.
