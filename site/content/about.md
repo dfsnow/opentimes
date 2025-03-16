@@ -11,7 +11,7 @@ for free and with no limits.
 All times are calculated using open-source software from publicly available
 data. The OpenTimes data pipelines, infrastructure, packages, and website
 are all open-source and available on [GitHub](https://github.com/dfsnow/opentimes).
-See the [GitHub README](https://github.com/dfsnow/opentimes#opentimes) to learn how to download the data.
+See the [README](https://github.com/dfsnow/opentimes#getting-the-data) to learn how to download the data.
 
 ### Goals
 
@@ -35,7 +35,7 @@ performing live routing, etc.).
 
 This section focuses on the what, why, and how of the OpenTimes project. For
 more specific questions about the data (i.e. its coverage, structure,
-and limitations), see the [GitHub README](https://github.com/dfsnow/opentimes#opentimes).
+and limitations), see the project [README](https://github.com/dfsnow/opentimes#opentimes).
 
 <details>
 <summary>General questions</summary>
@@ -231,6 +231,9 @@ that work.
 I built most of OpenTimes during a six-week programming retreat at the
 [Recurse Center](https://www.recurse.com/scout/click?t=e5f3c6558aa58965ec2efe48b1b486af),
 which I highly recommend.
+
+If you need to contact me about this project, please
+reach out [via email](mailto:info@opentimes.org).
 
 ### Why did you build this?
 

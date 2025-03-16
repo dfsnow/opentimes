@@ -1,6 +1,6 @@
 # OpenTimes
 
-### [About OpenTimes](https://opentimes.org/about) | [Interactive Map](https://opentimes.org) | [Data Directory](https://data.opentimes.org)
+#### [About OpenTimes](https://opentimes.org/about) | [Interactive Map](https://opentimes.org) | [Data Directory](https://data.opentimes.org)
 
 **OpenTimes** is a database of pre-computed, point-to-point travel times between
 United States Census geographies. The travel times are stored as partitioned
