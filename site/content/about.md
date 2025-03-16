@@ -11,7 +11,7 @@ for free and with no limits.
 All times are calculated using open-source software from publicly available
 data. The OpenTimes data pipelines, infrastructure, packages, and website
 are all open-source and available on [GitHub](https://github.com/dfsnow/opentimes).
-See the [Data]({{< ref "data" >}}) section to learn how to download the data.
+See the [README](https://github.com/dfsnow/opentimes#getting-the-data) to learn how to download the data.
 
 ### Goals
 
@@ -34,8 +34,8 @@ performing live routing, etc.).
 ## FAQs
 
 This section focuses on the what, why, and how of the OpenTimes project. For
-more specific questions about the data (i.e. its coverage, structure, and
-limitations), see the [Data]({{< ref "data" >}}) section.
+more specific questions about the data (i.e. its coverage, structure,
+and limitations), see the project [README](https://github.com/dfsnow/opentimes#opentimes).
 
 <details>
 <summary>General questions</summary>
@@ -45,19 +45,18 @@ limitations), see the [Data]({{< ref "data" >}}) section.
 In this case, a travel time is just how long it takes to get from location A
 to location B while following a road or path network. Think Google Maps or
 your favorite smartphone mapping service. OpenTimes provides billions of these
-times, all pre-calculated from public data. However, unlike a smartphone map,
+times, all pre-calculated from public data. However, unlike a smartphone,
 OpenTimes does not provide the route itself, only the time between the two
 points.
 
 #### What are the times between?
 
 Times are between the _population-weighted_ centroids of United States Census
-geographies. See [Data]({{< ref "data" >}}) for a full list of geographies.
-Centroids are weighted because sometimes Census geographies are huge and their
-unweighted centroid is in the middle of a desert or mountain range. However,
-most people don't want to go to the desert, they want to go to where other
-people are. Weighting the centroids moves them closer to where people actually
-want to go (i.e. towns and cities).
+geographies. Centroids are weighted because sometimes Census geographies are
+huge and their unweighted centroid is in the middle of a desert or mountain
+range. However, most people don't want to go to the desert, they want to go
+to where other people are. Weighting the centroids moves them closer to where
+people actually want to go (i.e. towns and cities).
 
 #### What travel modes are included?
 
@@ -145,8 +144,8 @@ can access a list of all the files [here](https://data.opentimes.org).
 Files can be downloaded directly, queried with DuckDB or Arrow, or accessed
 via the (forthcoming) R or Python wrapper packages.
 
-To learn more about how to access the data, see the dedicated
-[Data]({{< ref "data" >}}) section.
+To learn more about how to access the data, see the
+[GitHub README](https://github.com/dfsnow/opentimes#opentimes).
 
 #### How much does this all cost to host?
 
@@ -203,7 +202,7 @@ Attribution is required when using OpenTimes data.
 Please see the
 [CITATION file on GitHub](https://github.com/dfsnow/opentimes/blob/master/CITATION.cff).
 You can also generate APA and BibTeX citations directly from the
-[GitHub project](https://github.com/dfsnow/opentimes) page.
+project's [GitHub page](https://github.com/dfsnow/opentimes#opentimes).
 
 #### What license do you use?
 
@@ -232,6 +231,9 @@ that work.
 I built most of OpenTimes during a six-week programming retreat at the
 [Recurse Center](https://www.recurse.com/scout/click?t=e5f3c6558aa58965ec2efe48b1b486af),
 which I highly recommend.
+
+If you need to contact me about this project, please
+reach out [via email](mailto:info@opentimes.org).
 
 ### Why did you build this?
 
