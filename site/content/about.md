@@ -11,7 +11,8 @@ for free and with no limits.
 All times are calculated using open-source software from publicly available
 data. The OpenTimes data pipelines, infrastructure, packages, and website
 are all open-source and available on [GitHub](https://github.com/dfsnow/opentimes).
-See the [README](https://github.com/dfsnow/opentimes#getting-the-data) to learn how to download the data.
+See the [README](https://github.com/dfsnow/opentimes?tab=readme-ov-file#getting-the-data)
+to learn how to download the data.
 
 ### Goals
 
@@ -35,7 +36,7 @@ performing live routing, etc.).
 
 This section focuses on the what, why, and how of the OpenTimes project. For
 more specific questions about the data (i.e. its coverage, structure,
-and limitations), see the project [README](https://github.com/dfsnow/opentimes#opentimes).
+and limitations), see the project [README](https://github.com/dfsnow/opentimes?tab=readme-ov-file#opentimes).
 
 <details>
 <summary>General questions</summary>
@@ -145,7 +146,7 @@ Files can be downloaded directly, queried with DuckDB or Arrow, or accessed
 via the (forthcoming) R or Python wrapper packages.
 
 To learn more about how to access the data, see the
-[GitHub README](https://github.com/dfsnow/opentimes#opentimes).
+[GitHub README](https://github.com/dfsnow/opentimes?tab=readme-ov-file#opentimes).
 
 #### How much does this all cost to host?
 
@@ -202,7 +203,7 @@ Attribution is required when using OpenTimes data.
 Please see the
 [CITATION file on GitHub](https://github.com/dfsnow/opentimes/blob/master/CITATION.cff).
 You can also generate APA and BibTeX citations directly from the
-project's [GitHub page](https://github.com/dfsnow/opentimes#opentimes).
+project's [GitHub page](https://github.com/dfsnow/opentimes?tab=readme-ov-file#opentimes).
 
 #### What license do you use?
 
