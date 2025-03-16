@@ -1,6 +1,6 @@
 # OpenTimes
 
-[About OpenTimes](https://opentimes.org/about) | [Interactive Map](https://opentimes.org) | [Data Directory](https://data.opentimes.org)
+### [About OpenTimes](https://opentimes.org/about) | [Interactive Map](https://opentimes.org) | [Data Directory](https://data.opentimes.org)
 
 **OpenTimes** is a database of pre-computed, point-to-point travel times between
 United States Census geographies. The travel times are stored as partitioned
@@ -139,7 +139,13 @@ Some notes on using DuckDB:
 
 ## Example queries
 
-To get the start and end coordinates of every pair, you can run a query like:
+Below are some common query patterns for OpenTimes using DuckDB.
+
+#### Get pair coordinates
+
+Match the GEOID of the Census geography to its respective coordinates from
+the `points` table. These are the coordinates _after_ they're snapped to the
+OSM network.
 
 ```sql
 SELECT
