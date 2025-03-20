@@ -221,8 +221,8 @@ from [OpenFreeMap](https://openfreemap.org). Times are calculated using
 
 ### Who is behind this project?
 
-I'm Dan Snow, a data scientist/policy wonk currently living in Chicago. My
-blog is at [sno.ws](https://sno.ws).
+I'm Dan Snow, a data scientist/policy wonk currently living in San Francisco.
+My blog is at [sno.ws](https://sno.ws).
 
 I spent some time during graduate school as an RA at the
 [Center for Spatial Data Science](https://spatial.uchicago.edu), where I helped
@@ -231,9 +231,7 @@ that work.
 
 I built most of OpenTimes during a six-week programming retreat at the
 [Recurse Center](https://www.recurse.com/scout/click?t=e5f3c6558aa58965ec2efe48b1b486af),
-which I highly recommend.
-
-If you need to contact me about this project, please
+which I highly recommend. If you need to contact me about this project, please
 reach out [via email](mailto:info@opentimes.org).
 
 ### Why did you build this?
